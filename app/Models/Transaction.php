@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     use HasFactory;
+    protected $with = ['source'];
     protected $fillable = [
         "owner_id",
         "owner_type",
@@ -17,9 +18,10 @@ class Transaction extends Model
         "appropriation_history_id",
         "data",
         "account_type",
-        "source",
+        "source_id",
         "description",
         "performed_by",
+        "fund_category"
     ];
     protected $casts = [
         'data'=>AsArrayObject::class,
@@ -31,5 +33,9 @@ class Transaction extends Model
 
     public function owner(){
         return $this->morphTo();
+    }
+
+    public function source(){
+        return $this->belongsTo(Source::class);
     }
 }

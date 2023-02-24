@@ -7,9 +7,9 @@ use App\Models\Wallet;
 
 trait Account
 {
-    public function wallet()
+    public function wallets()
     {
-        return  $this->morphOne(Wallet::class,'owner');
+        return  $this->morphToMany(Wallet::class,'appropriation');
     }
     
 

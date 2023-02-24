@@ -16,9 +16,8 @@ return new class extends Migration
         Schema::create('appropriations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("scheme_id");
-            $table->longText("department_id");
-            $table->string("name");
-            $table->unsignedBigInteger("wallet_number")->index()->nullable();
+            $table->longText("department_id");                  
+            $table->integer("appropriation_type_id");            
             $table->float("percentage_dividend");
             $table->timestamps();
             $table->softDeletes();

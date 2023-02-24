@@ -66,7 +66,7 @@ class UserController extends Controller
             $user = User::find($request->get('model_id'));            
             if($request->get('type')=='assign'){
                 $user->assignRole($request->get('role'));
-            }else{
+            }else{                
                 $user->removeRole($request->get('role'));
             }
             return response('Updated Successfully',200);

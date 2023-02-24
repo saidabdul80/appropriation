@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class TblRequest extends Model
 {
     use HasFactory;
-    protected $table ='tbl_requests';
+    protected $table ='tbl_request';
 
     public function __construct() {
         $this->connection ='central_connection';
     }
+
+
 }

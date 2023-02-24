@@ -72,7 +72,7 @@ $routename = Route::currentRouteName();
 				<svg class="bi me-2" width="40" height="32">
 					<use xlink:href="#bootstrap" />
 				</svg>
-				<span class="fs-6">Task Management</span>
+				<span class="fs-6">Account Management</span>
 			</a>
 		</span>
 		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -87,8 +87,7 @@ $routename = Route::currentRouteName();
 					</svg>
 					Home
 				</a>
-			</li>
-			@hasrole('Admin')
+			</li>			
 			<li>
 				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'active text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
@@ -99,20 +98,19 @@ $routename = Route::currentRouteName();
 			</li>
 			
 			<li>
-				<a href="#" class="nav-link {{$routename =='department'? 'active text-white':'text-dark' }}  link-dark">
+				<a href="{{route('user')}}"  class="nav-link {{$routename =='user'? 'active text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#grid" />
 					</svg>
-					#
+					User
 				</a>
-			</li>					
-			@endrole	
+			</li>								
 			<li class="nav-item dropdown ">
-				<a class="nav-link {{$routename =='task'? 'active text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink" >
+				<a href="{{route('account')}}"  class="nav-link {{$routename =='scheme'? 'active text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink" >
 					<svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#table" />
 					</svg>
-					Appropriation
+					Account
 				</a>
 				<!--
 					<ul class="nav nav-pills flex-column mb-auto">
@@ -120,8 +118,7 @@ $routename = Route::currentRouteName();
 						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'active text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>					
 					</ul> 
 				-->
-			</li>
-			@hasrole('Admin')
+			</li>			
 			<li>
 				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'active text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
@@ -129,8 +126,7 @@ $routename = Route::currentRouteName();
 					</svg>
 					Users
 				</a>
-			</li>
-			@endrole
+			</li>			
 
 		</ul>
 		<hr>

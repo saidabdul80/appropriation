@@ -15,16 +15,18 @@ return new class extends Migration
     {
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("wallet_number")->unique()->index();
+            $table->unsignedBigInteger("wallet_number")->unique()->index()->nullable();
             $table->enum("owner_type",['App\\\Models\\\Scheme','App\\\Models\\\Appropriation']);
             $table->unsignedBigInteger("owner_id");
             $table->float("balance",15,2)->default(0.00);
-            $table->date('fund_month_year')->nullable();
+            $table->string("fund_month_year")->nullable();
+            $table->string('fund_category')->default(''); 
             $table->float("safe_balance",15,2)->default(0.00);        
             $table->float("transits",15,2)->default(0.00);    //fake                
             $table->float("total_collection",15,2)->default(0.00);    
-            $table->enum("source",['BHCPF Funding (FG)','State Counterpart Funding','Premium Sales','Formal Sector Premium','TiSHIP Premium','Other Source']);
+            $table->unsignedBigInteger("source_id")->nullable();
             $table->string("description")->nullable();        
+            $table->string("token")->unique();
             $table->timestamps();
             $table->softDeletes();
         });

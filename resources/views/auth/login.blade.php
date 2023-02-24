@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8 mt-5">
-            <div class="card">
+            <div class="">
                 <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
@@ -11,12 +11,12 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                            <label for="nicare_code" class="col-md-4 col-form-label text-md-end">{{ __('NiCare Code') }}</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                                <input id="nicare_code" type="text" class="form-control @error('nicare_code') is-invalid @enderror" name="nicare_code" value="{{ old('nicare_code') }}" required autocomplete="nicare_code" autofocus>
 
-                                @error('email')
+                                @error('nicare_code')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

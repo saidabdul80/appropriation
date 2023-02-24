@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appropriation;
+use App\Models\MainWallet;
+use App\Models\Scheme;
 use App\Models\Transaction;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
@@ -16,9 +18,30 @@ class TransactionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function expenditureDetails(Request $request)
     {
-        //
+        try{
+            $request->validate([                
+                "scheme_id"=>"required",
+                "fund_category"=>"required"
+            ]);
+            $scheme_id = $request->get('scheme_id');
+            $fund_category = $request->get('fund_category');
+            $appropriations = Appropriation::where('scheme_id',$scheme_id)->get();
+            foreach($appropriations as $key => &$appropriation){
+                $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation', 'fund_category'=>$fund_category])->sum('amount');
+                $appropriation->expenditure_total_amount = $totalAmount;            
+            }            
+            return response($appropriations,200);
+        }catch(ValidationException $e){
+            return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e->getMessage(),400);                
+            }else{
+                return response('failed',400);
+            }
+        }   
     }
 
     /**
@@ -35,6 +58,33 @@ class TransactionsController extends Controller
             ]);
             $response = Transaction::where(['owner_id'=>$request->get('owner_id'),"owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(20);
             return response($response,200);
+        }catch(ValidationException $e){
+            return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e->getMessage(),400);                
+            }else{
+                return response('failed',400);
+            }
+        }   
+    }
+
+    public function appropriationTransactions(Request $request)
+    {
+        try{
+            $request->validate([                
+                "owner_id"=>"required",//
+                "owner_type"=>"required",                
+                "fund_category"=>"required",                
+            ]);
+            $owner_id = $request->get('owner_id');
+            $owner_type = $request->get('owner_type');            
+            $appropriations = Appropriation::where('scheme_id',$owner_id)->get();
+            foreach($appropriations as $key => &$appropriation){
+                $res = Transaction::where(['owner_id'=>$appropriation->id,"owner_type"=>$owner_type])->orderBy('id','desc')->get();
+                $appropriation->transactions = $res;
+            }
+            return response($appropriations,200);
         }catch(ValidationException $e){
             return response($e->getMessage(),400);   
         }catch(\Exception $e){
@@ -70,43 +120,59 @@ class TransactionsController extends Controller
     {
         try{
             $request->validate([                
-                "owner_id"=>"required",
-                "owner_type"=>"required",
+                "owner_id"=>"required",       
+                "fund_category"=>"required",
                 "transaction"=>"required"
             ]);
 
             $transaction = $request->get("transaction");        
-            $appropriation = Appropriation::find($request->get('owner_id'));            
+            $fund_category = $request->get('fund_category');
+            $owner_id = $request->get('owner_id');
+            $appropriation = Appropriation::with(['wallet'=>function($query) use($fund_category,){
+                $query->where(['fund_category'=>$fund_category, 'owner_type'=>'App\\Models\\Appropriation']);
+            }])->where('id', $owner_id)->first();
             DB::beginTransaction();
-            if($transaction['id'] !=='' && !is_null($transaction['id']) ){
-                
-                    $oldTransaction = Transaction::find($transaction['id']);
-                    //because we are updating, we are returning balance to it former state then we will rededuct later
-                    $appropriation->wallet->balance = $appropriation->wallet->balance +$oldTransaction->amount;
-                    $appropriation->wallet->save();
-                    if(($appropriation->wallet->balance +$oldTransaction->amount) < $transaction['total_amount']){
-                        throw new \Exception('Insufficient balance');                
-                    }                                                                                
-                    $oldTransaction->amount = $transaction['total_amount'];                    
-                    $oldTransaction->data = $transaction['data'];
-                    $oldTransaction->save();
-                    //we are rededucting
-                    $appropriation->wallet->balance -= $transaction['total_amount'];
-                    $appropriation->wallet->save();
-                    $response = $oldTransaction;
+                $mainWallet = MainWallet::where(['owner_id'=>$appropriation->id,'owner_type'=>'appropriation'])->first();
+                if($transaction['id'] !=='' && !is_null($transaction['id']) ){
+
+                        $oldTransaction = Transaction::find($transaction['id']);
+                        $currentWalletBalance = $appropriation->wallet->balance + $oldTransaction->amount - $transaction['total_amount'];
+                        $currentMainWalletBalance = $mainWallet->balance + $oldTransaction->amount - $transaction['total_amount'];
+                    
+                        if(($mainWallet->balance + $oldTransaction->amount) < $transaction['total_amount']){
+                            throw new \Exception('Insufficient balance');                
+                        }                                   
+
+                        $oldTransaction->amount = $transaction['total_amount'];                    
+                        $oldTransaction->data = $transaction['data'];
+                        $oldTransaction->save();
+                        
+                        $appropriation->wallet->balance = $currentWalletBalance;
+                        $appropriation->wallet->save();
+                        
+                        $mainWallet->balance += $currentMainWalletBalance;                    
+                        $mainWallet->save();
+                        
+                        $response = $oldTransaction;
                 }else{
                     if($appropriation->wallet->balance < $transaction['total_amount']){
                         throw new \Exception('Insufficient balance');                
                     }
+                    
                     $appropriation->wallet->balance -= $transaction['total_amount'];
                     $appropriation->wallet->save();
+
+                    $mainWallet->balance -= $transaction['total_amount'];                    
+                    $mainWallet->save();
+
                     $response = Transaction::create([
                         'owner_id'=>$request->get('owner_id'),
-                        "owner_type"=>$request->get('owner_type'),
+                        "owner_type"=>'appropriation',
                         "account_type"=>'balance',
                         "action"=>'debit',
                         "description"=>'',
                         "amount"=>$transaction['total_amount'],
+                        "fund_category"=> $fund_category,
                         "performed_by"=>1,
                         "data"=>$transaction['data']
                     ]);

@@ -217,6 +217,61 @@ body{
 	grid-gap: 0.5rem;
   }
   
+  
+  @media only screen and (max-width: 1145px){
+	.mobile-none{
+		display: none !important;		
+	}
+	.top-header-button{
+		width: 100%;
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(5)){
+		width: 20%
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(6)){
+		width: 16.67%
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(7)){
+		width: 14.2857%
+	}
+  }
+  @media only screen and (max-width: 991px){
+	.mobile-none{
+		display: block !important;		
+	}
+	
+  }
+
+  @media only screen and (max-width: 482px){
+	.modal-dialog{
+		margin:0px auto;
+		width: 90% !important;
+	}
+	.mobile-none{
+		display: none !important;		
+	}
+	.top-header-button{
+		width: 100%;
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(5)){
+		width: 20%
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(6)){
+		width: 16.67%
+	}
+	.top-header-button>.btn:has(>:last-child:nth-child(7)){
+		width: 14.2857%
+	}
+	.update-scheme{
+		margin: 5px auto !important;
+		width: 100%;
+	}
+
+}
+.modal-dialog{
+	margin:0px auto;
+}
+  
   /* Screen larger than 600px? 2 column */
   @media (min-width: 600px) {
 	.card-btn {		
@@ -355,6 +410,7 @@ body{
 
 ::-webkit-scrollbar {
 	width: 5px;
+	height: 5px;
   }
 	::-webkit-scrollbar-track {
 	background: #f1f1f1; 
@@ -604,4 +660,26 @@ body{
   }
   .no-event{
 	pointer-events: none;
+  }
+  .pageTitleCard {
+    position: absolute !important;
+    z-index: 1000 !important;
+    left: 0;
+    top: 0px;
+    font-weight: 600;
+}
+.dataTable {    
+    border-collapse: collapse !important;     
+}
+.visible-no{
+	visibility: hidden;
+	display: none;
+}
+
+  
+  /* The sticky class is added to the header with JS when it reaches its scroll position */
+  .sticky {
+	position: fixed;
+	top: 0;
+	width: 100%
   }

@@ -12,12 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'tasks',
-        'add_update_task',
-        'add_member_to_task',
-        'delete_task',
-        'remove_member_from_task',
-        'create_task',
+        'fund_programme',        
         'logout'
     ];
 }

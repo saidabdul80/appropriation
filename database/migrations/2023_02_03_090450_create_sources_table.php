@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('schemes', function (Blueprint $table) {
+        Schema::create('sources', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->float("premium_amount");
-            $table->enum('fund_category',['month','year']);            
-            $table->unsignedBigInteger("wallet_number")->index()->nullable();
-            $table->enum("fund_type",['api','entry'])->default('entry');
+            $table->string('name');
+            $table->string('short_name');
+            $table->unsignedBigInteger('scheme_id');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('agencies');
+        Schema::dropIfExists('sources');
     }
 };

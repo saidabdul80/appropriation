@@ -19,13 +19,21 @@
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
 	
 	<script src="/lib/js/swift-menu.js"></script>
-	<script src="/lib/js/jspdf.js"></script>
+	<!-- <script src="/lib/js/jspdf.js"></script> -->
+	<script src="/lib/js/chart.js"></script>
 
 	<script src="/lib/css/sweetalert.css"></script>
 	<!-- <script src="/lib/js/listjs/paging.js"></script> -->
 	<script src="/lib/js/datatable/datatables.min.js" defer></script>
+	<script type="text/javascript" src="/lib/js/datatable/buttons.min.js"></script>	
+	<script type="text/javascript" src="/lib/js/datatable/jszip.min.js"></script>	
 	<script type="text/javascript" src="/lib/js/datatable/pdfmake.min.js"></script>
 	<script type="text/javascript" src="/lib/js/datatable/vfs_fonts.js"></script>	
+	<script type="text/javascript" src="/lib/js/datatable/buttons.html5.min.js"></script>	
+	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>	
+	
+	
+	
 	<script type="text/javascript" src="/lib/js/select2.js"></script>
 	<script src="/lib/js/jqueryvalidate.js"></script>
 	<!-- <script src="/lib/js/propper.js"></script> -->
@@ -33,6 +41,7 @@
 	<link rel="stylesheet" href="/lib/css/boostrap4.css">
 	<script src="/lib/js/bootstrap4.js"></script>
 	<script src="/lib/js/vue.js"></script>
+	<script type="module" src="/lib/js/vue-currency.js"></script>
 	<script src="/lib/js/vue-tagins.js" ></script>
 
 	<script src="/lib/js/axios.js"></script>
@@ -134,11 +143,11 @@
 
 			var mywindow = window.open('', 'PRINT','left=0,top=0,toolbar=0,scrollbars=0,status=0');
 
-			mywindow.document.write('<html><head><title>' + title + '</title>');
+			mywindow.document.write('<html><head><title>' +'<?= agencyName()?>' + '</title>');
 			mywindow.document.write(`<link rel="stylesheet" href="{{asset('/lib/css/styles.css')}}"  >`);
 			mywindow.document.write(`<link rel="stylesheet" href="{{asset('/lib/css/boostrap4.css')}} "  >`);
 			mywindow.document.write(`</head><body>`);
-			mywindow.document.write('<h1 class="text-center">' + title + '</h1>');
+			mywindow.document.write('<h1 class="text-center">' +'<?= agencyName()?>' + '</h1>');
 			let html = $('#' + id).html();
 			html = html.replace('height', '');
 			html = html.replace('overflow', '');
@@ -153,37 +162,7 @@
 			}, 2000);
 			return true;
 		}
-		window.jsPDF = window.jspdf.jsPDF;
-
-		function Convert_HTML_To_PDF(id) {
-			var doc = new jsPDF({
-				orientation: 'l',
-				unit: 'mm',
-				format: 'a4',
-				putOnlyUsedFonts: true
-			});
-
-			// Source HTMLElement or a string containing HTML.
-			var elementHTML = document.querySelector("#" + id);
-
-			doc.html(elementHTML, {
-
-				callback: function(doc) {
-					// Save the PDF
-					window.open(doc.output('bloburl'));
-				},
-				margin: [10, 10, 10, 10],
-				autoPaging: 'text',
-				/* width: 190, //target width in the PDF document
-        windowWidth: 675, //window width in CSS pixels */
-				html2canvas: {
-					scale: 0.22
-				},
-				dpi: 300,
-			});
-
-			
-		}
+	
 		async function postDataWithAlert(url, data,elt ,wmsg='Are you sure you want to continue', smsg='success') {
 				Swal.fire({
 					text: wmsg,

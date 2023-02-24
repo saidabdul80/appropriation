@@ -15,10 +15,10 @@ $permissions = Permission::all();
 
 <div class="background px-4 py-2" style="height: 92.1vh;">
     <div class="alert-white rounded px-2 py-2 shadow bg-white">
-        <button @click="tab=1" :disabled="tab==1" class="btn btn-primary mx-2">New User</button>
-        <button @click="tab=2" :disabled="tab==2" class="btn btn-primary mx-2">Change Password</button>
-        <button @click="tab=3" :disabled="tab==3" class="btn btn-primary mx-2">Upload User</button>
-        <button @click="tab=4" :disabled="tab==4" class="btn btn-primary mx-2">Assign Rank</button>
+     <!--    <button @click="tab=1" :disabled="tab==1" class="btn btn-primary mx-2">New User</button> -->
+        <!-- <button @click="tab=2" :disabled="tab==2" class="btn btn-primary mx-2">Change Password</button> -->
+        <!-- <button @click="tab=3" :disabled="tab==3" class="btn btn-primary mx-2">Upload User</button> -->
+        <button @click="tab=4" :disabled="tab==4" class="btn btn-primary mx-2">Assign Role</button>
         <button @click="tab=5" :disabled="tab==5" class="btn btn-primary mx-2">Assign Permission</button>
     </div>
     <div  class="row w-100 mb-3  mx-auto py-3 ">
@@ -30,7 +30,8 @@ $permissions = Permission::all();
                         <li v-for="(user,i) in users.data" @click="selectUser(user,$event,i)" class="mb-2 border p-0 nav-item rounded user-items select-none" tabindex="-1">
                             <a class="px-2 py-1 nav-link text-dark a-item " style="pointer-events: none;">
                                 <div style="pointer-events: none;color: inherit;" class="m-0 p-0" aria-describedby="emailHelp">@{{user.first_name}} @{{user.surname}}</div>
-                                <div  id="emailHelp" style="pointer-events: none; color: inherit;" class="m-0 p-0 form-text">@{{user.email}}</div>
+                                <div  id="emailHelp" style="pointer-events: none; color: inherit;" class="m-0 p-0 form-text">@{{user.nicare_code}}</div>
+                                
                             </a>
                         </li>
                     </ul>                    
@@ -40,7 +41,7 @@ $permissions = Permission::all();
             </div>
         </div>
         <div v-if="tab ==1" class="user-list mx-auto  col-md-8 px-3">
-            <form class="row needs-validation shadow bg-white rounded p-3" novalidate>
+            <form  class="row needs-validation shadow bg-white rounded p-3" novalidate>
                 <div class="mb-3 col-md-6">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" class="form-control" v-model="selected_user.first_name" id="first_name" required>
@@ -97,10 +98,10 @@ $permissions = Permission::all();
                         <div class="invalid-feedback">Required</div>
                     </div>
                 </div>
-                <div class="col-12">
+              <!--   <div class="col-12">
                     <button v-if="selected_user.id==''" @click="newUser()" class="btn btn-primary" type="button">Submit form</button>
                     <button v-else @click="newUser()" class="btn btn-success" type="button">Update form</button>
-                </div>
+                </div> -->
             </form>
         </div>
         <div class="user-list mx-auto  col-md-8 px-3" v-if="tab==2">
@@ -126,8 +127,8 @@ $permissions = Permission::all();
             <di class="row needs-validation shadow bg-white rounded p-3"v>
         </div>
         <div class="user-list mx-auto  col-md-8 px-3" v-if="tab==4">
-            <div class="row needs-validation shadow bg-white rounded p-3">
-                <div v-if="selected_user.id !=''" class="col-md-12 d-flex justify-content-between">
+            <div style="overflow: auto;height: 72vh;" class="row needs-validation shadow bg-white rounded p-3">
+                <div v-if="selected_user.id !=''" class="col-md-12 ">
                     <span v-for="role in roles" class="d-flex fs-9 p-2 bg-light text-dark rounded m-2 d-inline-block">
                         <input class="me-1" @change="assignRole(role,$event)" type="checkbox" :value="role.id" v-model="role_ids"> @{{role.name.replace('_',' ')}}
                     </span>                  
@@ -138,8 +139,8 @@ $permissions = Permission::all();
             </div>
         </div>
         <div class="user-list mx-auto  col-md-8 px-3" v-if="tab==5">
-            <div class="row needs-validation shadow bg-white rounded p-3">
-                <div v-if="selected_user.id !=''" class="col-md-12 d-flex justify-content-between">
+            <div style="overflow: auto;height: 72vh;" class="row needs-validation shadow bg-white rounded p-3">
+                <div v-if="selected_user.id !=''" class="col-md-12">
                     <span v-for="permission in permissions" class="d-flex fs-9 p-2 bg-light text-dark rounded m-2 d-inline-block">
                         <input class="me-1" @change="assignPermission(permission,$event)" type="checkbox" :value="permission.id" v-model="permission_ids"> @{{permission.description}}
                     </span>                  
@@ -200,7 +201,8 @@ $permissions = Permission::all();
                 if(e.target.checked){
                     type = "assign"
                 }
-                let res = await postData('/assign_role',{model_id:this.selected_user.id,role_id:role.name,type:type},true);
+                
+                let res = await postData('/assign_role',{model_id:this.selected_user.id,role:role.name,type:type},true);
                 if(res.status == 200){                   
                     showAlert(res.data,'success')
                 }else{

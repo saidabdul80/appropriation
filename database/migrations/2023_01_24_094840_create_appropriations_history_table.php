@@ -19,9 +19,10 @@ return new class extends Migration
             $table->enum('owner_type',['scheme','department']);
             $table->float('amount',20,2);
             $table->json("appropriation");//[{name:'',percentage_dividend:'',amount:''}]
-            $table->enum("source",['BHCPF Funding (FG)','State Counterpart Funding','Premium Sales','Formal Sector Premium','TiSHIP Premium','Other Source']);
+            $table->unsignedBigInteger("source_id")->nullable();
             $table->string("description")->nullable();   
-            $table->json('fund_category');     
+            $table->string('fund_category');    
+            $table->string("fund_month_year")->nullable(); 
             $table->timestamps();
         });
     }

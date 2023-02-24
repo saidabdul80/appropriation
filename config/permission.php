@@ -158,4 +158,9 @@ return [
 
         'store' => 'default',
     ],
+
+    /*
+     * Database connection name 
+     */
+    "connection"=>"mysql"
 ];

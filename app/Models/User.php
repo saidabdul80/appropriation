@@ -24,18 +24,16 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        "email",
+        "email_address",
         "first_name",
         "surname",
-        "department_id",
-        "unit_id",
+        "department_id",        
         "gender",
-        "phone_number",
-        "department_id",
-        "unit_id",
+        "phone_number",           
         "password",
     ];
 
+    
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -50,48 +48,32 @@ class User extends Authenticatable
      * The attributes that should be cast.
      *
      * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+     */   
 
-    public function getTaskIdsAttribute(){
-        $id =  $this->id;
-        return collect(DB::select(DB::raw("SELECT id FROM `tasks` WHERE JSON_CONTAINS(members,JSON_OBJECT('id', $id))")))->pluck('id');
+     public function __construct() {
+        $this->connection ='central_connection';
     }
-
-    public function getUnitAttribute(){
-        return Unit::find($this->unit_id)?->short_name;
-    }
-
+ 
     public function getDepartmentAttribute(){
-        return Department::find($this->department_id)?->short_name;
+       /*  $department_ids = explode(',',$this->roles()->pluck('department_ids')->join(','));
+        return Department::whereIn('id',$department_ids)?->short_name; */
     }
 
-    public function getUserRolesAttribute(){
-        
+    public function getUserRolesAttribute(){        
         return $this->getRoleNames();// DB::table('roles')->whereIn('id', DB::table('model_has_roles')->where('model_id',$this->id)->pluck('role_id'))->pluck('name');
     }
 
     public function getRoleIdsAttribute(){        
-        return DB::table('model_has_roles')->where('model_id',$this->id)->pluck('role_id');
+       return $this->roles()->pluck('id');
+    }
+
+    public function getDepartmentIdsAttribute(){                
+        return explode(',',$this->roles()->pluck('department_ids')->join(','));
     }
 
     public function getPermissionIdsAttribute(){        
-        return DB::table('model_has_permissions')->where('model_id',$this->id)->pluck('permission_id');
+       return $this->permissions()->pluck('id'); 
     }
 
-    public function getViewedTasksAttribute(){
-        return ViewedTask::where('user_id', $this->id)->pluck('task_id');
-    }   
-
-    public function getTodayTasksAttribute(){        
-        return Task::whereIn('id',Accomplisher::whereDate('created_at', Carbon::today())->where('user_id', $this->id)->pluck('task_id'))->get();
-    }
-
-    public function getCompletedAttribute(){        
-        return Task::whereIn('id',Accomplisher::whereDate('created_at', Carbon::today())->where('user_id', $this->id)->pluck('task_id'))->where('completed', 'yes')->count();
-    }
-
-    protected $appends = ['completed', 'today_tasks','viewed_tasks','task_ids','unit','department','user_roles','role_ids','permission_ids'];
+    protected $appends = ['department','department_ids','user_roles','role_ids','permission_ids'];
 }

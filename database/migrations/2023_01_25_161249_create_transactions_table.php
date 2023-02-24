@@ -30,9 +30,9 @@ return new class extends Migration
                 taxes:[charges,VAT,Withholding Tax,Stamp Duty]
             }  */
             $table->enum("account_type",['balance','transits','reserve'])->default('balance');
-            $table->enum("source",['BHCPF Funding (FG)','State Counterpart Funding','Premium Sales','Other Source'])->default('Other Source');
+            $table->unsignedBigInteger("source_id")->nullable();
             $table->string("description",5000)->nullable();
-            $table->date("fund_month_year")->nullable();            
+            $table->string("fund_category")->nullable();            
             $table->unsignedBigInteger("performed_by")->nullable();
             $table->timestamps();
         });

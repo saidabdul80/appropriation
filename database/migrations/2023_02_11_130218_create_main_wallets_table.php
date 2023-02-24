@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('schemes', function (Blueprint $table) {
+        Schema::create('main_wallets', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->float("premium_amount");
-            $table->enum('fund_category',['month','year']);            
-            $table->unsignedBigInteger("wallet_number")->index()->nullable();
-            $table->enum("fund_type",['api','entry'])->default('entry');
+            $table->enum("owner_type",['appropriation','scheme']);
+            $table->unsignedBigInteger("owner_id");
+            $table->float("balance",15,2)->default(0.00);
+            $table->float("total_collection",15,2)->default(0.00);  
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('agencies');
+        Schema::dropIfExists('main_wallets');
     }
 };
