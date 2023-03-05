@@ -8,8 +8,7 @@
 	<link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css">
 	<!-- <link rel="stylesheet" href="/lib/css/bootstrap.min.css"> -->
 	<!-- 
-		-->
-		@vite(['resources/sass/app.scss', 'resources/js/app.js'])
+		-->		
 		<link rel="stylesheet" href="/lib/css/select2.css">
 		<link rel="stylesheet" href="/lib/css/swift-menu.css">
 		<link rel="stylesheet" href="/lib/js/datatable.css">
