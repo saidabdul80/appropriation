@@ -61,14 +61,14 @@ $logedInUser  = auth()->user();
                 <div class="col-lg-3 py-2">
                     @can('income')
                     <p class="m-0 fs-8">
-                        @{{selected_fund_category}} Income: <span>&#8358;</span> @{{currency(category_income)}} 
+                    <b>@{{selected_scheme.name}}</b> @{{selected_fund_category}} Income: <span>&#8358;</span> <span v-show="selected_fund_category == ''">@{{currency(selected_scheme.total_collection)}}</span> <span v-show="selected_fund_category != ''"> @{{currency(category_income)}} </span>
                     </p>
                     @endcan
                     <p class="m-0 fs-8">Available Income for @{{selected_scheme.wallet?.fund_category}} Approp.: <span>&#8358;</span> @{{currency(selected_scheme.wallet?.balance)}} </p>
                 </div>
                 <div class="col-lg-3 py-2 fs-8">
                     @can('balance')
-                    <p class="m-0 fs-8">Balance: <span>&#8358;</span> @{{currency(category_income_balance)}} </p>
+                    <p class="m-0 fs-8"><b>@{{selected_scheme.name}}</b>  Balance: <span>&#8358;</span> <span v-if="selected_fund_category == ''">@{{currency(selected_scheme.balance)}}</span>  <span v-show="selected_fund_category!= ''">@{{currency(category_income_balance)}} </span></p>
                     @endcan
                     @can('expenditure')
                     <p href="#" class="m-0 fs-8 " ><span class="display-inline-block me-2"> Expenditure: <span>&#8358;</span> 
@@ -784,14 +784,14 @@ $logedInUser  = auth()->user();
                          const { value: fund_category }  
                             = await Swal.fire({
                                 title: 'Continue Direct Funding?',                                
-                                html: `<p class='mx-0 w-100'>Select Fund category</p><input type="month"  id="fund-category-swal"  class="swal2-input w-100 m-0"><p class="fs-9 text-danger">this should take not more than 20 seconds</p>`,
+                                html: `<p class='mx-0 w-100'>Select Funding year</p><input type="month"  id="fund-category-swal"  class="swal2-input w-100 m-0"><p class="fs-9 text-danger">this will take few seconds</p>`,
                                 showCancelButton:true,
                                 confirmButtonText:'Continue',
                                 cancelButtonText:'Cancel',                                                                                    
                                 preConfirm: (fund_category) => {
                                     let value = document.getElementById('fund-category-swal').value                                    
                                     if (!value) {
-                                        Swal.showValidationMessage('Fund category field is required') 
+                                        Swal.showValidationMessage('Funding Year field is required') 
                                     }
                                     return value
                                 }
@@ -1011,10 +1011,10 @@ $logedInUser  = auth()->user();
                             //this.selected_scheme = res.data.scheme
                             this.selected_scheme.wallet.balance = 0;
                             //this.schemes[this.getSchemeIndex(this.selected_scheme)] = res.data.scheme                            
-                            this.schemeTriggered(1)
+                            //this.schemeTriggered(1)
                             //this.appropriations_history.data.unshift(res.data.appropriationHistory);
                             showAlert('Appropriation Completed');
-                            //location.reload();
+                            location.reload();
                         }else{
                             showAlert('Appropriation Failed Completed','error');
                         }
