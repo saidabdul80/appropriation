@@ -9,6 +9,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Contracts\Role;
 
@@ -24,14 +25,17 @@ use Spatie\Permission\Contracts\Role;
 */
 
 Route::get('/', function () {
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    return  redirect('/login');
+    //Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
 
 Auth::routes();
 Route::group(["middleware"=>['web','auth']],function(){
+    
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/user', [UserController::class, 'userIndex'])->name('user');
+    Route::post('/get_users', [UserController::class, 'getUsers']);
     Route::post('/new_update_user', [UserController::class, 'newUpdateUser']);
     Route::post('/change_password', [UserController::class, 'changePassword']);
     Route::post('/assign_role', [UserController::class, 'assignRole']);

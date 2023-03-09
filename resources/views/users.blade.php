@@ -23,10 +23,13 @@ $permissions = Permission::all();
     </div>
     <div  class="row w-100 mb-3  mx-auto py-3 ">
         <div class="col-md-4 mx-auto px-3">
-            <div class="shadow bg-white py-3 px-3 rounded">
-                <input type="text" class="form-control" autocomplete="no" placeholder="search">
+            <div class="shadow bg-white py-3 px-3 rounded" style="height: 100%;">
+                <div class="input-group">
+                    <input type="text"  v-model="search_keyword"  class="form-control" autocomplete="no" placeholder="search">
+                    <button class=" input-group-text btn btn-secondary" @click="fetchUsers()">Search</button>
+                </div>
                 <div class="my-2 border px-3 ">
-                    <ul class="my-3 nav nav-pills flex-column mb-auto" style="height: 400px;">
+                    <ul class="my-3 nav nav-pills flex-column mb-auto" >
                         <li v-for="(user,i) in users.data" @click="selectUser(user,$event,i)" class="mb-2 border p-0 nav-item rounded user-items select-none" tabindex="-1">
                             <a class="px-2 py-1 nav-link text-dark a-item " style="pointer-events: none;">
                                 <div style="pointer-events: none;color: inherit;" class="m-0 p-0" aria-describedby="emailHelp">@{{user.first_name}} @{{user.surname}}</div>
@@ -36,8 +39,8 @@ $permissions = Permission::all();
                         </li>
                     </ul>                    
                 </div>
-                <a :disabled="users.prev_page_url==null" :href="users.prev_page_url" class="btn btn-secondary mx-1" >Prev</a>
-                <a  :disabled="users.next_page_url==null" :href="users.next_page_url" class="btn btn-secondary mx-1">Next</a>
+                <a :disabled="users.prev_page_url==null" :href="users.prev_page_url" class="btn btn-secondary py-1 mx-1" >Prev</a>
+                <a  :disabled="users.next_page_url==null" :href="users.next_page_url" class="btn btn-secondary py-1 mx-1">Next</a>
             </div>
         </div>
         <div v-if="tab ==1" class="user-list mx-auto  col-md-8 px-3">
@@ -126,8 +129,8 @@ $permissions = Permission::all();
         <div class="user-list mx-auto  col-md-8 px-3" v-if="tab==3">
             <di class="row needs-validation shadow bg-white rounded p-3"v>
         </div>
-        <div class="user-list mx-auto  col-md-8 px-3" v-if="tab==4">
-            <div style="overflow: auto;height: 72vh;" class="row needs-validation shadow bg-white rounded p-3">
+        <div style="height:inherits;" class="user-list mx-auto  col-md-8 px-3" v-if="tab==4">
+            <div style="overflow: auto;height: 72%;" class="row needs-validation shadow bg-white rounded p-3">
                 <div v-if="selected_user.id !=''" class="col-md-12 ">
                     <span v-for="role in roles" class="d-flex fs-9 p-2 bg-light text-dark rounded m-2 d-inline-block">
                         <input class="me-1" @change="assignRole(role,$event)" type="checkbox" :value="role.id" v-model="role_ids"> @{{role.name.replace('_',' ')}}
@@ -181,8 +184,8 @@ $permissions = Permission::all();
                 },
                 password:'',
                 confirm_password:'',
-
-
+                search_keyword:'',
+                paginateBy:7,
             }
         },
         computed: {
@@ -219,6 +222,16 @@ $permissions = Permission::all();
                     showAlert(res.data,'success')
                 }else{
                     showAlert(res.data,'error')
+                }
+            },
+            async fetchUsers(e){                         
+                if (event.key === "Enter") {
+                    let res = await postData('/get_users',{search:this.search_keyword,paginateBy:this.paginateBy}, true);
+                    if(res.status == 200){                   
+                        this.users = res.data
+                    }else{
+                        showAlert(res.data,'error')
+                    }
                 }
             },
             selectUser(user,e){ 

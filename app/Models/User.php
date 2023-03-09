@@ -59,6 +59,18 @@ class User extends Authenticatable
         return Department::whereIn('id',$department_ids)?->short_name; */
     }
 
+    public function scopeSearch($query, $search)
+    {
+        if(!is_null($search)){
+            return $query->where('first_name', 'like', '%' . $search . '%')
+                ->orWhere('other_name', 'like', '%' . $search . '%')
+                ->orWhere('surname', 'like', '%' . $search . '%')
+                ->orWhere('phone_number', 'like', '%' . $search . '%')                
+                ->orWhere('email_address', 'like', '%' . $search . '%')
+                ->orWhere('nicare_code', 'like', '%' . $search . '%');
+        }
+    }
+
     public function getUserRolesAttribute(){        
         return $this->getRoleNames();// DB::table('roles')->whereIn('id', DB::table('model_has_roles')->where('model_id',$this->id)->pluck('role_id'))->pluck('name');
     }

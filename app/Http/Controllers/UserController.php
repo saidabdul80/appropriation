@@ -97,4 +97,23 @@ class UserController extends Controller
             }
         }
     }
+
+
+    public function getUsers(Request $request){
+        try{
+            $search = $request->get('search')??'';
+            if($search==''){
+                $users = User::paginate($request->get('paginageBy')??7);                      
+            }else{
+                $users = User::search($search)->paginate($request->get('paginageBy')??7);                      
+            }
+            return response($users,200);
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e->getMessage(),400);                
+            }else{
+                return response('failed',400);
+            }
+        }
+    }
 }
