@@ -25,8 +25,8 @@ $permissions = Permission::all();
         <div class="col-md-4 mx-auto px-3">
             <div class="shadow bg-white py-3 px-3 rounded" style="height: 100%;">
                 <div class="input-group">
-                    <input type="text"  v-model="search_keyword"  class="form-control" autocomplete="no" placeholder="search">
-                    <button class=" input-group-text btn btn-secondary" @click="fetchUsers()">Search</button>
+                    <input type="text"  v-model="search_keyword" @keyup="fetchUsers()"  class="form-control" autocomplete="no" placeholder="search">
+                    <button class=" input-group-text btn btn-secondary" @click="fetchUsersClick()">Search</button>
                 </div>
                 <div class="my-2 border px-3 ">
                     <ul class="my-3 nav nav-pills flex-column mb-auto" >
@@ -224,7 +224,8 @@ $permissions = Permission::all();
                     showAlert(res.data,'error')
                 }
             },
-            async fetchUsers(e){                         
+            async fetchUsers(e){            
+                             
                 if (event.key === "Enter") {
                     let res = await postData('/get_users',{search:this.search_keyword,paginateBy:this.paginateBy}, true);
                     if(res.status == 200){                   
@@ -233,6 +234,15 @@ $permissions = Permission::all();
                         showAlert(res.data,'error')
                     }
                 }
+            },
+            async fetchUsersClick(e){            
+                                                          
+                    let res = await postData('/get_users',{search:this.search_keyword,paginateBy:this.paginateBy}, true);
+                    if(res.status == 200){                   
+                        this.users = res.data
+                    }else{
+                        showAlert(res.data,'error')
+                    }                             
             },
             selectUser(user,e){ 
                 console.log(user)            
