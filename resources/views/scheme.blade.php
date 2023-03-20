@@ -114,7 +114,7 @@ $logedInUser  = auth()->user();
                                             <th>SN.</th>
                                             <th>Appropriation Name</th>
                                             <th>Department Code</th>
-                                            <th>Current Percentage (%)</th>                                                                                
+                                            <th>Current Percentage (@{{totalAppropriationPercentageValue}} %)</th>                                                                                
                                             <th>#</th>
                                         </tr>
                                     </thead>
@@ -124,7 +124,7 @@ $logedInUser  = auth()->user();
                                             <td>@{{i+1}}</td>
                                             <td>@{{appropriation.name}}</td>
                                             <td>@{{appropriation.department}}</td>
-                                            <td>@{{appropriation.percentage_dividend}}</td>                                                                              
+                                            <td>@{{returnPercentageDividend(appropriation.percentage_dividend, i)}}</td>                                                                              
                                             <td>                                    
                                                 <button @click="appropriationModalUpdate(appropriation,i)" class="me-2 btn btn-sm btn-info text-white">
                                                     <i class="bi bi-pencil-square" style="color:inherit"></i>
@@ -334,8 +334,10 @@ $logedInUser  = auth()->user();
                     <div class="input-group mt-1" id="dividendContainer">
                         <span class="input-group-text">%</span>
                         <input v-model="selected_appropriation.percentage_dividend" id="percentage_dividend" type="number" step="any"  class="form-control" aria-label="Amount (to the nearest dollar)">
-                        <!-- <span v-if="selected_appropriation.id === ''" id="totalDividend" class="input-group-text">@{{100-totalPercentage}}</span> -->
-                        <!-- <span v-else id="totalDividend" class="input-group-text">@{{parseFloat(100 - totalPercentage).toFixed(2)}}</span> -->
+                        <!-- 
+                            <span v-if="selected_appropriation.id === ''" id="totalDividend" class="input-group-text">@{{100-totalPercentage}}</span>
+                            <span v-else id="totalDividend" class="input-group-text">@{{parseFloat(100 - totalPercentage).toFixed(2)}}</span> 
+                        -->
                     </div>
                 </div>               
             </div>
@@ -646,7 +648,8 @@ $logedInUser  = auth()->user();
                         data_columns:[],
                         transactions_table_toggle:true,
                         logedInUser:<?= json_encode($logedInUser) ?>,
-                        selected_appropriations_to_appropriate:[]
+                        selected_appropriations_to_appropriate:[],
+                        totalAppropriationPercentageValue:0,
 
                     }
                 },
@@ -654,7 +657,7 @@ $logedInUser  = auth()->user();
                     this.appropriation_log.data = this.dynamic_data
                     this.data_columns = Object.keys(this.dynamic_data);                    
                 },
-                computed: {                                                       
+                computed: { 
                     pageName(){
                         return (this.switchPage == 1)?'Home Page':'Appropriation History'
                     },
@@ -710,6 +713,14 @@ $logedInUser  = auth()->user();
                     
                 },
                 methods: { 
+                    returnPercentageDividend(perc,i){
+                        if(i == 0){
+                            this.totalAppropriationPercentageValue = perc
+                        }else{
+                            this.totalAppropriationPercentageValue += perc
+                        }
+                        return perc
+                    },
                     selectAllAppropriation(appropriations, e){
                         if(e.target.checked){                                                   
                             this.selected_appropriations_to_appropriate = appropriations.map((item)=>item.id)
