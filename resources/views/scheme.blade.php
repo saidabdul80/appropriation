@@ -10,30 +10,25 @@ $dyear = 2020;
 $cyear = date('Y');
 $years  =  array();
 $logedInUser  = auth()->user();
-/* for ($i=$dyear; $i <= $cyear ; $i++) { 
-    $years[] = $i;
-} */
 ?>
 @extends('layouts/master')
 @section('content')
 
+<div class="mb-2 mt-2" style="position:fixed; top:5px;left:5px; z-index:900000001">                   
+    <select @change="schemeTriggered(1)" v-model="selected_scheme" class=" mx-1 form-control d-inline-block" style="width: 240px;" placeholder="Select Scheme">            
+        <option :value="{index:'', id:'', name:'', appropriations:[]}" style="color:#ccc;">Select a Scheme</option>
+        <option v-for="(scheme,i) in schemes" :value="scheme">@{{scheme?.name}}</option>
+    </select>                       
+    <button v-if="getSchemeIndex(selected_scheme) !== ''" @click="schemeModalUpdate()" class="update-scheme btn fs-8 mx-1 btn-success d-inline-block">Update Programme <!-- Scheme->Programme --></button>
+</div>
 <div class="background px-4 pb-2 pt-3" style="height: 92.1vh;z-index:1"> 
 <div class=" bg-light pageTitleCard w-100 fs-9 text-danger ps-4">::@{{pageName}}</div>
     <div class="position-relative" >
         
-        <div class="mb-2 mt-2">                   
-            <select @change="schemeTriggered(1)" v-model="selected_scheme" class=" mx-1 form-control d-inline-block" style="width: 240px;">            
-                <option v-for="(scheme,i) in schemes" :value="scheme">@{{scheme?.name}}</option>
-            </select>            
-           <!--  <button @click="schemeModalAdd()" class="btn mx-1 btn-primary d-inline-block">New Scheme</button> -->
-            <button v-if="getSchemeIndex(selected_scheme) !== ''" @click="schemeModalUpdate()" class="update-scheme btn fs-8 mx-1 btn-success d-inline-block">Update Programme <!-- Scheme->Programme --></button>
-        </div>
-        <div class=" bg-white px-3 rounded shadow py-2">            
-            <div class="mb-3 row shadow">
+        <div class="py-2 ">            
+            <div class="mb-3 mx-1 row bg-white rounded shadow">
                 <div class="col-lg-6 p-0 d-flex">
-                    <div class="btn-group top-header-button" role="group" aria-label="Basic example">
-                        <!-- <button v-if="getSchemeIndex(selected_scheme) !== ''" title="Archive" @click="showArchived()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
-                        <i class="bi bi-archive"></i><span class="mobile-none">Archive</span></button> -->
+                    <div class="btn-group top-header-button" role="group" aria-label="Basic example">                        
                         @can('new_appropriation')
                         <button v-if="getSchemeIndex(selected_scheme) !== ''" title="New Appropriation" @click="appropriationModalAdd()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
                             <i class="bi bi-journals"></i><span class="mobile-none">New Approp.</span></button>
@@ -41,11 +36,7 @@ $logedInUser  = auth()->user();
                         @can('projection')
                         <button v-if="getSchemeIndex(selected_scheme) !== ''" title="Projection" @click="projectionModal()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
                             <i class="bi bi-collection"></i><span class="mobile-none">Projection</span></button>
-                        @endcan
-                        <!-- @can('appropriate')
-                        <button v-if="getSchemeIndex(selected_scheme) !== ''" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
-                            <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span></button>
-                        @endcan -->
+                        @endcan                    
                         @can('fund_scheme')
                         <button v-if="getSchemeIndex(selected_scheme) !== ''" title="Fund Programme" @click="fundModal()" class="m-0 btn fs-9 btn-secondary text-white d-inline-block">
                         <i class="bi bi-database-down"></i><span class="mobile-none">Credit</span></button>
@@ -79,223 +70,221 @@ $logedInUser  = auth()->user();
                     </p>
                     @endcan
                 </div>
-            </div>
-             <!-- <h5 class="py-1 px-2 mb-0 bg-secondary text-white shadow rounded">Selected Scheme: @{{selected_scheme.name}}</h5> -->
-            <div class="mb-3 input-group">
-                <span class="input-group-text">Funding Year</span>
-                <select  @change="monthYearTriggered(1)" v-model="selected_fund_category" class="form-control">
-                    <option value=""> </option>
-                    <option v-for="month_year in fund_categories">@{{month_year}}</option>
-                </select>
-            </div>
-            <ul  v-show="switchPage==1" class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a @click="switchPageOne=0" class="fs-8 nav-link" id="home-tab2" data-bs-toggle="tab" href="#home2" role="tab" aria-controls="home2" aria-selected="true">
-                        Appropriations</a>
-                </li>
-                <li  class="nav-item" role="presentation">
-                    <a @click="switchPageOne=1" class="fs-8 nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">
-                        Appropriated Income </a>
-                </li>
-                <li v-if="appropriations?.length>0" class="nav-item" role="presentation">
-                    <a @click="switchPageOne=2" class="fs-8 nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
-                    <strong> @{{selected_fund_category}}</strong>  Appropriated Income <!--   Approp. Current Balance --></a>
-                </li>                
-            </ul>
-            <div id="pagerContainer" style="overflow:auto; height:54.5vh;">               
-                <div  v-show="switchPage===1" style="height: inherit">                 
-                    <div v-show="switchPageOne==0" style="height: inherit">
-                        <div style="height: inherit;display:flex;flex-direction:column">
-                            <div style="height: 85%;overflow: auto;">                    
-                                <table class="table">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th><input v-if="selected_scheme.appropriations.length>0"  type="checkbox" @click="selectAllAppropriation(selected_scheme.appropriations, $event)"></th>
-                                            <th>SN.</th>
-                                            <th>Appropriation Name</th>
-                                            <th>Department Code</th>
-                                            <th>Current Percentage (@{{totalAppropriationPercentageValue}} %)</th>                                                                                
-                                            <th>#</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(appropriation,i) in selected_scheme.appropriations">
-                                            <td><input type="checkbox" :value="appropriation.id" v-model="selected_appropriations_to_appropriate"></td>
-                                            <td>@{{i+1}}</td>
-                                            <td>@{{appropriation.name}}</td>
-                                            <td>@{{appropriation.department}}</td>
-                                            <td>@{{returnPercentageDividend(appropriation.percentage_dividend, i)}}</td>                                                                              
-                                            <td>                                    
-                                                <button @click="appropriationModalUpdate(appropriation,i)" class="me-2 btn btn-sm btn-info text-white">
-                                                    <i class="bi bi-pencil-square" style="color:inherit"></i>
-                                                </button>                                                                                  
-                                            </td>                        
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class=" bg-white p-3" style="height: 15%;">
-                                @can('appropriate')
-                                <button v-if="selected_scheme?.id !== ''" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
-                                    <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span></button>
-                                @endcan
+            </div>  
+            <div class="bg-white rounded shadow " style="height: 77vh;">
+                <div class="mb-3 input-group">
+                    <span class="input-group-text">Funding Year</span>
+                    <select  @change="monthYearTriggered(1)" v-model="selected_fund_category" class="form-control" placeholder="Select funding year">
+                        <option value=""> </option>
+                        <option v-for="month_year in fund_categories">@{{month_year}}</option>
+                    </select>
+                </div>
+                <ul  v-show="switchPage==1" class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a @click="switchPageOne=0" class="fs-8 nav-link" id="home-tab2" data-bs-toggle="tab" href="#home2" role="tab" aria-controls="home2" aria-selected="true">
+                            Appropriations</a>
+                    </li>
+                    <li  class="nav-item" role="presentation">
+                        <a @click="switchPageOne=1" class="fs-8 nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">
+                            Appropriated Income </a>
+                    </li>
+                    <li v-if="appropriations?.length>0" class="nav-item" role="presentation">
+                        <a @click="switchPageOne=2" class="fs-8 nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
+                        <strong> @{{selected_fund_category}}</strong>  Appropriated Income <!--   Approp. Current Balance --></a>
+                    </li>                
+                </ul>
+                <div id="pagerContainer" style="overflow:auto; height:54.5vh;">               
+                    <div  v-show="switchPage===1" style="height: inherit">                 
+                        <div v-show="switchPageOne==0" style="height: inherit">
+                            <div style="height: inherit;display:flex;flex-direction:column">
+                                <div style="height: 85%;overflow: auto;">                    
+                                    <table class="table">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th><input v-if="selected_scheme.appropriations.length>0"  type="checkbox" @click="selectAllAppropriation(selected_scheme.appropriations, $event)"></th>
+                                                <th>SN.</th>
+                                                <th>Appropriation Name</th>
+                                                <th>Department Code</th>
+                                                <th>Current Percentage (@{{totalAppropriationPercentageValue}} %)</th>                                                                                
+                                                <th>#</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(appropriation,i) in selected_scheme.appropriations">
+                                                <td><input type="checkbox" :value="appropriation.id" v-model="selected_appropriations_to_appropriate"></td>
+                                                <td>@{{i+1}}</td>
+                                                <td>@{{appropriation.name}}</td>
+                                                <td>@{{appropriation.department}}</td>
+                                                <td>@{{returnPercentageDividend(appropriation.percentage_dividend, i)}}</td>                                                                              
+                                                <td>                                    
+                                                    <button @click="appropriationModalUpdate(appropriation,i)" class="me-2 btn btn-sm btn-info text-white">
+                                                        <i class="bi bi-pencil-square" style="color:inherit"></i>
+                                                    </button>                                                                                  
+                                                </td>                        
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class=" bg-white p-3" style="height: 15%;">
+                                    @can('appropriate')
+                                    <button v-if="selected_scheme?.id !== ''" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
+                                        <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span></button>
+                                    @endcan
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <table v-show="switchPageOne==1" class="table">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>SN.</th>
-                                <th>Appropriation Name</th>
-                                <th>Department Code</th>
-                                <th>Current Percentage (%)</th>                                                                           
-                                <th>Total Appropriation Income Accross Funding Years(<span>&#8358;</span>)</th>      
-                                <th>Total Balance Accross Funding Years (<span>&#8358;</span>) </th>                                                      
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(appropriation,i) in selected_scheme.appropriations">
-                                <td>@{{i+1}}</td>
-                                <td>@{{appropriation.name}}</td>
-                                <td>@{{appropriation.department}}</td>
-                                <td>@{{appropriation.percentage_dividend}}</td>                                                                          
-                                <td>@{{currency(appropriation.total_collection)}}</td>                                       
-                                <td>@{{currency(appropriation.balance)}}</td>                                                                
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table v-show="switchPageOne==2" class="table table-sm">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>SN.</th>
-                                <th>Appropriation Name</th>
-                                <th>Department Code</th>        
-                                <th>Appropriation Income (<span>&#8358;</span>) </th>                                                                       
-                                <th>Balance (<span>&#8358;</span>) </th>                                                        
-                                <th>#</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(appropriation,i) in appropriations">
-                                <td>@{{i+1}}</td>
-                                <td>@{{appropriation.name}}</td>
-                                <td>@{{appropriation.department}}</td>       
-                                <td>@{{currency(getAppropriationIncome(appropriation.name))}}</td>                                                                                                              
-                                <td>@{{currency(appropriation.wallet?.balance)}}</td>                                                                                                                       
-                                <td>
-                                    <button @click="appropriationLogPage(appropriation,i)" class="btn me btn-sm btn-success text-white">
-                                        <i class="bi bi-columns-gap" style="color:inherit"></i>
-                                    </button>                                                             
-                                </td>                        
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div v-show="switchPage===2">
-                    <div v-for="(key,i) in Object.keys(appropriationHistories)" :id="'appro_'+i">
-                        <button @click="printE('appro_'+i)" class="btn btn-sm btn-light pull-right">Print</button>
-                        <p>@{{key}}</p>
-                        <table id="myHeader" class="table table-bordered bg-secondary text-white mb-0">
-                            <tbody>
+                        <table v-show="switchPageOne==1" class="table">
+                            <thead class="bg-light">
                                 <tr>
-                                    <td>Source: @{{appInfo(appropriationHistories[key],'source')}}</td>
-                                    <td>Description: @{{appInfo(appropriationHistories[key],'description')}}</td>                                  
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <b> Total Appropriated (Income): <span>&#8358;</span>@{{currency(appInfo(appropriationHistories[key],'amount'))}}</b>                        
-                                    </td>
-                                    <td>Programme: @{{selected_scheme.name}}</td>
-                                </tr>
-                            </tbody>                            
-                        </table>
-                        <table class="table table-sm bg-white table-bordered shadow-sm w-100" style="width:100%">
-                            <thead  class="bg-light">
-                                <tr>
-                                    <th>S/N</th>
-                                    <th>Approprations Details</th>
-                                    <th>Approriations</th>                                    
+                                    <th>SN.</th>
+                                    <th>Appropriation Name</th>
+                                    <th>Department Code</th>
+                                    <th>Current Percentage (%)</th>                                                                           
+                                    <th>Total Appropriation Income Accross Funding Years(<span>&#8358;</span>)</th>      
+                                    <th>Total Balance Accross Funding Years (<span>&#8358;</span>) </th>                                                      
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(objs,i) in appropriationHistories[key]" >
+                                <tr v-for="(appropriation,i) in selected_scheme.appropriations">
                                     <td>@{{i+1}}</td>
-                                    <td>
-                                        <p class="mb-0"><b>Amount:</b> <span>&#8358;</span>@{{ currency(objs.amount)}}</p>
-                                        <p class="mb-0"><b>Appropriation Date:</b> @{{objs.created_at}}</p>
-                                        <p class="" v-if="selected_scheme.fund_category =='month'"><b>Funding Month:</b> @{{objs.fund_month_year}}</p>                                                                                
-                                    </td>
-                                    <td>
-                                        <table class="table tabl-sm table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Percentage Dividend</th>
-                                                    <th>Amount (<span>&#8358;</span>)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(obj,i) in objs.appropriation">
-                                                    <td>@{{obj.name}}</td>                                                    
-                                                    <td>@{{obj.percentage_dividend}}</td>                                                    
-                                                    <td>@{{currency(obj?.amount)}}</td>                                                    
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                  <!--   <td>@{{obj.appropriation.name}}</td>
-                                    <td>@{{obj.appropriation.percentage_dividend}}</td>
-                                    <td>@{{currency(obj.appropriation?.amount)}}</td> -->
+                                    <td>@{{appropriation.name}}</td>
+                                    <td>@{{appropriation.department}}</td>
+                                    <td>@{{appropriation.percentage_dividend}}</td>                                                                          
+                                    <td>@{{currency(appropriation.total_collection)}}</td>                                       
+                                    <td>@{{currency(appropriation.balance)}}</td>                                                                
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                <div v-show="switchPage===3" class="position-relative p-2 border" id="transaction-sheet">
-                    <div class="btn-group" role="group" aria-label="Basic example2">
-                        <button @click="switchPageFunc(1)" class="btn fs-9 btn-primary text-white" style="">Back to Appropriation</button>
-                 
-                    </div>                    
-                    <h4 class="text-center"><b>@{{selected_appropriation.name}} / @{{selected_appropriation.department}}</b> Transactions</h4>
-                    <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span> @{{currency(selected_appropriation_balance)}}</p>
-                    <p class="inline-block mb-2"><b>Total Expenditure: <span>&#8358;</span></b> @{{currency(total_expenditure_appropriation)}}</p>
-                    <div style="overflow: auto;" v-if="transactions_table_toggle">
-                        <table class=" fs-8 table-bordered transactions-tables table table-sm table-hover" style="width:130%">
-                            <thead>
+                        <table v-show="switchPageOne==2" class="table table-sm">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th>S/N</th>
-                                    <th v-for="header in Object.keys(dynamic_data)">
-                                        @{{header.replaceAll('_',' ')}}
-                                    </th>
-                                    <th>Total Amount</th>
+                                    <th>SN.</th>
+                                    <th>Appropriation Name</th>
+                                    <th>Department Code</th>        
+                                    <th>Appropriation Income (<span>&#8358;</span>) </th>                                                                       
+                                    <th>Balance (<span>&#8358;</span>) </th>                                                        
                                     <th>#</th>
                                 </tr>
                             </thead>
-                            <tbody >                                
-                             <!--    @{{resetTotalExpenditureForAppropriation()}} -->
-                                <tr v-for="(appr,i) in appropriation_transactions?.data" v-memo="appropriation_transactions?.data">                                    
-                                    <td>@{{parseInt(i+1)}} </td>
-                                    <td v-for="key in Object.keys(appr.data)">
-                                        <span v-if="key.includes('₦')">
-                                                @{{currency(appr.data[key])}}
-                                        </span>
-                                        <span v-else>
-                                            <span v-if="appr.data[key].type =='number'">@{{currency(appr.data[key].value)}}</span>
-                                            <span v-else>@{{appr.data[key].value}}</span>                                    
-                                        </span>
-                                    </td>
-                                    <td><i style="visibility: hidden;"> @{{i==0?total_expenditure_appropriation=0:''}}</i> @{{currency(appr.amount)}}   @{{getTotalExpenditureForAppropriation(appr.amount)}}</td>                                
+                            <tbody>
+                                <tr v-for="(appropriation,i) in appropriations">
+                                    <td>@{{i+1}}</td>
+                                    <td>@{{appropriation.name}}</td>
+                                    <td>@{{appropriation.department}}</td>       
+                                    <td>@{{currency(getAppropriationIncome(appropriation.name))}}</td>                                                                                                              
+                                    <td>@{{currency(appropriation.wallet?.balance)}}</td>                                                                                                                       
                                     <td>
-                                        <button @click="editAppropriationTransaction(appr,i)" class="btn btn-info text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
-                                        <button @click="deleteAppropriationTransaction(appr.id,i)"  class="btn btn-danger btn-sm"><i class="fs-9 bi bi-trash"></i></button>
-                                    </td>
+                                        <button @click="appropriationLogPage(appropriation,i)" class="btn me btn-sm btn-success text-white">
+                                            <i class="bi bi-columns-gap" style="color:inherit"></i>
+                                        </button>                                                             
+                                    </td>                        
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <div v-show="switchPage===2">
+                        <div v-for="(key,i) in Object.keys(appropriationHistories)" :id="'appro_'+i">
+                            <button @click="printE('appro_'+i)" class="btn btn-sm btn-light pull-right">Print</button>
+                            <p>@{{key}}</p>
+                            <table id="myHeader" class="table table-bordered bg-secondary text-white mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td>Source: @{{appInfo(appropriationHistories[key],'source')}}</td>
+                                        <td>Description: @{{appInfo(appropriationHistories[key],'description')}}</td>                                  
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <b> Total Appropriated (Income): <span>&#8358;</span>@{{currency(appInfo(appropriationHistories[key],'amount'))}}</b>                        
+                                        </td>
+                                        <td>Programme: @{{selected_scheme.name}}</td>
+                                    </tr>
+                                </tbody>                            
+                            </table>
+                            <table class="table table-sm bg-white table-bordered shadow-sm w-100" style="width:100%">
+                                <thead  class="bg-light">
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Approprations Details</th>
+                                        <th>Approriations</th>                                    
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(objs,i) in appropriationHistories[key]" >
+                                        <td>@{{i+1}}</td>
+                                        <td>
+                                            <p class="mb-0"><b>Amount:</b> <span>&#8358;</span>@{{ currency(objs.amount)}}</p>
+                                            <p class="mb-0"><b>Appropriation Date:</b> @{{objs.created_at}}</p>
+                                            <p class="" v-if="selected_scheme.fund_category =='month'"><b>Funding Month:</b> @{{objs.fund_month_year}}</p>                                                                                
+                                        </td>
+                                        <td>
+                                            <table class="table tabl-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Percentage Dividend</th>
+                                                        <th>Amount (<span>&#8358;</span>)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(obj,i) in objs.appropriation">
+                                                        <td>@{{obj.name}}</td>                                                    
+                                                        <td>@{{obj.percentage_dividend}}</td>                                                    
+                                                        <td>@{{currency(obj?.amount)}}</td>                                                    
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>                             
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div v-show="switchPage===3" class="position-relative p-2 border" id="transaction-sheet">
+                        <div class="btn-group" role="group" aria-label="Basic example2">
+                            <button @click="switchPageFunc(1)" class="btn fs-9 btn-primary text-white" style="">Back to Appropriation</button>
+                    
+                        </div>                    
+                        <h4 class="text-center"><b>@{{selected_appropriation.name}} / @{{selected_appropriation.department}}</b> Transactions</h4>
+                        <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span> @{{currency(selected_appropriation_balance)}}</p>
+                        <p class="inline-block mb-2"><b>Total Expenditure: <span>&#8358;</span></b> @{{currency(total_expenditure_appropriation)}}</p>
+                        <div style="overflow: auto;" v-if="transactions_table_toggle">
+                            <table class=" fs-8 table-bordered transactions-tables table table-sm table-hover" style="width:130%">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th v-for="header in Object.keys(dynamic_data)">
+                                            @{{header.replaceAll('_',' ')}}
+                                        </th>
+                                        <th>Total Amount</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+                                <tbody >                                
+                                <!--    @{{resetTotalExpenditureForAppropriation()}} -->
+                                    <tr v-for="(appr,i) in appropriation_transactions?.data" v-memo="appropriation_transactions?.data">                                    
+                                        <td>@{{parseInt(i+1)}} </td>
+                                        <td v-for="key in Object.keys(appr.data)">
+                                            <span v-if="key.includes('₦')">
+                                                    @{{currency(appr.data[key])}}
+                                            </span>
+                                            <span v-else>
+                                                <span v-if="appr.data[key].type =='number'">@{{currency(appr.data[key].value)}}</span>
+                                                <span v-else>@{{appr.data[key].value}}</span>                                    
+                                            </span>
+                                        </td>
+                                        <td><i style="visibility: hidden;"> @{{i==0?total_expenditure_appropriation=0:''}}</i> @{{currency(appr.amount)}}   @{{getTotalExpenditureForAppropriation(appr.amount)}}</td>                                
+                                        <td>
+                                            <button @click="editAppropriationTransaction(appr,i)" class="btn btn-info text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
+                                            <button @click="deleteAppropriationTransaction(appr.id,i)"  class="btn btn-danger btn-sm"><i class="fs-9 bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </div>           
         </div>
 
         <div  class="swift swift-bottom-left">
@@ -775,7 +764,7 @@ $logedInUser  = auth()->user();
                         var myModal = new bootstrap.Modal(document.getElementById('expenditure-details-modal'), {})
                         myModal.show()                            
                         let res = await postData('/fetch_expenditures',{scheme_id:this.selected_scheme.id,fund_category:this.selected_fund_category},true)
-                        if(res.status == 200){
+                        if(res?.status == 200){
                             this.expenditure_details = res.data                            
                         }else{
                             showAlert('something went wrong');
@@ -1020,10 +1009,7 @@ $logedInUser  = auth()->user();
                         let res = await postData('/appropriate',{scheme_id:this.selected_scheme.id,appropriation_ids:this.selected_appropriations_to_appropriate},true);
                         if(res.status == 200){
                             //this.selected_scheme = res.data.scheme
-                            this.selected_scheme.wallet.balance = 0;
-                            //this.schemes[this.getSchemeIndex(this.selected_scheme)] = res.data.scheme                            
-                            //this.schemeTriggered(1)
-                            //this.appropriations_history.data.unshift(res.data.appropriationHistory);
+                            this.selected_scheme.wallet.balance = 0;                      
                             showAlert('Appropriation Completed');
                             location.reload();
                         }else{
@@ -1171,22 +1157,7 @@ $logedInUser  = auth()->user();
                         this.schemes[this.getSchemeIndex(this.selected_scheme)].appropriations.push(this.selected_appropriation);
                         $("#totalDividend").removeClass('bg-danger text-white')
                         $(".errorMsg").remove()
-                                                
-                        /* if(this.totalPercentage >100 && this.selected_appropriation.id === '' ){                            
-                            $("#totalDividend").addClass('bg-danger text-white')
-                            this.schemes[this.getSchemeIndex(this.selected_scheme)].appropriations.pop()
-                            $("#dividendContainer").after(this.errorMessage('Invalid Value: left accepted value is '+ (100-this.totalPercentage)))
-                            return 0
-                        } */
-                        /* else{
-                            let left = 100 + this.selected_appropriation_old_percentage_dividend - this.selected_appropriation.percentage_dividend
-                            if(left > 100){
-                                $("#totalDividend").addClass('bg-danger text-white')
-                                this.schemes[this.getSchemeIndex(this.selected_scheme)].appropriations.pop()
-                                $("#dividendContainer").after(this.errorMessage('Invalid Value: left accepted value is '+ (100-this.totalPercentage)))
-                                return 0
-                            }
-                        }     */       
+                                                                   
                         if(this.selected_appropriation.id !== ''){
                             this.schemes[this.getSchemeIndex(this.selected_scheme)].appropriations.pop()
                         }
@@ -1214,11 +1185,7 @@ $logedInUser  = auth()->user();
                     
                     },
                     switchPageFunc(num){                        
-                        this.switchPage = num
-                        /* if(num==1){
-                            //front data
-                            localStorage.removeItem('selected_appropriation')
-                        } */
+                        this.switchPage = num                    
                         localStorage.setItem('pageNum',num)
                     },                    
                     async appropriationLogPage(appropriation,i){
@@ -1262,17 +1229,7 @@ $logedInUser  = auth()->user();
                         this.appropriation_log.data = this.dynamic_data;
                         var myModal3 = new bootstrap.Modal(document.getElementById('debit-modal'), {})
                         myModal3.show()
-                        this.markSelectedDynamicField()
-                        //this.dynamicDataSelected = []
-                       /*  let $this = this
-                        this.reloadDynamicData = false
-                        setTimeout(()=>{
-                            $this.reloadDynamicData = true
-                        },100) */
-                     /*   $('#dynamicData').val(null)
-                        setTimeout(function(){
-                            $('#dynamicData').select2();
-                        },100) */
+                        this.markSelectedDynamicField()                
                     },
                     async projectionModal() {                      
                         let res = await postData('/get_appropriations_projection',{scheme_id:this.selected_scheme.id},true);
@@ -1415,25 +1372,6 @@ $logedInUser  = auth()->user();
                     $(this).find('i').toggleClass('bi-chevron-up')
                     $('.cards-container').slideToggle();
                 })
-/* 
-                setTimeout(()=>{
-
-                
-                    // Get the header                
-                    window.header = document.getElementById("myHeader");                    
-                    // Get the offset position of the navbar
-                    window.sticky = header.offsetTop;
-                    window.pager = document.getElementById('pagerContainer');
-                    // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
-                    function myFunction() {                        
-                        if (pager.pageYOffset > sticky) {
-                            header.classList.add("sticky");
-                        } else {
-                            header.classList.remove("sticky");
-                        }
-                    }
-                    pager.addEventListener("scroll", function() {myFunction()});
-                },3000) */
             })
         </script>
         @endsection

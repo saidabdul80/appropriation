@@ -17,11 +17,14 @@
 		<!-- <link rel="stylesheet" href="/lib/css/vue-tagin.css"> -->
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
 	
+	<link rel="stylesheet"  href="/lib/css/style3.css">
+	<link rel="stylesheet" href="/lib/css/boostrap4.css">
+	@if(request()->path() !== 'login')
+	
 	<script src="/lib/js/swift-menu.js"></script>
 	<!-- <script src="/lib/js/jspdf.js"></script> -->
 	<script src="/lib/js/chart.js"></script>
-
-	<script src="/lib/css/sweetalert.css"></script>
+	<link rel="stylesheet"  href="/lib/css/sweetalert.css">
 	<!-- <script src="/lib/js/listjs/paging.js"></script> -->
 	<script src="/lib/js/datatable/datatables.min.js" defer></script>
 	<script type="text/javascript" src="/lib/js/datatable/buttons.min.js"></script>	
@@ -37,16 +40,17 @@
 	<script src="/lib/js/jqueryvalidate.js"></script>
 	<!-- <script src="/lib/js/propper.js"></script> -->
 	<script src="/lib/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="/lib/css/boostrap4.css">
+	
 	<script src="/lib/js/bootstrap4.js"></script>
 	<script src="/lib/js/vue.js"></script>
 	<script type="module" src="/lib/js/vue-currency.js"></script>
 	<script src="/lib/js/vue-tagins.js" ></script>
-
+	
 	<script src="/lib/js/axios.js"></script>
 	<!-- <script src="/lib/js/datatable.css"></script> -->
 	<link rel="stylesheet" href="/lib/css/styles.css">
 	<script src="/lib/js/fullscreen.js"></script>
+	@endif
 	<!-- CSRF Token -->
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 

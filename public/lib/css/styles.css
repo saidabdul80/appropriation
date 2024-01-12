@@ -139,6 +139,7 @@ body{
   .lh-tight { line-height: 1.25; }
   
   .background{
+	height: 100vh !important;
 	/* background: #F7F7F7; */
 	/* background-color: #1111; */
 	position: relative;
@@ -151,7 +152,7 @@ body{
 	background-color: var(--primary2);
 	box-shadow: 1px 0px 3px #000;
 	width: 100%;
-	content: '© 2023 Project TMS';
+	content: '© 2023 Account';
 	color:white;
 	text-align: center;
 	display: flex;
