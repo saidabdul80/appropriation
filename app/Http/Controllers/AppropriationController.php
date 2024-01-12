@@ -26,7 +26,7 @@ class AppropriationController extends Controller
         try{
             $request->validate([                
                 "scheme_id"=>"required",       
-                "fund_category"=>"required"         
+//                "fund_category"=>""         
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');

@@ -14,7 +14,7 @@ $logedInUser  = auth()->user();
 @extends('layouts/master')
 @section('content')
 
-<div class="mb-2 mt-2" style="position:fixed; top:5px;left:5px; z-index:900000001">                   
+<div class="mb-2 mt-2 bg-white" style="position:fixed; top:5px;z-index:9; padding-left:20px">                   
     <select @change="schemeTriggered(1)" v-model="selected_scheme" class=" mx-1 form-control d-inline-block" style="width: 240px;" placeholder="Select Scheme">            
         <option :value="{index:'', id:'', name:'', appropriations:[]}" style="color:#ccc;">Select a Scheme</option>
         <option v-for="(scheme,i) in schemes" :value="scheme">@{{scheme?.name}}</option>
@@ -22,7 +22,7 @@ $logedInUser  = auth()->user();
     <button v-if="getSchemeIndex(selected_scheme) !== ''" @click="schemeModalUpdate()" class="update-scheme btn fs-8 mx-1 btn-success d-inline-block">Update Programme <!-- Scheme->Programme --></button>
 </div>
 <div class="background px-4 pb-2 pt-3" style="height: 92.1vh;z-index:1"> 
-<div class=" bg-light pageTitleCard w-100 fs-9 text-danger ps-4">::@{{pageName}}</div>
+<div class=" bg-light pageTitleCard w-15 fs-9 text-danger ps-4">::@{{pageName}}</div>
     <div class="position-relative" >
         
         <div class="py-2 ">            
@@ -51,22 +51,22 @@ $logedInUser  = auth()->user();
                 </div>
                 <div class="col-lg-3 py-2">
                     @can('income')
-                    <p class="m-0 fs-8">
+                    <p class="m-0 fs-9">
                     <b>@{{selected_scheme.name}}</b> @{{selected_fund_category}} Income: <span>&#8358;</span> <span v-show="selected_fund_category == ''">@{{currency(selected_scheme.total_collection)}}</span> <span v-show="selected_fund_category != ''"> @{{currency(category_income)}} </span>
                     </p>
                     @endcan
-                    <p class="m-0 fs-8">Available Income for @{{selected_scheme.wallet?.fund_category}} Approp.: <span>&#8358;</span> @{{currency(selected_scheme.wallet?.balance)}} </p>
+                    <p class="m-0 fs-9">Available Income for @{{selected_scheme.wallet?.fund_category}} Approp.: <span>&#8358;</span> @{{currency(selected_scheme.wallet?.balance)}} </p>
                 </div>
-                <div class="col-lg-3 py-2 fs-8">
+                <div class="col-lg-3 py-2 ">
                     @can('balance')
-                    <p class="m-0 fs-8"><b>@{{selected_scheme.name}}</b>  Balance: <span>&#8358;</span> <span v-if="selected_fund_category == ''">@{{currency(selected_scheme.balance)}}</span>  <span v-show="selected_fund_category!= ''">@{{currency(category_income_balance)}} </span></p>
+                    <p class="m-0 fs-9"><b>@{{selected_scheme.name}}</b>  Balance: <span>&#8358;</span> <span v-if="selected_fund_category == ''">@{{currency(selected_scheme.balance)}}</span>  <span v-show="selected_fund_category!= ''">@{{currency(category_income_balance)}} </span></p>
                     @endcan
                     @can('expenditure')
-                    <p href="#" class="m-0 fs-8 " ><span class="display-inline-block me-2"> Expenditure: <span>&#8358;</span> 
+                    <p href="#" class="m-0 fs-9 " ><span class="display-inline-block me-2"> Expenditure: <span>&#8358;</span> 
                         <span v-if="getCategoryIncomeBalance == 0">0.00</span> 
                         <span v-else>@{{currency(category_income - category_income_balance)}} </span>
                         </span>                        
-                        <a @click="expenditureDetails()" class="d-inline-block" href="#">View Details </a>                        
+                        <a @click="expenditureDetails()" class="d-inline-block fs-9" href="#">View Details </a>                        
                     </p>
                     @endcan
                 </div>
@@ -90,17 +90,17 @@ $logedInUser  = auth()->user();
                     </li>
                     <li v-if="appropriations?.length>0" class="nav-item" role="presentation">
                         <a @click="switchPageOne=2" class="fs-8 nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
-                        <strong> @{{selected_fund_category}}</strong>  Appropriated Income <!--   Approp. Current Balance --></a>
+                        <strong> @{{selected_fund_category==''?'Yearly':selected_fund_category }}</strong>  Appropriated Income <!--   Approp. Current Balance --></a>
                     </li>                
                 </ul>
-                <div id="pagerContainer" style="overflow:auto; height:54.5vh;">               
+                <div id="pagerContainer" style="overflow:auto; height:57vh;">               
                     <div  v-show="switchPage===1" style="height: inherit">                 
                         <div v-show="switchPageOne==0" style="height: inherit">
                             <div style="height: inherit;display:flex;flex-direction:column">
-                                <div style="height: 85%;overflow: auto;">                    
+                                <div style="height: 100%;overflow: auto;">                    
                                     <table class="table">
-                                        <thead class="bg-light">
-                                            <tr>
+                                        <thead >
+                                            <tr class="fw-bold">
                                                 <th><input v-if="selected_scheme.appropriations.length>0"  type="checkbox" @click="selectAllAppropriation(selected_scheme.appropriations, $event)"></th>
                                                 <th>SN.</th>
                                                 <th>Appropriation Name</th>
@@ -974,7 +974,7 @@ $logedInUser  = auth()->user();
                     },
                     async appropriate(){
                         if(this.selected_appropriations_to_appropriate.length <1){
-                            Swal.fire('select appropriation')
+                            Swal.fire('select appropriations')
                             return false
                         }
 

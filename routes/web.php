@@ -3,6 +3,7 @@
 use App\Http\Controllers\SchemeController;
 use App\Http\Controllers\AppropriationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FundController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaskController;
