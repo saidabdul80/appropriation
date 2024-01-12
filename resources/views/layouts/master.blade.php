@@ -4,7 +4,9 @@
 ?>
 @extends('/layouts/links')
 @section('body')
+@if(request()->path() !== 'login')
 @include('layouts.nav')
+@endif
 <div id="loaderHtml" class="w-100 position-absolute xloader">
             <div class="middle">
                 <div class="bar bar1"></div>
