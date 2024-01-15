@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appropriation;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use stdClass;
 
 class WalletController extends Controller
 {
@@ -13,20 +14,31 @@ class WalletController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function getWallet(Request $request)
     {   
         $request->validate([
-            'owner_id'=>"required",
-            'owner_type'=>"required"
+            'owner_id' => "required",
+            'owner_type' => "required",
+            'fund_category' => "required"            
         ]);
+    
         $id = $request->get('owner_id');
-        if($request->get('owner_type')=='appropriation'){
-            $response = Appropriation::find($id);
+    
+        if ($request->get('owner_type') == 'appropriation') {
+            $response = Appropriation::with(['wallets' => function ($query) use ($request) {
+                $query->where('fund_category', $request->get('fund_category'))
+                      ->where('owner_type', 'App\\Models\\Appropriation');
+            }])->where('id', $id)->first();  // Use first() to get a single model instance
+    
+            return response($response->wallets[0] ?? new \stdClass(), 200);
 
         }
-
-        return response($response->wallet,200);
+    
+        // Handle other cases or return an appropriate response
+        return response("Invalid owner_type", 400);
     }
+    
 
     /**
      * Show the form for creating a new resource.

@@ -21,12 +21,14 @@ class AppropriationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
     public function getPreparedData(Request $request)
     {
         try{
             $request->validate([                
                 "scheme_id"=>"required",       
-                "fund_category"=>"required"         
+//                "fund_category"=>""         
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
@@ -37,6 +39,57 @@ class AppropriationController extends Controller
             }])->where('scheme_id', $scheme_id)->get();
 
             return response(['appropriations'=>$appropriations, 'appropriations_histories'=>$appropriation_histories],200);
+        }catch(ValidationException $e){
+            return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e,500);                
+            }else{
+                return response('failed',400);
+            }
+        }   
+    }
+    
+    public function getAmountSummaryData(Request $request)
+    {
+        try{
+            $request->validate([                
+                "scheme_id"=>"required",       
+//                "fund_category"=>""         
+            ]);
+            $scheme_id = $request->get('scheme_id');
+            $fund_category = $request->get('fund_category');
+            //return $fund_category;
+            $appropriation_histories = AppropriationHistory::where([
+                'owner_id' => $scheme_id,
+                'owner_type' => 'scheme',
+                'fund_category' => $fund_category,
+            ])->get();
+            
+            $result1 = [];
+            
+            foreach ($appropriation_histories as $history) {
+                foreach ($history->appropriation as $appr) {
+                    $result1[$appr['name']] = ($result1[$appr['name']] ?? 0) + $appr['amount'];
+                }
+            }
+            // Now $result is an associative array with 'name' as key and 'total_amount' as value
+            
+        
+            $appropriations = Appropriation::with(['wallet' => function ($query) use ($fund_category) {
+                $query->where(['fund_category' => $fund_category, 'owner_type' => 'App\\Models\\Appropriation']);
+            }])->where('scheme_id', $scheme_id)->get();
+            
+            $result2 = [];
+            
+            foreach ($appropriations as $appropriation) {
+                $totalAmount = $appropriation->wallet->balance;
+                $result2[$appropriation->name] = $totalAmount;
+            }
+            
+            // Now $result is an associative array with 'name' as key and 'total_amount' as value            
+
+            return response(['balance'=>$result2, 'income'=>$result1],200);
         }catch(ValidationException $e){
             return response($e->getMessage(),400);   
         }catch(\Exception $e){

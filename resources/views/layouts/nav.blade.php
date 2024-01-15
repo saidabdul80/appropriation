@@ -152,7 +152,7 @@ $routename = Route::currentRouteName();
 	</div>
 </main>
 <div class="w-100" style="height: 62px;"></div>
-<nav class="w-100 navbar navbar-white bg-white pb-0 shadow-sm" style="position: fixed;top:0; z-index: 9000000;">
+<nav class="w-100 navbar navbar-white bg-white pb-0 shadow-sm" style="position: fixed;top:0; z-index: 8;">
 	<div class="container-fluid">
 		<a href="/" class="d-flex navbar-brand  align-items-center py-2 link-dark text-decoration-none">
 			<i class="bi bi-flag"></i>

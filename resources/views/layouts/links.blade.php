@@ -7,8 +7,8 @@
 	<link rel="shortcut icon" href="/images/e_portal.png">
 	<link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css">
 	<!-- <link rel="stylesheet" href="/lib/css/bootstrap.min.css"> -->
-	<!-- 
-		-->		
+	 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 		<link rel="stylesheet" href="/lib/css/select2.css">
 		<link rel="stylesheet" href="/lib/css/swift-menu.css">
 		<link rel="stylesheet" href="/lib/js/datatable.css">
@@ -18,6 +18,7 @@
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
 	
 	<link rel="stylesheet"  href="/lib/css/style3.css">
+	
 	<link rel="stylesheet" href="/lib/css/boostrap4.css">
 	@if(request()->path() !== 'login')
 	
@@ -36,15 +37,15 @@
 	
 	
 	
-	<script type="text/javascript" src="/lib/js/select2.js"></script>
+<!-- 	<script type="text/javascript" src="/lib/js/select2.js"></script> -->
 	<script src="/lib/js/jqueryvalidate.js"></script>
 	<!-- <script src="/lib/js/propper.js"></script> -->
 	<script src="/lib/js/sweetalert.js"></script>
 	
 	<script src="/lib/js/bootstrap4.js"></script>
-	<script src="/lib/js/vue.js"></script>
+<!-- 	<script src="/lib/js/vue.js"></script>
 	<script type="module" src="/lib/js/vue-currency.js"></script>
-	<script src="/lib/js/vue-tagins.js" ></script>
+	<script src="/lib/js/vue-tagins.js" ></script> -->
 	
 	<script src="/lib/js/axios.js"></script>
 	<!-- <script src="/lib/js/datatable.css"></script> -->
@@ -138,6 +139,20 @@
 			})
 		}
 
+		async function postDataWithoutLoader(route, data) {			
+			return await axios.post(route, data).then(function(response) {
+				//switchPage(1)				
+					return response;				
+			}).catch(function(error) {
+				//switchPage(1)                   
+				$("#loaderHtml").hide()
+				Swal.fire({
+					text: error.response.data,
+					icon: 'error',
+				})
+			})
+		}
+
 		function formatToCurrency(amount) {
 			return (amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 		}
@@ -195,6 +210,8 @@
 	<div id="">
 		@yield('body')
 	</div>
+
+	
 </body>
 
 </html>

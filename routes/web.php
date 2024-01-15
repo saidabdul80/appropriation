@@ -3,6 +3,7 @@
 use App\Http\Controllers\SchemeController;
 use App\Http\Controllers\AppropriationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FundController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TaskController;
@@ -41,9 +42,11 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/assign_role', [UserController::class, 'assignRole']);
     Route::post('/assign_permission', [UserController::class, 'assignPermission']);
     Route::get('/scheme', [SchemeController::class, 'index'])->name('account');
+    Route::get('/scheme2', [SchemeController::class, 'schemeScreen'])->name('account2');
     Route::post('/add_appropriation', [SchemeController::class, 'addAppropriation']);
     Route::post('/add_scheme', [SchemeController::class, 'addScheme']);
     Route::post('/fund_programme', [SchemeController::class, 'fundProgramme']);
+    Route::post('/undo_fund_programme', [SchemeController::class, 'reverseFundProgramme']);
     Route::post('/fetch_fund', [FundController::class, 'fetchFund']);
     Route::post('/dashborad_data', [DashboardController::class, 'byProgramme']);
     
@@ -53,6 +56,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/get_appropriation_histories', [AppropriationController::class, 'getAppropriations']);
     Route::post('/fund_month_year', [AppropriationController::class, 'fundMonthYear']);
     Route::post('/get_prepared_data', [AppropriationController::class, 'getPreparedData']);
+    Route::post('/get_amount_summary_data', [AppropriationController::class, 'getAmountSummaryData']);    
     Route::get('/department', [DepartmentController::class, 'departmentIndex'])->name('department');
     Route::post('/department/create_update', [DepartmentController::class, 'createUpdate']);
     Route::post('/get_appropriations_projection', [AppropriationController::class, 'getAppropriationsProjection']);
@@ -63,4 +67,5 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/fetch_expenditures', [TransactionsController::class, 'expenditureDetails']);
     Route::get('/report/{scheme_id}', [HomeController::class, 'report']);
     Route::post('/get_appropriation_transactions', [TransactionsController::class, 'appropriationTransactions']);
+    
 });

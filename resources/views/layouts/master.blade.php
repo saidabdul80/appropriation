@@ -20,10 +20,11 @@
             </div>
 </div>   
 @yield('vueScript')
-<div class="row w-100 m-0" id="appIn">    
-    <div class="col-xs-12 col-md-12 col-lg-12 pb-0 bg-white position-relative p-0" id="app">
-           
-        @yield('content')        
+<div id="appId">
+    <div class="row w-100 m-0" id="appIn">    
+        <div class="col-xs-12 col-md-12 col-lg-12 pb-0 bg-white position-relative p-0" id="app">           
+            @yield('content')        
+        </div>
     </div>
 </div>
 @yield('newscript')
