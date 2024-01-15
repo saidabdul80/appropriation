@@ -27,6 +27,11 @@ class SchemeController extends Controller
         return view('scheme');
     }
 
+    public function schemeScreen()
+    {
+        return view('main_scheme');
+    }
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -191,6 +196,70 @@ class SchemeController extends Controller
             }
         }
     }
+
+    public function reverseFundProgramme(Request $request)
+    {
+        try {
+            $request->validate([
+                "transaction_id" => "required",                
+            ]);
+
+            $transaction_id = $request->get('transaction_id');            
+
+            DB::beginTransaction();
+
+            $transaction = Transaction::find($transaction_id);
+
+            if (!$transaction) {
+                throw new \Exception('Transaction not found');
+            }
+
+            // Reverse the transaction
+            $transaction->action = 'undo credit';
+            
+            $scheme = Scheme::find($transaction->owner_id);
+            $wallet = Wallet::find($scheme->wallet->id);
+            
+            if($wallet->balance < $transaction->amount){
+                throw new \Exception('Reverse failed');
+            }
+
+            $fundCategoryValue = intval(substr($transaction->fund_category, 0, 4))-1;
+            
+            // Reverse the wallet operations
+            $wallet->fund_category = $fundCategoryValue;
+            $wallet->balance -= $transaction->amount;
+            $wallet->total_collection -= $transaction->amount;
+            $wallet->save();
+            $transaction->save();
+            
+            // Reverse the Fund entry if scheme type is 'api'
+            if ($scheme->fund_type == 'api') {
+                Fund::where([
+                    'scheme_id' => $scheme->id,
+                    'fund_category' => $transaction->fund_category,
+                ])->update([
+                    'amount' => 0,
+                    'status' => 'unused',
+                ]);
+            }
+
+            DB::commit();
+
+            $scheme = Scheme::find($transaction->owner_id);
+
+            return response(["scheme" => $scheme, "msg" => 'Fund reversed successfully'], 200);
+        } catch (ValidationException $e) {
+            return response($e->getMessage(), 400);
+        } catch (\Exception $e) {
+            if (env('APP_DEBUG')) {
+                return response($e->getMessage(), 400);
+            } else {
+                return response('Failed to reverse fund', 400);
+            }
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *

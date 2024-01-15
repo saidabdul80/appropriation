@@ -162,5 +162,5 @@ return [
     /*
      * Database connection name 
      */
-    "connection"=>"mysql"
+    "connection"=>"central_connection"
 ];
