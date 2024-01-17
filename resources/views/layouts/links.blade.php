@@ -5,11 +5,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="/images/e_portal.png">
-	<link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css">
+	<!-- <link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css"> -->
 	<!-- <link rel="stylesheet" href="/lib/css/bootstrap.min.css"> -->
 	 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-		<link rel="stylesheet" href="/lib/css/select2.css">
+		<!-- <link rel="stylesheet" href="/lib/css/select2.css"> -->
 		<link rel="stylesheet" href="/lib/css/swift-menu.css">
 		<link rel="stylesheet" href="/lib/js/datatable.css">
 		<link rel="stylesheet" href="/lib/css/font-awesome-4.7.0/css/font-awesome.min.css">
@@ -38,7 +38,7 @@
 	
 	
 <!-- 	<script type="text/javascript" src="/lib/js/select2.js"></script> -->
-	<script src="/lib/js/jqueryvalidate.js"></script>
+	<!-- <script src="/lib/js/jqueryvalidate.js"></script> -->
 	<!-- <script src="/lib/js/propper.js"></script> -->
 	<script src="/lib/js/sweetalert.js"></script>
 	
@@ -50,7 +50,7 @@
 	<script src="/lib/js/axios.js"></script>
 	<!-- <script src="/lib/js/datatable.css"></script> -->
 	<link rel="stylesheet" href="/lib/css/styles.css">
-	<script src="/lib/js/fullscreen.js"></script>
+	<!-- <script src="/lib/js/fullscreen.js"></script> -->
 	@endif
 	<!-- CSRF Token -->
 	<meta name="csrf-token" content="{{ csrf_token() }}">
