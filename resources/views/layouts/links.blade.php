@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="/images/e_portal.png">
-	<!-- <link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css"> -->
+	<link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css">
 	<!-- <link rel="stylesheet" href="/lib/css/bootstrap.min.css"> -->
 	 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
