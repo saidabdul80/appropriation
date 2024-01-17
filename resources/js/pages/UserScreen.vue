@@ -1,22 +1,25 @@
 <template>
-    <div class="background px-4 py-2" style="height: 92.1vh;">
-        <div class="alert-white rounded px-2 py-2 shadow bg-white">
-            <button @click="tab = 4" :disabled="tab == 4" class="btn btn-primary mx-2">Assign Role</button>
-            <button @click="tab = 5" :disabled="tab == 5" class="btn btn-primary mx-2">Assign Permission</button>
+    <div class="px-4 py-2" style="height: 92.1vh;">
+        <div class="alert-white  px-2 py-2 ">
+            <button style="color: var(--primary-c);" @click="tab = 1" :disabled="tab == 1" class="btn mx-2 bg-white shadow-lg">Manage User</button>
+            <button style="color: var(--primary-c);" @click="tab = 4" :disabled="tab == 4" class="btn mx-2 bg-white shadow-lg">Assign Role</button>
+            <button style="color: var(--primary-c);" @click="tab = 5" :disabled="tab == 5" class="btn mx-2 bg-white shadow-lg">Assign Permission</button>
         </div>
         <div class="row w-100 mb-3  mx-auto py-3 ">
-            <div class="col-md-4 mx-auto px-3">
-                <div class="shadow bg-white py-3 px-3 rounded" style="height: 100%;">
+            <div class="col-md-4 mx-auto ps-0 pe-5 ">
+                <div class="bg-white py-3  rounded-lg shadow-lg" style="height: 100%;">
                 <!-- Search Input -->
-                <div class="input-group">
+                <div class="input-group px-3">
                     <input type="text" v-model="search_keyword" @keyup="fetchUsers" class="form-control" autocomplete="no" placeholder="Search">
                     <button class="input-group-text btn btn-secondary" @click="fetchUsersClick">Search</button>
                 </div>
 
                 <!-- User List -->
-                <div class="my-2 border px-3">
-                    <ul class="my-3 nav nav-pills flex-column mb-auto">
-                    <li v-for="(user, i) in users.data" :key="user.id" @click="selectUser(user, $event)" :class="{ 'mb-2': true, 'border': true, 'p-0': true, 'nav-item': true, 'rounded': true, 'user-items': true, 'select-none': true, 'active': user.id === selected_user.id }" tabindex="-1">
+                <div class="my-2">
+                    <ul class="my-3 px-0 nav nav-pills flex-column mb-auto">
+                    <li v-for="(user, i) in users.data" :key="user.id" @click="selectUser(user, $event)" 
+                                :class="{ 'p-2': true, 'nav-item': true, 'user-items': true, 
+                                    'select-none': true, 'active': user.id === selected_user.id }" tabindex="-1">
                         <a class="px-2 py-1 nav-link text-dark a-item" :style="{ 'pointer-events': 'none' }">
                         <div :style="{ 'color': 'inherit' }" class="m-0 p-0" aria-describedby="emailHelp">{{ user.first_name }} {{ user.surname }}</div>
                         <div :style="{ 'color': 'inherit' }" id="emailHelp" class="m-0 p-0 form-text">{{ user.nicare_code }}</div>
@@ -33,7 +36,7 @@
                 </div>
             </div>
             <div v-if="tab == 1" class="user-list mx-auto  col-md-8 px-3">
-                <form class="row needs-validation shadow bg-white rounded p-3" novalidate>
+                <form class="row needs-validation shadow bg-white rounded-lg shadow-lg p-3" novalidate>
                     <div class="mb-3 col-md-6">
                         <label for="first_name" class="form-label">First Name</label>
                         <input type="text" class="form-control" v-model="selected_user.first_name" id="first_name" required>
@@ -403,8 +406,22 @@ export default {
 </script>
 <style scoped>
 /* Add your custom styles for this component */
+.active a.px-2.py-1.nav-link.text-dark.a-item {
+    color: white !important;
+}
 .active {
-  background-color: #007bff !important; /* Add your preferred active background color */  
+  background-color: var(--primary-c) !important; /* Add your preferred active background color */  
   color: #fff !important; /* Add your preferred active text color */
+}
+.nav-pills{
+    position:static !important;
+}
+.nav-item{
+    border-bottom: 1px solid #bbb;
+}
+.user-items:hover a {
+    background-color: var(--primary-c) !important;
+    color: white !important;
+    box-shadow: 0px 1px 14px -5px #555;
 }
 </style>

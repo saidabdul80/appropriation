@@ -6,7 +6,7 @@
           <option :value="defaultScheme">Select a Scheme</option>
           <option v-for="(scheme, index) in schemes" :key="index" :value="scheme">{{ scheme?.name }} </option>
         </select>      
-        <button @click="$emit('openModal')" :class="{ 'btn-success': selectedScheme.id, 'btn-secondary disabled': !selectedScheme.id }" class="update-scheme btn fs-8 mx-1 d-inline-block w-15">
+        <button @click="$emit('openModal')" :class="{ 'btn-success': selectedScheme.id, 'btn-secondary disabled': !selectedScheme.id }" class="update-scheme btn fs-9 mx-1 d-inline-block">
           Manage
         </button>
         <i class="fa fa-caret-down text-secondary position-absolute" style="right: 26%; top: 33%;"></i>

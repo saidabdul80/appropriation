@@ -29,8 +29,10 @@ class DashboardController extends Controller
                 "programme_id"=>"required"
             ]);
             $programme_id = $request->get("programme_id");
-            $appropriations = collect(DB::select(DB::raw("SELECT  b.name, w.balance, w.total_collection, w.fund_category FROM appropriations a JOIN appropriation_types b ON b.id=a.appropriation_type_id JOIN wallets w ON (a.id= w.owner_id AND w.owner_type = 'App\\\Models\\\Appropriation') WHERE a.scheme_id = $programme_id")))
-                            ->groupBy('name');
+            $appropriations = collect(DB::select(DB::raw("SELECT  b.name, w.balance, w.total_collection, w.fund_category FROM appropriations a 
+                                                            JOIN appropriation_types b ON b.id=a.appropriation_type_id JOIN wallets w ON 
+                                                            (a.id= w.owner_id AND w.owner_type = 'App\\\Models\\\Appropriation') WHERE a.scheme_id = $programme_id")))
+                            ->groupBy('name');                            
             foreach($appropriations as $key => &$approps){
                 foreach($approps as $key2 => &$approp){
                     unset($approp->name);
