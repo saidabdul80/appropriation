@@ -11,6 +11,7 @@ $cyear = date('Y');
 $years = range($dyear, $cyear);
 $logedInUser = auth()->user();
 $permissions = $logedInUser->permissions->pluck('name')->toArray();
+
 ?>
 @extends('layouts.master') {{-- Assuming your master layout file is named master.blade.php --}}
 @section('content')
