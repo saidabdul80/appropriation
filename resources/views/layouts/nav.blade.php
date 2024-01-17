@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Auth;
 
-$routename = Route::currentRouteName();
+$routename = str_replace('#','', Route::currentRouteName());
+
 ?>
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
 	<symbol id="bootstrap" viewBox="0 0 118 94">
@@ -64,81 +65,314 @@ $routename = Route::currentRouteName();
 		<path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.319 1.319 0 0 0-.37.265.301.301 0 0 0-.057.09V14l.002.008a.147.147 0 0 0 .016.033.617.617 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.619.619 0 0 0 .146-.15.148.148 0 0 0 .015-.033L12 14v-.004a.301.301 0 0 0-.057-.09 1.318 1.318 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465-1.281 0-2.462-.172-3.34-.465-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411z" />
 	</symbol>
 </svg>
+<style>
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-o-box-sizing: border-box;
+		box-sizing: border-box;
+		/* adds animation for all transitions */
+		-webkit-transition: .25s ease-in-out;
+		-moz-transition: .25s ease-in-out;
+		-o-transition: .25s ease-in-out;
+		transition: .25s ease-in-out;
+		margin: 0;
+		padding: 0;
+		-webkit-text-size-adjust: none;
+	}
 
-<main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-	<div class="offcanvas-header bg-light justify-between">
+	/* Makes sure that everything is 100% height */
+
+	html,
+	body {
+		height: 100%;
+		overflow: hidden;
+	}
+
+	/* gets the actual input out of the way; 
+	we're going to style the label instead */
+
+	#drawer-toggle {
+		position: absolute;
+		opacity: 0;
+	}
+
+	#drawer-toggle-label {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		left: 9px;
+		height: 50px;
+		width: 50px;
+		display: block;
+		position: fixed;
+		background: transparent;
+		z-index: 1;
+	}
+
+	/* adds our "hamburger" menu icon */
+
+	#drawer-toggle-label:before {
+		content: '';
+		display: block;
+		position: absolute;
+		height: 2px;
+		width: 24px;
+		background: #fff;
+		left: 13px;
+		top: 18px;
+		box-shadow: 0 6px 0 #fff, 0 12px 0 #fff;
+	}
+
+	header {
+		width: 100%;
+		position: fixed;
+		left: 0px;
+		background: #efefef;
+		padding: 10px 10px 10px 50px;
+		font-size: 30px;
+		line-height: 30px;
+		z-index: 0;
+	}
+
+	/* drawer menu pane - note the 0px width */
+
+	#drawer {
+		position: fixed;
+		top: 0;
+		left: -300px;
+		height: 100%;
+		width: 300px;		
+		overflow-x: hidden;
+		overflow-y: hidden;
+		padding: 20px;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	/* actual page content pane */
+
+	#page-content {
+		margin-left: 0px;		
+		width: 100%;
+		height: 100vh;
+		overflow-x: hidden;
+		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
+		padding: 0px 60px;
+	}
+
+	/* checked styles (menu open state) */
+	.nav-pills {
+		position: fixed;
+		left: 10px;
+	}
+	
+	.nav-logo{
+		position: fixed;
+		/* left: 17px; */
+		right: 40px;
+		top: 2.5%;
+		width: 50px !important;
+		/* bottom: 30%; */
+		border-radius: 4px;
+	}
+	.nav-name{
+		display: none;
+	}
+	
+	.nav-pills li a.activeLink .menu-icon{
+		color: var(--warning-c) !important;
+	}
+	.nav-link svg{
+		stroke: white !important;
+	}
+	.menu-icon{
+		color:white !important;
+		font-size: 30px;
+	}
+	#drawer-toggle:checked~#drawer-toggle-label {
+		height: 100%;
+		width: calc(100% - 300px);
+		background: transparent;
+	}
+
+
+	#drawer-toggle:checked~#drawer-toggle-label,
+	#drawer-toggle:checked~header {
+		left: 300px;
+	}
+
+	#drawer-toggle:checked~#drawer div .nav-pills,#drawer-toggle:checked~#drawer div div span a .nav-logo {
+		position: static;
+		left: auto;
+	}
+	#drawer-toggle:checked~#drawer div .nav-pills li a.activeLink .nav-name,
+	 #drawer-toggle:checked~#drawer div .nav-pills li a.activeLink .menu-icon {
+		color:var(--warning-c) !important;
+	}
+	#drawer-toggle:checked~#drawer div .nav-pills li a .nav-name{
+		display: inline-block;
+		color:var(--primary-c)
+	}
+	
+	#drawer-toggle:checked~#drawer div .nav-pills li a .menu-icon{
+		color: var(--primary-c) !important;
+		display: inline-flex !important;
+		justify-content: center !important;
+		padding: 5px 5px;
+		font-size: 18px;
+		width: 26px;
+		border-radius: 8px;
+	}
+
+	#drawer-toggle:checked~#drawer {
+		left: 0px;
+	}
+
+	#drawer-toggle:checked~#page-content {
+		margin-left: 300px;
+	}
+
+	/* Menu item styles */
+
+	#drawer ul {
+		list-style-type: none;
+	}
+
+	#drawer ul a {
+		display: block;
+		padding: 10px;
+		color: #c7c7c7;
+		text-decoration: none;
+	}
+
+	#drawer ul a:hover {
+		color: white;
+	}
+
+	/* Responsive MQ */
+
+	@media all and (max-width:350px) {
+
+		#drawer-toggle:checked~#drawer-toggle-label {
+			height: 100%;
+			width: 50px;
+		}
+
+		#drawer-toggle:checked~#drawer-toggle-label,
+		#drawer-toggle:checked~header {
+			left: calc(100% - 50px);
+		}
+
+		#drawer-toggle:checked~#drawer {
+			width: calc(100% - 50px);
+			padding: 20px;
+		}
+
+		#drawer-toggle:checked~#page-content {
+			margin-left: calc(100% - 50px);
+		}
+
+	}
+</style>
+<!-- <main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+	
+</main> 
+<div class="w-100" style="height: 62px;"></div>
+<nav class="navbar w-100 mx-auto d-flex justify-content-center py-2 px-4 pb-0 shadow-sm" style="position: fixed;top:0px; z-index: 8;">
+	<div class="background-primary-light container-fluid rounded-lg">
+		<a href="/" class="d-flex navbar-brand  align-items-center py-2 link-dark text-decoration-none">
+			<i class="bi bi-flag"></i>
+			<h6 class="px-2 mb-0 mt-2w-100  py-2 ">{{ucfirst($routename)}}</h6>
+		</a>
+		<button id="btnMenu" class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+			<i class="text-white bi bi-justify"></i>
+		</button>
+	</div>
+</nav> -->
+<input type="checkbox" id="drawer-toggle" name="drawer-toggle" />
+<label for="drawer-toggle" id="drawer-toggle-label"></label>
+<nav id="drawer" class="background-primary">
+	<div class="bg-white rounded-lg"> 
+
+	
+	<div class="offcanvas-header bg-white justify-between">
 		<span>
-			<a href="/" class="d-flex  align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-				<svg class="bi me-2" width="40" height="32">
-					<use xlink:href="#bootstrap" />
-				</svg>
-				<span class="fs-6">Account Management</span>
+			<a href="/" class="d-flex  align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
+				<img src="{{asset('images/nicare_logo.jpg')}}" style="width: 35px;" class="nav-logo">
+				<span class="fs-6 ms-2">FMS</span>
 			</a>
 		</span>
-		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		
+		<label for="drawer-toggle" class="btn-close" id="drawer-toggle-label2"></label>		
 	</div>
 	<hr class="m-0">
-	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-light w-100 position-relative">
+	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative">
 		<ul class="nav nav-pills flex-column mb-auto">
 			<li class="nav-item">
-				<a href="/home" class="nav-link {{$routename =='home'? 'active text-white':'text-dark' }}" aria-current="page">
-					<svg class="bi me-2" width="16" height="16">
+				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">
+					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#home" />
-					</svg>
-					Home
-				</a>
-			</li>			
-			<li>
-				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'active text-white':'text-dark' }}  link-dark">
-					<svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#speedometer2" />
-					</svg>
-					Dashboard
+					</svg> -->
+					<i class="fa fa-home menu-icon"></i>
+					<span class="nav-name">Home</span>
 				</a>
 			</li>
-			
 			<li>
-				<a href="{{route('user')}}"  class="nav-link {{$routename =='user'? 'active text-white':'text-dark' }}  link-dark">
-					<svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#grid" />
-					</svg>
-					User
+				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">
+					<!-- <svg class="bi me-2" width="16" height="16">
+						<use xlink:href="#speedometer2" />
+					</svg> -->
+					<i class="fa fa-dashboard menu-icon"></i>
+					<span class="nav-name">Dashboard</span>
 				</a>
-			</li>								
+			</li>
+
+			<li>
+				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
+					<!-- <svg class="bi me-2" width="16" height="16">
+						<use xlink:href="#grid" />
+					</svg> -->
+					<i class="fa fa-user menu-icon d-flex justify-content-center"></i>
+					<span class="nav-name">User</span>
+				</a>
+			</li>
 			<li class="nav-item dropdown ">
-				<a href="{{route('account')}}"  class="nav-link {{$routename =='scheme'? 'active text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink" >
-					<svg class="bi me-2" width="16" height="16">
+				<a href="{{route('account')}}" class="nav-link {{$routename =='account'? 'activeLink text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink">
+					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#table" />
-					</svg>
-					Account
+					</svg> -->
+					<i class="fa fa-table menu-icon d-flex justify-content-center"></i>
+					<span class="nav-name">Account</span>
 				</a>
 				<!--
 					<ul class="nav nav-pills flex-column mb-auto">
-						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'active text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> New</a></li>
-						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'active text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>					
+						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> New</a></li>
+						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>					
 					</ul> 
 				-->
-			</li>			
-			<li>
-				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'active text-white':'text-dark' }}  link-dark">
+			</li>
+			<!-- <li>
+				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#people-circle" />
 					</svg>
-					Users
+					<span class="nav-name">Users</span>
 				</a>
-			</li>			
+			</li> -->
 
 		</ul>
 		<hr>
 		<div class="dropdown">
-			<a style="cursor: pointer;" tabindex="-1"  class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2">
+			<a style="cursor: pointer;" tabindex="-1" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2">
 				<img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
 				<strong>mdo</strong>
 			</a>
-			<ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-				<!-- <li><a class="dropdown-item" href="#">New project...</a></li>
-				<li><a class="dropdown-item" href="#">Settings</a></li> -->
-				<li><a class="dropdown-item" href="#">Profile</a></li>
+			<ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">				
+				<li><a class="dropdown-item nav-item" href="#">Profile</a></li>
 				<li>
 					<hr class="dropdown-divider">
 				</li>
@@ -150,37 +384,26 @@ $routename = Route::currentRouteName();
 			</ul>
 		</div>
 	</div>
-</main>
-<div class="w-100" style="height: 62px;"></div>
-<nav class="w-100 navbar navbar-white bg-white pb-0 shadow-sm" style="position: fixed;top:0; z-index: 8;">
-	<div class="container-fluid">
-		<a href="/" class="d-flex navbar-brand  align-items-center py-2 link-dark text-decoration-none">
-			<i class="bi bi-flag"></i>
-			<h6 class="px-2 mb-0 mt-2w-100  py-2 ">{{ucfirst($routename)}}</h6>
-		</a>
-		<button id="btnMenu" class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-			<i class="text-white bi bi-justify"></i>
-		</button>
 	</div>
 </nav>
 
 <script>
 	/* global bootstrap: false */
-(function () {
-  'use strict'
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-    new bootstrap.Tooltip(tooltipTriggerEl)
-  })
+	(function() {
+		'use strict'
+		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+		tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+			new bootstrap.Tooltip(tooltipTriggerEl)
+		})
 
 
-	  $('#btnMenu').click(function(){		  
-		if($('.modal-backdrop').is(':visible')){
-			$('.modal-backdrop').removeClass('show');
+		$('#btnMenu').click(function() {
+			if ($('.modal-backdrop').is(':visible')) {
+				$('.modal-backdrop').removeClass('show');
 
-		}	
-	  })
-	 /*  $("#dropdownUser2").click(function(e){		
+			}
+		})
+		/*  $("#dropdownUser2").click(function(e){		
 		e.stopPropagation();
 		if(e.target !== e.currentTarget){
 			$(this).parent().next().toggleClass('show');
@@ -188,8 +411,7 @@ $routename = Route::currentRouteName();
 			$(this).next().toggleClass('show');
 		}
 	  }); */
-})()
-
+	})()
 </script>
 
 <style>

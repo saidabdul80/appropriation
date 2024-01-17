@@ -125,12 +125,14 @@ class AppropriationController extends Controller
     public function getAppropriations(Request $request)
     {
         try{
-            $request->validate([                
-                "owner_id"=>"required",
-                "owner_type"=>"required"
-            ]);
-
-            $response = AppropriationHistory::where(['owner_id'=>$request->get('owner_id'),"owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(20);
+            $response = AppropriationHistory::where([
+                'owner_id' => $request->get('owner_id'),
+                'owner_type' => $request->get('owner_type')
+            ])
+            ->orderBy('fund_category', 'desc')
+            ->orderBy('owner_id', 'desc')  // Add more columns if needed
+            ->paginate(1);
+        
             return response($response,200);
         }catch(ValidationException $e){
             return response($e->getMessage(),400);   

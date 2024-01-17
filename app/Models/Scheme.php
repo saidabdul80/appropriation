@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use stdClass;
+
 class Scheme extends Model
 {
     use HasFactory, LogsActivity, Account;
@@ -50,6 +52,13 @@ class Scheme extends Model
         return $balance;
     }
 
+    public function getFundCategoriesAttribute(){
+        $ids = Appropriation::where('scheme_id',$this->id)->pluck('id')->toArray();
+        $wallet_details = Wallet::selectRaw('SUM(balance) as balance, SUM(total_collection) as total_collection, fund_category')->whereIn('owner_id',$ids)->where(['owner_type'=>'App\\Models\\Appropriation'])->groupBy('fund_category')->get();
+
+        return $wallet_details->count() >0? $wallet_details->groupBy('fund_category'):new stdClass();
+    }
+
     public function getTotalCollectionAttribute(){
         return $this->wallet->total_collection;
     }
@@ -60,17 +69,7 @@ class Scheme extends Model
         ->logOnly(['wallet_number', 'owner_id','owner_type','amount']);
         // Chain fluent methods for configuration options
     }
-
-    public function getAppropriationBalanceAttribute(){
-        $appropriations = Appropriation::where('scheme_id',$this->id)->get();
-        /* foreach($appropriations as $key => $appropriation){
-            $total_balance = Wallet::where(['owner_id'=>$appropriation->id, 'owner_type'=>Appropriation::class])->sum('balance');            
-            $appropriation->total_balance = $total_balance;
-        } */
-        return $appropriations;
-
-    }
-
-    protected $appends = ['balance','total_collection','appropriation_wallets','funds', 'appropriation_balance'];
+ 
+    protected $appends = ['balance','total_collection','appropriation_wallets','funds','fund_categories'];
     
 }

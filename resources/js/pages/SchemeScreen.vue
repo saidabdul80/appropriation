@@ -1,37 +1,67 @@
 <template>
   <div>
-    <scheme-selector @openModal="openModalScheme = true" :schemes="schemes" @scheme-selected="changeScheme" ></scheme-selector>
-    <div class="background px-4 pb-2 pt-3" style="height: 92.1vh; z-index: 1">
-      <div class="bg-light pageTitleCard w-15 fs-9 text-danger ps-4">::{{ pageName }}</div>
+    <!-- //Ribbon -->  
+    <div class="row mx-0 mt-3">
+      <div class="col-md-6 px-0">
+        <ribbon-menu
+          @projectionModal="openModalProjection = true"            
+          @fundModal="openModalFund= true"
+          @appropriationModalRemit="openModalApprRemit= true"
+          @report="openReport()"
+          @openExpenditure="openExpenditureModal"
+          :category_income_balance="0"          
+          :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme" 
+          />
+      </div>
+      <div class="col-md-6">
+        <scheme-selector 
+          @month-selected="monthYearTriggered" 
+          :fund_categories="fund_categories" 
+          @openModal="openModalScheme = true" 
+          :schemes="schemes" 
+          @scheme-selected="changeScheme" 
+          />
+         
+      </div>
+    </div>          
+    <div class="row mx-0 mt-3">
+      <div class="col-md-6 px-0">
+        <nav-tab v-show="switchPage == 1" 
+              @switch-page="handlePageSwitch" 
+              :appropriations="selected_scheme.appropriations" 
+              :selected_fund_category ="selected_fund_category"
+              />
+      </div>
+      <div class="col-md-6 px-0">
+        <summary-data 
+          :permissions="permissions"
+          :selected_scheme="selected_scheme"
+          :selected_fund_category="selected_fund_category"
+          :category_income="category_income"
+          :category_income_balance="category_income_balance"
+          :getCategoryIncomeBalance="getCategoryIncomeBalance"
+          @openExpenditure="openExpenditureModal"
+        />
+      </div>
+    </div>
+    <div class=" pb-2 pt-3" style="height: 92.1vh; z-index: 1">
+      <!-- <div class="bg-light pageTitleCard w-15 fs-9 text-danger ps-4">::{{ pageName }}</div> -->
       <div class="position-relative">
+      
         <div class="py-2">
-          <div class="mb-3 mx-1 row bg-white rounded shadow">
-            <!-- //Ribbon -->
-            
-            <ribbon-menu
-            @projectionModal="openModalProjection = true"            
-            @fundModal="openModalFund= true"
-            @appropriationModalRemit="openModalApprRemit= true"
-            @report="openReport()"
-            @openExpenditure="openExpenditureModal"
-            :category_income_balance="0"
-            :appropriation_data_summary="appropriation_data_summary"
-            :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme" />
+          <div class="mb-3 mx-1 row ">
           </div>
-          <div class="bg-white rounded shadow" style="height: 77vh;">
-            <div class="mb-3 input-group">
+         
+          <div class="" style="height: 77vh;">
+          <!--   <div class="mb-3 input-group">
               <span class="input-group-text">Funding Year</span>
               <select @input="monthYearTriggered($event)" class="form-control" placeholder="Select funding year">
                 <option value=""> </option>
                 <option v-for="month_year in fund_categories" :value="month_year">{{ month_year }}</option>
               </select>
-            </div>
-            <nav-tab v-show="switchPage == 1" 
-              @switch-page="handlePageSwitch" 
-              :appropriations="selected_scheme.appropriations" 
-              :selected_fund_category ="selected_fund_category"
-              />
-            <div id="pagerContainer" style="overflow:auto; height:62vh;">
+            </div> -->
+            
+            <div id="pagerContainer"  style="height:65vh">
               <div v-if="switchPage === 1" style="height: inherit">
                   <index-screen                   
                   :key="selected_scheme.id"
@@ -50,9 +80,12 @@
                   />
               </div>
               <div v-if="switchPage === 2">
-
+                <appropriation-history 
+                  :appropriationHistories="appropriations_history"
+                  :selected_scheme="selected_scheme"
+                />
               </div>              
-              <div v-if="switchPage === 3" class="position-relative p-2 border" id="transaction-sheet">
+              <div v-if="switchPage === 3" class="position-relative " style="height: inherit;" id="transaction-sheet">
                 <transaction-sheet      
                   :key="selected_fund_category"                               
                   :selected_appropriation="selected_transcation_appropriation"
@@ -67,7 +100,7 @@
         </div>
 
         <!-- Use proper registration for swift-button -->
-        <swift-button></swift-button>
+        <swift-button :currentPage="switchPage" @switch-page="switchPageFunc"></swift-button>
       </div>
     </div>
     <Transition name="fade">
@@ -132,6 +165,8 @@ import AddFundModal from './../components/Scheme/Modals/AddFundModal.vue';
 import DebitModal from './../components/Scheme/Modals/DebitModal.vue';
 import SchemeModal from './../components/Scheme/Modals/SchemeModal.vue';
 import ExpenditureDetailsModal from './../components/Scheme/Modals/ExpenditureDetailsModal.vue';
+import SummaryData from '../components/Scheme/SummaryData.vue';
+import AppropriationHistory from '../components/Scheme/AppropriationHistory.vue';
 export default {
   components: {    
     'scheme-modal':SchemeModal,
@@ -143,7 +178,9 @@ export default {
     'debit-modal':DebitModal,
     'nav-tab':NavTab,
     'transaction-sheet':TransactionSheet,
-    'expenditure-details-modal':ExpenditureDetailsModal
+    'expenditure-details-modal':ExpenditureDetailsModal,
+    SummaryData,
+    AppropriationHistory
   },
   data() {
     return {
@@ -224,6 +261,13 @@ export default {
       window.open('/report/'+this.selected_scheme.id,'blank')
     },
     async appropriationSummaryResolver() {
+        if(this.selected_fund_category == ''){
+          this.appropriation_data_summary = {
+            income:{},
+            balance:{}
+          }
+          return 0;
+        }
         let res = await postDataWithoutLoader('/get_amount_summary_data', {
           scheme_id: this.selected_scheme.id,
           fund_category: this.selected_fund_category,
@@ -269,30 +313,16 @@ export default {
     getSchemeIndex(scheme) {
         return this.schemes.findIndex((item) => item.id == scheme.id)
     },
-    async monthYearTriggered(e) { //1 means from the right source
-      this.selected_fund_category  = e.target.value;
-          let res = await postData('/get_prepared_data', {
-              scheme_id: this.selected_scheme.id,
-              fund_category: this.selected_fund_category
-          }, true);
-          if (res?.status == 200) {    
-            this.appropriationSummaryResolver();                
-              this.appropriations_history = {
-                  data: []
-              }
-              this.$nextTick(() => {
-                  this.appropriations_history = res.data.appropriations_histories
-                  console.log( this.appropriations_history)
-                  this.appropriations = res.data.appropriations                                                      
-                  setTimeout(() => {
-                      this.getCategoryIncome()
-                      this.getCategoryIncomeBalance()
-                  }, 10)
-              })
-          } else {
-              showAlert('Something went wrong');
-              return false;
-          }
+    async monthYearTriggered(data) { //1 means from the right source
+      //console.log(data)
+      this.selected_fund_category = data.selected_month
+        this.appropriationSummaryResolver();                
+        this.appropriations_history = data.appropriations_histories        
+        this.appropriations = data.appropriations                                                      
+        setTimeout(() => {
+            this.getCategoryIncome()
+            this.getCategoryIncomeBalance()
+        }, 10)
       },
     async changeScheme(data) {      
          this.selected_scheme = data;      

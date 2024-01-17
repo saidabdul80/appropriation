@@ -60,7 +60,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::get('/department', [DepartmentController::class, 'departmentIndex'])->name('department');
     Route::post('/department/create_update', [DepartmentController::class, 'createUpdate']);
     Route::post('/get_appropriations_projection', [AppropriationController::class, 'getAppropriationsProjection']);
-    Route::post('/get_transactions', [TransactionsController::class, 'transactions']);
+    Route::post('/get_transactions', [TransactionsController::class, 'appropriationTransactions']);
     Route::post('/save_appropriation_transaction', [TransactionsController::class, 'saveAppropriationTransaction']);
     Route::post('/delete_appropriation_transaction', [TransactionsController::class, 'deleteAppropriationTransaction']);
     Route::post('/get_wallet', [WalletController::class, 'getWallet']);
