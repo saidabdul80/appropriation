@@ -63,7 +63,8 @@
             
             <div id="pagerContainer"  style="height:65vh">
               <div v-if="switchPage === 1" style="height: inherit">
-                  <index-screen                   
+                  <index-screen     
+                  :permissions="permissions"              
                   :key="selected_scheme.id"
                   :switchPageOne="switchPageOne"
                   :selected_scheme="selected_scheme"

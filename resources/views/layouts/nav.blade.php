@@ -312,7 +312,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 	<hr class="m-0">
 	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative">
 		<ul class="nav nav-pills flex-column mb-auto">
-			<li class="nav-item">
+			<li data-bs-toggle="tooltip" title="Home" class="nav-item">
 				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#home" />
@@ -321,7 +321,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 					<span class="nav-name">Home</span>
 				</a>
 			</li>
-			<li>
+			<li data-bs-toggle="tooltip" title="Dashboard" >
 				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#speedometer2" />
@@ -331,7 +331,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 				</a>
 			</li>
 
-			<li>
+			<li data-bs-toggle="tooltip" title="User">
 				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#grid" />
@@ -340,7 +340,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 					<span class="nav-name">User</span>
 				</a>
 			</li>
-			<li class="nav-item dropdown ">
+			<li  data-bs-toggle="tooltip" title="Account" class="nav-item dropdown ">
 				<a href="{{route('account')}}" class="nav-link {{$routename =='account'? 'activeLink text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink">
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#table" />
@@ -368,8 +368,8 @@ $routename = str_replace('#','', Route::currentRouteName());
 		<hr>
 		<div class="dropdown">
 			<a style="cursor: pointer;" tabindex="-1" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2">
-				<img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-				<strong>mdo</strong>
+				<img src="{{asset('/images/default.jpg')}}" alt="" width="32" height="32" class="rounded-circle me-2">
+				<strong>{{auth()->user()->fullname}}</strong>
 			</a>
 			<ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">				
 				<li><a class="dropdown-item nav-item" href="#">Profile</a></li>

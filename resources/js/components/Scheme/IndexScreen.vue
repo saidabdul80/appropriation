@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-lg-only shadow-lg-only" style="overflow: auto;height: inherit;">
+    <div class="bg-white rounded-lg-only shadow-lg-only" >
       <div v-show="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
           <div style="height: 100%; ">
@@ -33,8 +33,8 @@
             </table>
           </div>
           <div class="p-3" style="height: 15%;">
-            <div v-if="canPerformAction('Appropriate')">
-              <button v-if="selected_scheme?.id !== ''" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
+            <div v-if="canPerformAction('appropriate')">
+              <button v-if="selected_scheme?.id !== '' || selected_scheme?.id !== null" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
                 <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span>
               </button>
             </div>
@@ -257,10 +257,11 @@
         return total;
       },
       canPerformAction(permission) {
+        //console.log(this.permissions,222)
         return this.permissions.includes(permission);
       },    
       appropriationModalUpdate(appropriation, index) {
-        this.showModal = true
+        this.showModal = true 
         this.selected_appropriation = appropriation
       },
       totalPercentage(){
