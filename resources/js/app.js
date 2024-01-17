@@ -21,7 +21,7 @@ import ExpenditureDetailsModal from './components/Scheme/Modals/ExpenditureDetai
 
 import SchemeModal from './components/Scheme/Modals/SchemeModal.vue';
 import SharehoderModal from './components/Scheme/Modals/SharehoderModal.vue';
- 
+import DashboardScreen from './pages/DashboardScreen.vue';
 
 const app = createApp({});
 
@@ -29,6 +29,7 @@ app.config.globalProperties.$globals = helpers;
 app.component('scheme-screen', SchemeScreen);
 app.component('report-screen', ReportScreen);
 app.component('user-screen', UserScreen);
+app.component('dashboard-screen', DashboardScreen);
 //app.component('scheme-selector', schemeSelector); // Corrected camelCase component name
 /* 
 app.component('transaction-sheet', TransactionSheet);
