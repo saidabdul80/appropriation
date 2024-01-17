@@ -1,6 +1,6 @@
 <template>
-    <div class="background px-4 py-2" style="height: 92.1vh;">
-      <div class="bg-light pageTitleCard w-100 fs-9 text-danger ps-4">::Report</div>
+    <div class=" px-4 mt-5 py-2" style="height: 92.1vh;">
+      <!-- <div class="bg-light pageTitleCard w-100 fs-9 text-danger ps-4">::Report</div> -->
       <div class="position-relative">
         <div class="bg-white px-3 rounded shadow py-2">
           <div class="mb-2 mt-2 row">

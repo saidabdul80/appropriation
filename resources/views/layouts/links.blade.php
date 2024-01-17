@@ -206,12 +206,8 @@
 	</script>
 </head>
 
-<body>
-	<div id="">
+<body class="background-primary px-2 w-100">	
 		@yield('body')
-	</div>
-
-	
 </body>
 
 </html>

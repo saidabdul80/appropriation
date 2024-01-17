@@ -1,20 +1,22 @@
 <template>
-    <div>
-      <div class="btn-group" role="group" aria-label="Basic example2">
-        <button @click="$emit('switch-page',1)" class="btn fs-9 btn-primary text-white" style="">Back to Appropriation</button>
+    <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;" >
+      <div >
+        <div class="btn-group" role="group" aria-label="Basic example2">
+          <button @click="$emit('switch-page',1)" class="btn fs-9 btn-primary text-white" style="">Back to Appropriation</button>
+        </div>
+        <h4 class="text-center"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department }}</b> Transactions</h4>
+        <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span> {{ $globals.currency(selected_appropriation_balance) }}</p>
+        <p class="inline-block mb-2"><b>Total Expenditure: <span>&#8358;</span></b> {{ $globals.currency(total_expenditure_appropriation) }}</p>
       </div>
-      <h4 class="text-center"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department }}</b> Transactions</h4>
-      <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span> {{ $globals.currency(selected_appropriation_balance) }}</p>
-      <p class="inline-block mb-2"><b>Total Expenditure: <span>&#8358;</span></b> {{ $globals.currency(total_expenditure_appropriation) }}</p>
-      <div style="overflow: auto;" >        
+      <div style="overflow: auto;height: 45vh;" >        
         <table class="fs-8 table-bordered transactions-tables table table-sm table-hover" style="width:130%">
           <thead>
             <tr>
-              <th>S/N</th>
-              <th v-for="header in Object.keys($globals.dynamic_data)">
+              <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
+              <th v-for="header in Object.keys($globals.dynamic_data)" class="fs-8 fw-bold" style="white-space: nowrap;">
                 {{ header.replaceAll('_', ' ') }}
               </th>
-              <th>Total Amount</th>
+              <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
               <th>#</th>
             </tr>
           </thead>
@@ -22,7 +24,7 @@
             <!-- {{ resetTotalExpenditureForAppropriation() }} -->
             <tr v-for="(appr, i) in transactions?.data" >
               <td>{{ parseInt(i + 1) }} </td>
-              <td v-for="key in Object.keys(appr.data)">
+              <td v-for="key in Object.keys(appr.data)" class="" style="white-space: nowrap;">
                 <span v-if="key.includes('₦')">
                   {{ $globals.currency(appr.data[key]) }}
                 </span>
@@ -33,9 +35,9 @@
               </td>
               <td>
                 <i style="visibility: hidden;"> {{ i == 0 ? (total_expenditure_appropriation = 0) : '' }}</i> {{ $globals.currency(appr.amount) }} </td>
-              <td>
-                <button @click="editAppropriationTransaction(appr, i)" class="btn btn-info text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
-                <button @click="deleteAppropriationTransaction(appr, i)" class="btn btn-danger btn-sm"><i class="fs-9 bi bi-trash"></i></button>
+              <td class="p-0">
+                <button @click="editAppropriationTransaction(appr, i)" class="btn btn-info d-inline-block text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
+                <button @click="deleteAppropriationTransaction(appr, i)" class="btn btn-danger btn-sm d-inline-block"><i class="fs-9 bi bi-trash"></i></button>
               </td>
             </tr>
           </tbody>
@@ -200,6 +202,8 @@
   
   <!-- Add your component-specific styles here if needed -->
   <style scoped>
-    /* Add your component-specific styles here if needed */
+button.btn.btn-secondary.buttons-print {
+      margin-left:18px !important;
+    }
   </style>
   

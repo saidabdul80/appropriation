@@ -62,6 +62,18 @@ class TransactionsController extends Controller
                 "owner_id"=>"required",
                 "owner_type"=>"required",                
             ]);
+            if($request->get('owner_type')!='scheme'){
+                if($request->get('fund_category')){
+                    $response = Transaction::where(['owner_id'=>$request->get('owner_id'),
+                                    "owner_type"=>$request->get('owner_type'), 
+                                    'fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(20);
+                }else{
+                    $response = Transaction::where([
+                                    'owner_id'=>$request->get('owner_id'),
+                                    "owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(20);
+                }
+                return response($response);
+            }
             if($request->get('fund_category')){
 
                 $response_credit = Transaction::where(['owner_id'=>$request->get('owner_id'),

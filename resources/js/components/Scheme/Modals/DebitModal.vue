@@ -314,5 +314,8 @@
     display: block !important;
     background: #000a;
   }
+  select{
+    border: 1px solid #ccc;
+  }
   </style>
   

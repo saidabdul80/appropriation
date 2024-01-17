@@ -32,4 +32,9 @@ class AppropriationHistory extends Model
         return $this->belongsTo(Source::class);
     }
     
+    public function getSchemeNameAttribute(){
+        return Scheme::find($this->owner_id)->name;
+    }
+
+    protected $appends = ['scheme_name'];
 }

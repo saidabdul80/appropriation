@@ -21,6 +21,10 @@ File: style.css
 /**  =====================
       Custom css start
 ==========================  **/
+:root{
+	--primary-c: #1da1f2;
+	--warning-c:#ffca2a;
+}
 
 body {
 	background-color: #f3f3f3;
@@ -10629,8 +10633,48 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
 }
 
 .background-primary {
-	background-color: #448aff;
-	color: #fff;
+	background-color: var(--primary-c);
+}
+.background-primary-light{
+	/* background-color: #2255bb; */
+}
+.rounded-lg{
+	background-color: white;
+	border-radius: 18px;
+	padding:12px;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px; 	
+}
+.shadow-lg-only{
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px !important; 	
+}
+.rounded-lg-only{
+	border-radius: 18px !important;
+}
+.rounded-lg-tr{
+	border-top-right-radius: 18px !important;
+}
+.rounded-lg-tl{
+	border-top-left-radius: 18px !important;
+}
+
+.rounded-lg-br{
+	border-bottom-right-radius: 18px !important;
+}
+.rounded-lg-bl{
+	border-bottom-left-radius: 18px !important;
+}
+
+.rounded-sm-only{
+	border-radius: 10px !important;
+}
+.rounded-sm{
+	background-color: white !important;
+	border-radius: 10px;
+	padding:6px;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px; 	
+}
+.color-primary{
+	color:var(--primary-c)
 }
 
 .background-success {

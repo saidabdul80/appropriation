@@ -45,5 +45,5 @@ app.component('shareholder-modal', ShareholderModal); // Corrected component nam
 */
 app.component('swift-button', SwiftButton); // Corrected component name
 
-app.mount('#appId');
+app.mount('#page-content');
  

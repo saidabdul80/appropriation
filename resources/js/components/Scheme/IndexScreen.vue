@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="bg-white rounded-lg-only shadow-lg-only" style="overflow: auto;height: inherit;">
       <div v-show="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
-          <div style="height: 100%; overflow: auto;">
-            <table class="table">
+          <div style="height: 100%; ">
+            <table class="table table-lg">
               <thead>
                 <tr class="fw-bold">
                   <th>
@@ -32,7 +32,7 @@
               </tbody>
             </table>
           </div>
-          <div class="bg-white p-3" style="height: 15%;">
+          <div class="p-3" style="height: 15%;">
             <div v-if="canPerformAction('Appropriate')">
               <button v-if="selected_scheme?.id !== ''" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
                 <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <table v-show="switchPageOne == 1" class="table">
+      <table v-show="switchPageOne == 1" class="table table-lg">
         <thead class="bg-light">
           <tr>
             <th>SN.</th>
@@ -65,8 +65,8 @@
         </tbody>
       </table>
   
-      <table v-show="switchPageOne == 2" class="table table-sm" :key="selected_fund_category">
-        <thead class="bg-light">
+      <table v-show="switchPageOne == 2" class="table table-lg" :key="selected_fund_category">
+        <thead class="">
           <tr>
             <th>SN.</th>
             <th>Appropriation Name</th>
