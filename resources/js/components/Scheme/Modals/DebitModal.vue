@@ -260,7 +260,7 @@
             this.appropriation_log2.data['VAT_₦'] = this.calculatedValues.vatCalculate
             this.appropriation_log2.data['Withholding_Tax_₦'] = this.calculatedValues.withholdingCalculate
             this.appropriation_log2.data['Stamp_Duty_₦'] = this.calculatedValues.stampDutyCalculate
-            this.appropriation_log.total_amount = this.calculatedValues.gross; 
+            this.appropriation_log2.total_amount = this.calculatedValues.gross;             
             let res = await postData('/save_appropriation_transaction', {
                 fund_category: this.selected_fund_category,
                 owner_id: this.appropriation.id,

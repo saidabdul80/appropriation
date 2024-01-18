@@ -329,8 +329,10 @@ body{
 	justify-content:center;
 	display: block;
 	align-items:center;
-	z-index: 100000000;
+	z-index: 9000000000;
 	background:rgba(0, 0, 0,.4);
+	top:0px;
+	left:0px;
 }
 .middle {
 	top: 50%;
