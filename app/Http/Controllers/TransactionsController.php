@@ -232,7 +232,7 @@ class TransactionsController extends Controller
 
             $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
 
-            if (filled($transactionData['id'])) {
+            if ($transactionData['id']??'' != '') {
                 $response = $this->updateTransaction($transactionData, $appropriation, $mainWallet);
             } else {
                 $response =  $this->createTransaction($transactionData, $appropriation, $mainWallet, $request);
