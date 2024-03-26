@@ -37,7 +37,7 @@
                     <td class="nobreak">Date Updated</td>
                     <td>Amount</td>
                 </tr>
-                <tr v-for="(transaction,i) in transactions.credit.data" :key="transaction.id">
+                <tr v-for="(transaction,i) in transactions?.credit?.data" :key="transaction.id">
                   <td>{{ transaction.action=='undo credit'?'Deleted':'Credit' }}</td>
                   <td>{{ transaction.date_added }}</td>
                   <td>{{ transaction.date_updated}}</td>
@@ -56,7 +56,7 @@
                     <td class="nobreak">Date Updated</td>
                     <td>Amount</td>
                 </tr>
-                <tr v-for="(transaction,i) in transactions.undo.data" :key="transaction.id">
+                <tr v-for="(transaction,i) in transactions?.undo?.data" :key="transaction.id">
                   <td>Deleted</td>
                   <td>{{ transaction.date_added }}</td>
                   <td>{{ transaction.date_updated}}</td>
