@@ -1,19 +1,20 @@
 <template>
   <div class="row mx-auto">
     <div class="col-8  ps-0 ">
-      <div class="mb-2 w-100 d-flex bg-white d-inline-block rounded-sm  input-group position-relative">
+      <div class="mb-2 w-100 d-flex bg-white d-inline-block rounded-sm p-0 input-group position-relative">
         <select @input="onSchemeChange" v-model="selectedScheme" class="mx-1 form-control border-0" >
           <option :value="defaultScheme">Select a Scheme</option>
           <option v-for="(scheme, index) in schemes" :key="index" :value="scheme">{{ scheme?.name }} </option>
         </select>      
-        <button @click="$emit('openModal')" :class="{ 'btn-success': selectedScheme.id, 'btn-secondary disabled': !selectedScheme.id }" class="px-1 update-scheme w-25 btn fs-9 mx-1">
-          Manage
+        <button @click="$emit('openModal')" :class="{ 'btn-success': selectedScheme.id, 'btn-secondary disabled': !selectedScheme.id }" class="px-1 update-scheme w-25 btn fs-9 ms-1">
+          <i class="fa fa-wrench"></i>          
+          <span class="nav-name2">Manage</span>
         </button>
         <i class="fa fa-caret-down text-secondary position-absolute" style="right: 26%; top: 33%;"></i>
       </div>
     </div>
     <div class="col-4 " style="/* position: fixed; top: 5px; z-index: 9; padding-left: 20px */">
-      <div class="mb-2  bg-white d-inline-block rounded-sm">
+      <div class="mb-2  bg-white d-inline-block rounded-sm p-0">
         <month-year-selector :selected_scheme_id="selectedScheme.id" @month-selected="monthSelected" :fund_categories="fund_categories"/>
        </div>
     </div>
