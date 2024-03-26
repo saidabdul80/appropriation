@@ -1,9 +1,9 @@
 <template>
-    <div class="bg-white rounded-lg-only shadow-lg-only" >
+    <div class="bg-white rounded-lg-only shadow-lg-only" style="overflow-x: auto">
       <div v-show="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
           <div style="height: 100%; ">
-            <table class="table table-lg">
+            <table class="table table-lg" style="min-width:1000px;">
               <thead>
                 <tr class="fw-bold">
                   <th>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <table v-show="switchPageOne == 1" class="table table-lg">
+      <table v-show="switchPageOne == 1" class="table table-lg" style="min-width:1000px;">
         <thead class="bg-light">
           <tr>
             <th>SN.</th>
@@ -65,7 +65,7 @@
         </tbody>
       </table>
   
-      <table v-show="switchPageOne == 2" class="table table-lg" :key="selected_fund_category">
+      <table v-show="switchPageOne == 2" class="table table-lg" :key="selected_fund_category" style="min-width:1000px;">
         <thead class="">
           <tr>
             <th>SN.</th>

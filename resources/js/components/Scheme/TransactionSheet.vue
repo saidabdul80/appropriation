@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;" >
+    <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;overflow-x: auto;" >
       <div >
         <div class="btn-group" role="group" aria-label="Basic example2">
           <button @click="$emit('switch-page',1)" class="btn fs-9 btn-primary text-white" style="">Back to Appropriation</button>
@@ -9,7 +9,7 @@
         <p class="inline-block mb-2"><b>Total Expenditure: <span>&#8358;</span></b> {{ $globals.currency(total_expenditure_appropriation) }}</p>
       </div>
       <div style="overflow: auto;height: 45vh;" >        
-        <table class="fs-8 table-bordered transactions-tables table table-sm table-hover" style="width:130%">
+        <table class="fs-8 table-bordered transactions-tables table table-sm table-hover" style="min-width:1000px;">
           <thead>
             <tr>
               <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
