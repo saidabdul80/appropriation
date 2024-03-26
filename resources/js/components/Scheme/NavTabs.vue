@@ -1,5 +1,6 @@
 <template>
-  <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+  <hr class="line-mobile d-none">
+  <ul class="nav nav-tabs border-0 mb-3" id="myTab" role="tablist">
     <li class="nav-item  t-shadow" role="presentation">
       <a @click="handleTabClick(0)" class="rounded-sm-only mx-2 fs-8 nav-link t-white active" id="home-tab2" data-bs-toggle="tab" href="#home2" role="tab" aria-controls="home2" aria-selected="true">
         Appropriations

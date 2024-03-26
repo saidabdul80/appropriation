@@ -2,7 +2,7 @@
   <div>
     <!-- //Ribbon -->  
     <div class="row mx-0 mt-3">
-      <div class="col-md-6 px-0">
+      <div class="col-md-6 px-0 mb-4">
         <ribbon-menu
           @projectionModal="openModalProjection = true"            
           @fundModal="openModalFund= true"
@@ -13,7 +13,7 @@
           :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme" 
           />
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6 px-0">
         <scheme-selector 
           @month-selected="monthYearTriggered" 
           :fund_categories="fund_categories" 
@@ -62,7 +62,7 @@
             </div> -->
             
             <div id="pagerContainer"  style="height:65vh">
-              <div v-if="switchPage === 1" style="height: inherit">
+              <div v-if="switchPage === 1" style="height: inherit;">
                   <index-screen     
                   :permissions="permissions"              
                   :key="selected_scheme.id"
@@ -80,13 +80,13 @@
                   @openTransaction="handleOpenTransaction"
                   />
               </div>
-              <div v-if="switchPage === 2">
+              <div v-if="switchPage === 2" style="height: inherit; min-width:1000px; overflow-x: auto">
                 <appropriation-history 
                   :appropriationHistories="appropriations_history"
                   :selected_scheme="selected_scheme"
                 />
               </div>              
-              <div v-if="switchPage === 3" class="position-relative " style="height: inherit;" id="transaction-sheet">
+              <div v-if="switchPage === 3" class="position-relative " style="height: inherit; min-width:1000px; overflow-x: auto" id="transaction-sheet">
                 <transaction-sheet      
                   :key="selected_fund_category"                               
                   :selected_appropriation="selected_transcation_appropriation"

@@ -275,7 +275,20 @@ $routename = str_replace('#','', Route::currentRouteName());
 		#drawer-toggle:checked~#page-content {
 			margin-left: calc(100% - 50px);
 		}
-
+		
+		
+	}
+	.line-mobile{
+		display: none;
+		background-color: white;
+	}
+	@media all and (max-width:720px) {
+		.line-mobile{
+			display: block !important;
+		}
+		#page-content {		
+			padding: 0px 10px 0px 60px !important;
+		}
 	}
 </style>
 <!-- <main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">

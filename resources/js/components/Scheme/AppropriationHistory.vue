@@ -19,7 +19,7 @@
                     </tbody>
                 </table>
             </div>
-            <table class="table table-sm bg-white  shadow-sm w-100 rounded-lg-only shadow-lg-only" style="width:100%">
+            <table class="table table-sm bg-white  shadow-sm w-100 rounded-lg-only shadow-lg-only" style="min-width:1000px;">
                 <thead class="bg-light">
                     <tr>
                         <th>S/N</th>
