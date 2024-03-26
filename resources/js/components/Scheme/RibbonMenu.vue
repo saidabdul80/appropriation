@@ -4,7 +4,7 @@
         "request_approval","mark_completed","view_task_report",
         "update_report","e_s","fund_scheme","projection","appropriate","new_appropriationm",
         "appr_income","appr_current_balance","income","balance","expenditure","general._app._history","debit_fund","report","appro_history"] -->
-        <div class="  p-0 d-flex">
+        <div class="  p-0 d-flex shift-right">
             <div class="" role="group" aria-label="Basic example">
                 <button v-if="canPerformAction('new_appropriation')" title="New Appropriation"
                     @click="$emit('showAddModal')" class="m-0 fs-9 btn rounded-sm mx-2 color-primary d-inline-block">

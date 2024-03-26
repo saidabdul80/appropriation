@@ -183,13 +183,13 @@ $routename = str_replace('#','', Route::currentRouteName());
 		display: none;
 	}
 	
-	.nav-pills li a.activeLink .menu-icon{
+	.nav-pills li a.activeLink .menu-icon {
 		color: var(--warning-c) !important;
 	}
 	.nav-link svg{
 		stroke: white !important;
 	}
-	.menu-icon{
+	.menu-icon {
 		color:white !important;
 		font-size: 30px;
 	}
@@ -210,15 +210,19 @@ $routename = str_replace('#','', Route::currentRouteName());
 		left: auto;
 	}
 	#drawer-toggle:checked~#drawer div .nav-pills li a.activeLink .nav-name,
-	 #drawer-toggle:checked~#drawer div .nav-pills li a.activeLink .menu-icon {
+	 #drawer-toggle:checked~#drawer div .nav-pills li a.activeLink .menu-icon  {
 		color:var(--warning-c) !important;
 	}
 	#drawer-toggle:checked~#drawer div .nav-pills li a .nav-name{
 		display: inline-block;
 		color:var(--primary-c)
 	}
+
+	#drawer-toggle:checked~#drawer div .nav-pills li a .nav-name2{
+		display: inline-block !important;		
+	}	
 	
-	#drawer-toggle:checked~#drawer div .nav-pills li a .menu-icon{
+	#drawer-toggle:checked~#drawer div .nav-pills li a .menu-icon {
 		color: var(--primary-c) !important;
 		display: inline-flex !important;
 		justify-content: center !important;
@@ -256,7 +260,13 @@ $routename = str_replace('#','', Route::currentRouteName());
 	/* Responsive MQ */
 
 	@media all and (max-width:350px) {
-
+		#drawer-toggle-label{
+			position: fixed;
+		}
+		
+		.nav{			
+			flex-direction: column-reverse !important;
+		}
 		#drawer-toggle:checked~#drawer-toggle-label {
 			height: 100%;
 			width: 50px;
@@ -276,11 +286,26 @@ $routename = str_replace('#','', Route::currentRouteName());
 			margin-left: calc(100% - 50px);
 		}
 		
-		
+	
 	}
 	.line-mobile{
 		display: none;
 		background-color: white;
+	}
+	@media all and (max-width:472px) {
+		.shift-right{
+			place-content: flex-end;
+		}
+		.nicare-logo-right{
+			display: none !important;
+		}
+		div#page-content {		
+			padding: 0px 10px 0px 10px !important;
+		}
+		
+		.nav-name2{
+			display: none !important;
+		}
 	}
 	@media all and (max-width:720px) {
 		.line-mobile{
@@ -314,7 +339,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 	
 	<div class="offcanvas-header bg-white justify-between">
 		<span>
-			<a href="/" class="d-flex  align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
+			<a href="/" class="d-flex nicare-logo-right align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
 				<img src="{{asset('images/nicare_logo.jpg')}}" style="width: 35px;" class="nav-logo">
 				<span class="fs-6 ms-2">FMS</span>
 			</a>
@@ -326,20 +351,14 @@ $routename = str_replace('#','', Route::currentRouteName());
 	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative">
 		<ul class="nav nav-pills flex-column mb-auto">
 			<li data-bs-toggle="tooltip" title="Home" class="nav-item">
-				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">
-					<!-- <svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#home" />
-					</svg> -->
-					<i class="fa fa-home menu-icon"></i>
+				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">				
+					<i class=" nav-name2 fa fa-home menu-icon "></i>
 					<span class="nav-name">Home</span>
 				</a>
 			</li>
 			<li data-bs-toggle="tooltip" title="Dashboard" >
-				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">
-					<!-- <svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#speedometer2" />
-					</svg> -->
-					<i class="fa fa-dashboard menu-icon"></i>
+				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">				
+					<i class=" nav-name2 fa fa-dashboard menu-icon "></i>
 					<span class="nav-name">Dashboard</span>
 				</a>
 			</li>
@@ -349,7 +368,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#grid" />
 					</svg> -->
-					<i class="fa fa-user menu-icon d-flex justify-content-center"></i>
+					<i class=" nav-name2 fa fa-user menu-icon  d-flex justify-content-center"></i>
 					<span class="nav-name">User</span>
 				</a>
 			</li>
@@ -358,7 +377,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 					<!-- <svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#table" />
 					</svg> -->
-					<i class="fa fa-table menu-icon d-flex justify-content-center"></i>
+					<i class=" nav-name2 fa fa-table menu-icon  d-flex justify-content-center"></i>
 					<span class="nav-name">Account</span>
 				</a>
 				<!--
@@ -372,7 +391,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#people-circle" />
-					</svg>
+					</svg> nav-name2 
 					<span class="nav-name">Users</span>
 				</a>
 			</li> -->
