@@ -121,22 +121,26 @@
 
 		async function postData(route, data, type = false) {
 			$("#loaderHtml").show()
-			return await axios.post(route, data).then(function(response) {
-				//switchPage(1)
-				$("#loaderHtml").hide()
-				if (!type) { //if false
-					showAlert(response.data);
-				} else {
-					return response;
-				}
-			}).catch(function(error) {
-				//switchPage(1)                   
-				$("#loaderHtml").hide()
-				Swal.fire({
-					text: error.response.data,
-					icon: 'error',
+			try{
+				return await axios.post(route, data).then(function(response) {
+					//switchPage(1)
+					$("#loaderHtml").hide()
+					if (!type) { //if false
+						showAlert(response.data);
+					} else {
+						return response;
+					}
+				}).catch(function(error) {
+					//switchPage(1)                   
+					$("#loaderHtml").hide()
+					Swal.fire({
+						text: error.response.data,
+						icon: 'error',
+					})
 				})
-			})
+			}catch(e){
+				console.log(e)
+			}
 		}
 
 		async function postDataWithoutLoader(route, data) {			
