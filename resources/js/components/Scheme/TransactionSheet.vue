@@ -76,7 +76,7 @@
     },
     computed:{
         total_expenditure_appropriation(){
-            return this.transactions.data.reduce((accumulator, currentTransaction) => accumulator + currentTransaction.amount, 0)
+            return this.transactions?.data?.reduce((accumulator, currentTransaction) => accumulator + currentTransaction.amount, 0)
         }
     },
     async created(){                    
