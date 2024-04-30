@@ -13,15 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('appropriations', function (Blueprint $table) {
+        Schema::create('fund_categories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("scheme_id");
-            $table->longText("department_id");                  
-            $table->integer("appropriation_type_id");            
-            $table->float("percentage_dividend");
-            $table->enum('budget_location',['head','subhead'])->default('head');
-            $table->timestamps();
+            $table->integer('scheme_id');
+            $table->string('fund_category');
+            $table->string('fund_month_year');
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shareholders');
+        Schema::dropIfExists('fund_categories');
     }
 };

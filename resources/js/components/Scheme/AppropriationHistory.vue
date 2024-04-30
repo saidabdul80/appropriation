@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <div v-for="(hist, i) in appropriation_histories.data" :id="'appro_' + i">
+        <div v-for="(hist, i) in appropriation_histories?.data" :id="'appro_' + i">
             <button @click="printE('appro_' + i)" class="btn btn-sm btn-light pull-right">Print</button>
             <p class="text-white fw-bold">{{ hist.fund_month_year }}, {{ hist.fund_category }}</p>
             <div class="bg-white rounded-lg-tl rounded-lg-tr shadow-lg-only px-3 pt-3">
@@ -91,7 +91,7 @@ export default {
             appropriation_histories:[]
         }
     },
-    created(){
+    created(){        
         this.appropriation_histories = this.appropriationHistories
     },
     methods: {

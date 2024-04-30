@@ -66,20 +66,6 @@ $routename = str_replace('#','', Route::currentRouteName());
 	</symbol>
 </svg>
 <style>
-	* {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		-o-box-sizing: border-box;
-		box-sizing: border-box;
-		/* adds animation for all transitions */
-		-webkit-transition: .25s ease-in-out;
-		-moz-transition: .25s ease-in-out;
-		-o-transition: .25s ease-in-out;
-		transition: .25s ease-in-out;
-		margin: 0;
-		padding: 0;
-		-webkit-text-size-adjust: none;
-	}
 
 	/* Makes sure that everything is 100% height */
 
@@ -158,8 +144,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 		margin-left: 0px;		
 		width: 100%;
 		height: 100vh;
-		overflow-x: hidden;
-		overflow-y: scroll;
+		overflow: hidden;		
 		-webkit-overflow-scrolling: touch;
 		padding: 0px 60px;
 	}
@@ -182,7 +167,6 @@ $routename = str_replace('#','', Route::currentRouteName());
 	.nav-name{
 		display: none;
 	}
-	
 	.nav-pills li a.activeLink .menu-icon {
 		color: var(--warning-c) !important;
 	}
@@ -314,6 +298,10 @@ $routename = str_replace('#','', Route::currentRouteName());
 		#page-content {		
 			padding: 0px 10px 0px 60px !important;
 		}
+		#page-content {
+			overflow-y:scroll !important ;
+		}
+		
 	}
 </style>
 <!-- <main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">

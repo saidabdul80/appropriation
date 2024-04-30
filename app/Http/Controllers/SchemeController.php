@@ -6,7 +6,9 @@ use App\Models\Scheme;
 use App\Models\AppropriationHistory;
 use App\Models\Appropriation;
 use App\Models\Fund;
+use App\Models\FundCategory;
 use App\Models\MainWallet;
+use App\Models\SubHeadBudget;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use Carbon\Carbon;
@@ -48,32 +50,24 @@ class SchemeController extends Controller
                 "percentage_dividend"=>"required"
             ]);
             
-
-            $data = $request->all();
-            $id = $data['id'];    
-            $data['wallet_number'] = date('ymdhis');
-            if($id == ''){
-                DB::beginTransaction();
-                
-                $res = Appropriation::create([
-                    "scheme_id"=>$data['scheme_id'],    
-                    "appropriation_type_id"=>$data['appropriation_type_id'],
-                    "department_id"=>$data['department_id'],
-                    "percentage_dividend"=>$data['percentage_dividend']
-                ]);                                    
-                DB::commit();
-                return response(["appropriation"=>$res, "msg" =>'Created Successfuly'],200);
-            }else{                           
-                DB::beginTransaction();
-                    $res = Appropriation::find($id);
-                    $res->scheme_id= $data['scheme_id'];
-                    $res->appropriation_type_id = $data['appropriation_type_id'];
-                    $res->department_id = $data['department_id'];
-                    $res->percentage_dividend= $data['percentage_dividend'];
-                    $res->save();   
-                DB::commit();                               
-                return response('Updated Successfuly',200);
+            $data = $request->only(['scheme_id', 'appropriation_type_id', 'department_id', 'percentage_dividend']);
+            $appropriation = Appropriation::updateOrCreate(
+                [
+                    'scheme_id' => $data['scheme_id'],
+                    'appropriation_type_id' => $data['appropriation_type_id']
+                ],
+                [
+                    'department_id' => $data['department_id'],
+                    'percentage_dividend' => $data['percentage_dividend']
+                ]
+            );
+                        
+            if ($appropriation->wasRecentlyCreated) {
+                return response()->json(['appropriation' => $appropriation, 'msg' => 'Created Successfully'], 200);
+            } else {
+                return response()->json(['appropriation' => $appropriation, 'msg' => 'Updated Successfully'], 200);
             }
+            
         } catch(ValidationException $e){
             return response($e->getMessage(),400);   
         }catch(\Exception $e){
@@ -84,6 +78,37 @@ class SchemeController extends Controller
                 return response('failed',400);
             }
         }
+    }
+
+    private function createSchemeWallet($scheme_id){
+        $wallet_number = date('ymdhis');
+        $scheme = Scheme::where('id', $scheme_id)->first();        
+        $token = walletToken($scheme_id,'scheme');
+        if(empty($scheme->wallet_number)){
+            $wallet =  Wallet::create([
+                "owner_id"=>$scheme_id,
+                "wallet_number"=>$wallet_number,
+                "owner_type"=>'App\\Models\\Scheme',
+                "balance"=>0.00,
+                "total_collection"=>0.00,
+                "token"=>$token
+            ]);
+
+            return $wallet;
+        }else{
+            if(!Wallet::where('wallet_number', $scheme->wallet_number)->exists()){
+                $wallet =  Wallet::create([
+                    "owner_id"=>$scheme_id,
+                    "wallet_number"=>$wallet_number,
+                    "owner_type"=>'App\\Models\\Scheme',
+                    "balance"=>0.00,
+                    "total_collection"=>0.00,
+                    "token"=>$token
+                ]);
+                return $wallet;    
+            }
+        }
+        return false;
     }
 
     public function addScheme(Request $request)
@@ -98,19 +123,16 @@ class SchemeController extends Controller
             $data = $request->all();
             $id = $data['id'];        
             if( $id == ''){
-                $data['wallet_number'] = date('ymdhis');
+                
                 DB::beginTransaction();
                     $res = Scheme::create(["name"=>$data['name']]);
-                    $wallet =  Wallet::create([
-                        "owner_id"=>$res->id,
-                        "wallet_number"=>$data['wallet_number'],
-                        "owner_type"=>'App\\Models\\Scheme',
-                        "balance"=>0.00,
-                        "total_collection"=>0.00,
-                    ]);
-                    
-                    $res->wallet_number =  $wallet->wallet_number;
-                    $res->save();
+                    $wallet = $this->createSchemeWallet($res->id);
+                    if($wallet){
+                        $res->wallet_number =  $wallet->wallet_number;
+                        $res->save();
+                    }else{
+                        throw new \Exception('Failed to Create Scheme Wallet: Try again');
+                    }
 
                 DB::commit();
                 return response(["scheme"=>Scheme::find($res->id), "msg" =>'Created Successfuly'],200);
@@ -142,17 +164,77 @@ class SchemeController extends Controller
                 "source_id"=>"required",
                 "fund_month_year"=>"required"
             ]);
+
             $amount = $request->get('amount');        
             $scheme_id = $request->get('scheme_id');
             $source_id = $request->get('source_id');
             $description = $request->get('description');
             $fund_month_year = $request->get('fund_month_year');
-
+            
+            
             if(Fund::where(['scheme_id'=>$scheme_id,'fund_category'=>$fund_month_year,'status'=>'used'])->exists()){
                 throw new \Exception('This fund has already been used');
             }
             
             DB::beginTransaction();
+                
+
+             
+                
+                $scheme = Scheme::find($scheme_id);  
+                $wallet = $this->createSchemeWallet($scheme_id);                
+                if($wallet){
+                    $scheme->wallet_number =  $wallet->wallet_number;
+                    $scheme->save();
+                    $scheme->fresh();
+                }
+                
+                
+                $wallet = Wallet::find($scheme->wallet->id);
+                $fundCategoryValue = substr($fund_month_year,0,4);// $this->monthYearFormatter($fund_month_year,$scheme);    
+                
+                if($scheme->fund_category == 'year'){
+                    if($wallet->balance > 0 && $wallet->fund_category != $fundCategoryValue){
+                        throw new \Exception("Invalid Funding: you cannot top up fund with different funding year ");
+                    }
+                }
+
+                if($scheme->fund_category == 'month'){
+                    if($wallet->balance > 0 && $wallet->fund_month_year != $fund_month_year){
+                        throw new \Exception("Invalid Funding: you cannot top up fund with different funding date ");
+                    }
+                }
+                //$wallet->safe_balance += $wallet->balance;
+                
+                $wallet->balance += $amount;
+                $wallet->fund_category = $fundCategoryValue; //shows the last fund category
+                $wallet->fund_month_year = $fund_month_year;
+                $wallet->total_collection += $amount;
+                $wallet->source_id = $source_id;
+                $wallet->description = $description;
+                $wallet->save();
+
+                $exists = FundCategory::where([
+                    'scheme_id' => $scheme_id,
+                    'fund_category' => $fundCategoryValue,
+                ])->exists();
+                
+                // Create the record only if it does not exist
+                if (!$exists) {
+                    FundCategory::create([
+                        'scheme_id' => $scheme_id,
+                        'fund_category' => $fundCategoryValue,
+                        'fund_month_year' => $fund_month_year
+                    ]);
+                }
+
+                if($scheme->fund_type=='api'){
+                    Fund::where(['scheme_id'=>$scheme->id,'fund_category'=>$fund_month_year])->update([
+                        'amount'=> $amount,
+                        'status'=>'used'
+                    ]);
+                }
+
                 $trasaction = Transaction::create([
                     "owner_id"=> $scheme_id,
                     "owner_type"=>'scheme',
@@ -163,33 +245,16 @@ class SchemeController extends Controller
                     "amount"=>$amount,
                     "fund_category"=>$fund_month_year,
                     "performed_by"=>1,
+                    "state"=>'unused'
                     //"performed_by"=>auth()->user()->id,
                 ]);
-                $scheme = Scheme::find($scheme_id);            
-                $wallet = Wallet::find($scheme->wallet->id);
-                $fundCategoryValue = substr($fund_month_year,0,4);// $this->monthYearFormatter($fund_month_year,$scheme);            
-                //$wallet->safe_balance += $wallet->balance;
-                $wallet->balance += $amount;
-                $wallet->fund_category = $fundCategoryValue; //shows the last fund category
-                $wallet->fund_month_year = $fund_month_year;
-                $wallet->total_collection += $amount;
-                $wallet->source_id = $source_id;
-                $wallet->description = $description;
-                $wallet->save();
-
-                if($scheme->fund_type=='api'){
-                    Fund::where(['scheme_id'=>$scheme->id,'fund_category'=>$fund_month_year])->update([
-                        'amount'=> $amount,
-                        'status'=>'used'
-                    ]);
-                }
             DB::commit();
             $scheme = Scheme::find($scheme_id);   
             return response(["scheme"=>$scheme, "msg"=>'funded'],200);
         } catch(ValidationException $e){
             return response($e->getMessage(),400);   
         }catch(\Exception $e){
-            if(env('APP_DEBUG')){
+            if(env('APP_DEBUG')){                
                 return response($e->getMessage(),400);                
             }else{
                 return response('failed',400);
@@ -277,7 +342,7 @@ class SchemeController extends Controller
     {
         try{
             $request->validate([                
-                "scheme_id"=>"required",
+                "scheme_id"=>"required",                
                 "appropriation_ids" =>"required"
             ]);
             $scheme = Scheme::find($request->get('scheme_id'));
@@ -296,6 +361,26 @@ class SchemeController extends Controller
             $fundCategoryValue = $scheme->wallet->fund_category;            
             $fund_month_year = $scheme->wallet->fund_month_year;
             DB::beginTransaction();
+            $lastSubheadBudgetEntries = SubHeadBudget::whereIn('appropriation_id', $appropriation_ids)
+                            ->whereIn('id', function($query) {
+                                $query->select(DB::raw('MAX(id)'))
+                                    ->from('sub_head_budgets')
+                                    ->groupBy('appropriation_id');
+                            })
+                            ->get();
+
+            $lastSubheadBudgetEntries->map(function ($entry) use ($fundCategoryValue ) {
+                if($entry->fund_category !== $fundCategoryValue ){
+                    $newEntry = $entry->replicate(['id'])->fill([
+                        "amount"=>0,
+                        "fund_category"=> $fundCategoryValue 
+                    ]);                
+                    $newEntry->save(); 
+                }
+            });
+
+            /* SubHeadBudget::whereIn('appropriation_id',$appropriation_ids)->where('fund_category', $request->get('fund_category')); */
+
             foreach($scheme->appropriations as $appropriation){
                 if(in_array($appropriation->id, $appropriation_ids)){                
                     $amount = ($scheme->wallet->balance* $appropriation->percentage_dividend) /100;                
@@ -307,7 +392,7 @@ class SchemeController extends Controller
                         "amount"=>$amount,
                         "percentage_dividend" => $appropriation->percentage_dividend
                     ];
-                    $token = walletToken($fundCategoryValue,$appropriation->id);
+                    $token = walletToken($appropriation->id,$fundCategoryValue);
                     $appropriationWithWallet = Appropriation::with(['wallet'=>function($query) use($token){
                         $query->where(['token'=>$token]);
                     }])->where('id', $appropriation->id)->first();
@@ -371,9 +456,10 @@ class SchemeController extends Controller
                 "source_id"=>$scheme->wallet->source_id,
                 "appropriation_history_id"=> $appropriationHistory->id,
                 "amount"=>$total_amount,
-                "performed_by"=>1,
+                "performed_by"=>1,                
                 //"performed_by"=>auth()->user()->id,
             ]);
+            Transaction::where(["owner_id"=> $scheme->id,"owner_type"=> 'scheme'])->update(['state'=>'used']);
             DB::commit();
             $scheme = Scheme::find($scheme->id);
             return response(["appropriationHistory"=>$appropriationHistory,"scheme"=>$scheme],200);
@@ -398,6 +484,22 @@ class SchemeController extends Controller
         return $fundCategoryValue;
     }
 
+    public function fetchFundCategories(Request $request){
+        try{
+
+            return response(FundCategory::where([
+                'scheme_id' => $request->get('scheme_id')                
+            ])->get(),200);
+        } catch(ValidationException $e){
+            return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e->getMessage(),400);                
+            }else{
+                return response('failed',400);
+            }
+        }
+    }
 
  
 }

@@ -1,14 +1,16 @@
 <template>
-  <div>
+  <div style="height:100vh" >
     <!-- //Ribbon -->  
     <div class="row mx-0 mt-3">
-      <div class="col-md-6 px-0 mb-4">
+      <div class="col-md-6 px-0 mb-4 mt-4 mt-sm-0">
         <ribbon-menu
           @projectionModal="openModalProjection = true"            
           @fundModal="openModalFund= true"
-          @appropriationModalRemit="openModalApprRemit= true"
+          @appropriationModalRemit="openTransactionModal()"
           @report="openReport()"
           @openExpenditure="openExpenditureModal"
+          @config="openConfig=true"
+          @showAddModal="openAppModalFunc()"
           :category_income_balance="0"          
           :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme" 
           />
@@ -19,6 +21,7 @@
           :fund_categories="fund_categories" 
           @openModal="openModalScheme = true" 
           :schemes="schemes" 
+          :scheme_changed="scheme_changed"
           @scheme-selected="changeScheme" 
           />
          
@@ -44,15 +47,12 @@
         />
       </div>
     </div>
-    <div class=" pb-2 pt-3" style="height: 92.1vh; z-index: 1">
+    <div class=" pb-2 pt-3" style="height: inherit; z-index: 1">
       <!-- <div class="bg-light pageTitleCard w-15 fs-9 text-danger ps-4">::{{ pageName }}</div> -->
       <div class="position-relative">
       
         <div class="py-2">
-          <div class="mb-3 mx-1 row ">
-          </div>
-         
-          <div class="" style="height: 77vh;">
+          <div class="" style="height: inherit;">
           <!--   <div class="mb-3 input-group">
               <span class="input-group-text">Funding Year</span>
               <select @input="monthYearTriggered($event)" class="form-control" placeholder="Select funding year">
@@ -68,7 +68,7 @@
                   :key="selected_scheme.id"
                   :switchPageOne="switchPageOne"
                   :selected_scheme="selected_scheme"
-                  :appropriations_history="appropriations_history?.data"
+                  :appropriations_history="appropriations_history"
                   :selected_fund_category="selected_fund_category"
                   :selected_month_appropriations="appropriations"
                   :totalAppropriationPercentageValue="totalAppropriationPercentageValue"
@@ -77,6 +77,8 @@
                   :appropriation_types="appropriationtypes"
                   :appropriation_data_summary="appropriation_data_summary"
                   :schemes="schemes"
+                  @updateSchemes="updateSchemes"
+                  @closeAppModal="openAppModal = false"
                   @openTransaction="handleOpenTransaction"
                   />
               </div>
@@ -97,11 +99,13 @@
                 />
               </div>
             </div>
+            <swift-button :currentPage="switchPage" @switch-page="switchPageFunc"></swift-button>
           </div>
+
         </div>
 
         <!-- Use proper registration for swift-button -->
-        <swift-button :currentPage="switchPage" @switch-page="switchPageFunc"></swift-button>
+        
       </div>
     </div>
     <Transition name="fade">
@@ -150,7 +154,12 @@
         :category_income_balance="category_income_balance"
       />
     </Transition>
-
+    <Transition name="fade">
+      <config-modal v-if="openConfig" @closeModal="openConfig = false" />
+    </Transition>
+<!--     <Transition name="fade">      
+      <sharehoder-modal  v-if="openAppModal" @closeModal="openAppModal = false" />
+    </Transition> -->
   </div>
 </template>
 
@@ -165,6 +174,8 @@ import ProjectionModal from './../components/Scheme/Modals/ProjectionModal.vue';
 import AddFundModal from './../components/Scheme/Modals/AddFundModal.vue';
 import DebitModal from './../components/Scheme/Modals/DebitModal.vue';
 import SchemeModal from './../components/Scheme/Modals/SchemeModal.vue';
+import SharehoderModal from './../components/Scheme/Modals/SharehoderModal.vue';
+import ConfigModal from './../components/Scheme/Modals/ConfigModal.vue';
 import ExpenditureDetailsModal from './../components/Scheme/Modals/ExpenditureDetailsModal.vue';
 import SummaryData from '../components/Scheme/SummaryData.vue';
 import AppropriationHistory from '../components/Scheme/AppropriationHistory.vue';
@@ -180,11 +191,14 @@ export default {
     'nav-tab':NavTab,
     'transaction-sheet':TransactionSheet,
     'expenditure-details-modal':ExpenditureDetailsModal,
+    SharehoderModal,
+    ConfigModal,
     SummaryData,
     AppropriationHistory
   },
   data() {
     return {
+      scheme_changed:0,
       switchPageOne:'0',
       pageName:'',
       selected_scheme: null,
@@ -203,6 +217,8 @@ export default {
       openModalApprRemit:false,
       openModalReport:false,
       openModalScheme:false,
+      openConfig:false,
+      openAppModal:false,
       appropriations_projection: {},
       selected_appropriation: {
           index: '',
@@ -235,6 +251,7 @@ export default {
       type: Array,
       default: [],
     },
+    
     dyear: {
       default: '',
     },
@@ -245,6 +262,13 @@ export default {
   computed:{ 
   },
   methods: {  
+    openTransactionModal(){
+      this.transaction = {id:''}
+      this.openModalApprRemit= true
+    },
+    openAppModalFunc(){      
+      this.openAppModal = true;
+    },
     openExpenditureModal(data){
       if(this.selected_scheme?.id =='' || this.selected_scheme?.id  == undefined){
               Swal.fire('Select a programme')
@@ -273,7 +297,7 @@ export default {
           scheme_id: this.selected_scheme.id,
           fund_category: this.selected_fund_category,
         }, true);
-        if (res.status == 200) {
+        if (res.status == 200) {          
           this.appropriation_data_summary = res.data;
         }   
       },
@@ -288,6 +312,9 @@ export default {
       /*   setTimeout(()=>{
           $("#loaderHtml").hide() 
         },100) */
+    },
+    updateSchemes(data){
+      this.$forceUpdate();
     },
     handleOpenTransaction(data){
       this.switchPageFunc(3)      
@@ -305,6 +332,7 @@ export default {
     fundAdded(res){
       let index = this.$globals.getIndexOf(this.schemes, this.selected_scheme)
       this.schemes[index] = res.scheme
+      this.scheme_changed +=1
       this.selected_scheme = res.scheme
       showAlert(res.msg)
     },
@@ -318,7 +346,8 @@ export default {
       //console.log(data)
       this.selected_fund_category = data.selected_month
         this.appropriationSummaryResolver();                
-        this.appropriations_history = data.appropriations_histories        
+        /* console.log(data) */
+        //this.appropriations_history = data.appropriations_history        
         this.appropriations = data.appropriations                                                      
         setTimeout(() => {
             this.getCategoryIncome()
@@ -328,8 +357,8 @@ export default {
     async changeScheme(data) {      
          this.selected_scheme = data;      
             try {
-                const [fundResponse, appropriationHistoryResponse] = await Promise.all([
-                    postData('/fund_month_year', {
+                const [fundResponse, appropriationHistoryResponse, ] = await Promise.all([
+                    postData('/get_fund_categories', {
                         scheme_id: this.selected_scheme.id
                     }, true),
                     postData('/get_appropriation_histories', {
@@ -338,12 +367,11 @@ export default {
                     }, true),
                 ]);                  
                 if (fundResponse?.status === 200) {
-                    this.fund_categories = fundResponse.data;             
+                    this.fund_categories = fundResponse.data?.map(item=> item.fund_category);             
                 } else {
                     showAlert('Something went wrong');
                     return false;
-                }
-
+                }                
                 if (appropriationHistoryResponse?.status === 200) {
                     this.appropriations_history = appropriationHistoryResponse.data;
                     this.appropriations = [];
@@ -364,7 +392,7 @@ export default {
     },
     getCategoryIncomeBalance() {
         this.category_income_balance = this.appropriations.reduce((total, appropriation) => {
-            return total + appropriation?.wallet.balance
+            return total + appropriation?.wallet?.balance || 0
         }, 0)
     },
     getCategoryIncome() {
@@ -384,3 +412,43 @@ export default {
   },
 };
 </script>
+
+
+<style>
+.p-inputtext {    
+    
+    color: #334155;
+    background: #ffffff;
+    padding: 0.5rem 0.75rem !important;
+    /* border: 1px solid #cbd5e1; */
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, outline-color 0.2s !important;
+    appearance: none;
+    border-radius: 6px;
+    outline-color: transparent !important;
+}
+.p-multiselect-panel .p-multiselect-header {
+    padding: 0.5rem 0.5rem 0 0.5rem !important;
+    }
+
+ .p-multiselect-filter-container {
+    position: relative;
+    flex: 1 1 auto;
+    padding: 9px !important;
+}
+.p-multiselect-filter-icon {
+    position: absolute;
+    top: 35% !important;
+    }
+
+ .p-multiselect.p-multiselect-chip .p-multiselect-token {
+    border-radius: 4px;
+    margin-right: 0.25rem !important;
+}
+.p-multiselect.p-multiselect-chip .p-multiselect-token {
+    padding: 0.25rem 0.75rem !important;
+}
+select.form-control:hover, input:hover{
+  border: 1px solid #ccc !important; 
+}  
+</style>
+  

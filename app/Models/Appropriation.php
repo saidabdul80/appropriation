@@ -34,6 +34,11 @@ class Appropriation extends Model
         return $this->hasMany(Wallet::class,'owner_id','id');
     }
 
+    public function subheads()
+    {
+        return $this->hasMany(SubHeadBudget::class);
+    }
+
     public function getMainWalletAttribute()
     {
         return MainWallet::where(['owner_id'=>$this->id,'owner_type'=>'appropriation'])->first();
@@ -60,6 +65,12 @@ class Appropriation extends Model
 
     public function getDepartmentAttribute(){        
        return implode(',', Department::whereIn("id", $this->department_id)->get()->pluck('short_name')->toArray());
+    }
+
+    public function scopeWithWallet($query,$fundCategory){
+       return $query->with(['wallet' => function ($query) use ($fundCategory) {
+            $query->where(['fund_category' => $fundCategory, 'owner_type' => 'App\\Models\\Appropriation']);
+        }]);
     }
 
     public function getNameAttribute()

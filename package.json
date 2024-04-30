@@ -17,6 +17,8 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "ckeditor4-vue": "^2.2.1"
+        "ckeditor4-vue": "^2.2.1",
+        "primeicons": "^7.0.0",
+        "primevue": "^3.51.0"
     }
 }

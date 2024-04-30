@@ -13,4 +13,9 @@ class Department extends Model
         "name",
         "short_name",
     ];
+
+    public function units(){
+        return $this->hasMany(Unit::class);
+    }
+    
 }

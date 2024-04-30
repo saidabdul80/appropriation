@@ -17,7 +17,7 @@
               </li>
               <li class="nav-item" @click="activeTab = 'transactions'; fetchTransactions()" v-if="selected_scheme.id !== ''">
                 <a class="nav-link" :class="{ active: activeTab === 'transactions' }" href="#">View Transactions</a>
-              </li>
+              </li>          
             </ul>
   
             <!-- Update Scheme Form -->
@@ -38,13 +38,14 @@
                     <td>Amount</td>
                 </tr>
                 <tr v-for="(transaction,i) in transactions?.credit?.data" :key="transaction.id">
-                  <td>{{ transaction.action=='undo credit'?'Deleted':'Credit' }}</td>
+                  <td>{{ transaction.action=='undo credit'?'Deleted':'Credit' }} 
+                    <span v-if="transaction?.state=='  '" class="text-danger" style="font-size: 0.9em;">(Not Appropriated)</span></td>
                   <td>{{ transaction.date_added }}</td>
                   <td>{{ transaction.date_updated}}</td>
                   <td> {{ $globals.currency(transaction.amount) }}</td>
-                  <td>
-                     <button v-if="i>0" disabled class="btn btn-primary bg-primary">Undo</button>                   
-                     <button @click="rollbackWithConfirmation(transaction.id)" v-else class="btn btn-primary bg-primary">Undo</button>
+                  <td>                    
+                     <button v-if="transaction?.state==='used'" disabled class="btn btn-primary bg-primary pi pi-undo"></button>                   
+                     <button @click="rollbackWithConfirmation(transaction.id)" v-else class="btn btn-primary bg-primary pi pi-undo"></button>
                    </td>
                 </tr>
               </table>

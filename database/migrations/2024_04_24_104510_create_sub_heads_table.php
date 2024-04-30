@@ -13,16 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('appropriations', function (Blueprint $table) {
+        Schema::create('sub_heads', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("scheme_id");
-            $table->longText("department_id");                  
-            $table->integer("appropriation_type_id");            
-            $table->float("percentage_dividend");
-            $table->enum('budget_location',['head','subhead'])->default('head');
+            $table->string('name');
             $table->timestamps();
-            $table->softDeletes();
         });
+
     }
 
     /**
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shareholders');
+        Schema::dropIfExists('sub_heads');
     }
 };

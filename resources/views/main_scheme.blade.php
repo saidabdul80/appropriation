@@ -1007,7 +1007,10 @@ $logedInUser  = auth()->user();
                             return false;
                         }
 
-                        let res = await postData('/appropriate',{scheme_id:this.selected_scheme.id,appropriation_ids:this.selected_appropriations_to_appropriate},true);
+                        let res = await postData('/appropriate',{
+                            scheme_id:this.selected_scheme.id,
+                            appropriation_ids:this.selected_appropriations_to_appropriate
+                            },true);
                         if(res.status == 200){
                             //this.selected_scheme = res.data.scheme
                             this.selected_scheme.wallet.balance = 0;                      

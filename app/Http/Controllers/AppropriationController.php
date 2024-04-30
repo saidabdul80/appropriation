@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Scheme;
 use App\Models\Appropriation;
 use App\Models\AppropriationHistory;
+use App\Models\AppropriationType;
 use App\Models\Department;
 use App\Models\TblRequest;
 use App\Models\Wallet;
@@ -50,9 +51,34 @@ class AppropriationController extends Controller
         }   
     }
     
+   public function fundCategoryAppropriations(Request $request){
+        try{
+            $request->validate([                
+                "scheme_id"=>"required",         
+            ]);
+            $scheme_id = $request->get('scheme_id');
+            $fund_category = $request->get('fund_category');
+            //return $fund_category;            
+            $appropriations = Appropriation::with(['subheads'=>function($query) use($fund_category){
+                $query->where('fund_category',$fund_category);
+            }])->withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+
+            return response($appropriations,200);
+        }catch(ValidationException $e){
+            return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e,500);                
+            }else{
+                return response('failed',400);
+            }
+        } 
+    }
+
     public function getAmountSummaryData(Request $request)
     {
         try{
+            
             $request->validate([                
                 "scheme_id"=>"required",       
 //                "fund_category"=>""         
@@ -75,17 +101,15 @@ class AppropriationController extends Controller
             }
             // Now $result is an associative array with 'name' as key and 'total_amount' as value
             
-        
-            $appropriations = Appropriation::with(['wallet' => function ($query) use ($fund_category) {
-                $query->where(['fund_category' => $fund_category, 'owner_type' => 'App\\Models\\Appropriation']);
-            }])->where('scheme_id', $scheme_id)->get();
             
+            $appropriations = Appropriation::withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
             $result2 = [];
             
             foreach ($appropriations as $appropriation) {
-                $totalAmount = $appropriation->wallet->balance;
+                $totalAmount = $appropriation->wallet?->balance ?? 0;
                 $result2[$appropriation->name] = $totalAmount;
             }
+            
             
             // Now $result is an associative array with 'name' as key and 'total_amount' as value            
 
@@ -198,6 +222,20 @@ class AppropriationController extends Controller
             return response($record,200); */
         }catch(ValidationException $e){
             return response($e->getMessage(),400);   
+        }catch(\Exception $e){
+            if(env('APP_DEBUG')){
+                return response($e->getMessage(),400);                
+            }else{
+                return response('failed',400);
+            }
+        }  
+    }
+
+    public function getApproTypes(){
+        try{
+
+            $app_types = AppropriationType::all();
+            return response()->json($app_types);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
                 return response($e->getMessage(),400);                

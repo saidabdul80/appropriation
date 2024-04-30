@@ -1,15 +1,15 @@
 <template>
     <div class="bg-white rounded-lg-only shadow-lg-only" style="overflow-x: auto">
-      <div v-show="switchPageOne == 0" style="height: inherit">
+      <div v-if="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
-          <div style="height: 100%; ">
-            <table class="table table-lg" style="min-width:1000px;">
+          <div style="height: inherit; ">
+            <table class="table mtable table-lg driveInRight " style="min-width:1000px;">
               <thead>
                 <tr class="fw-bold">
-                  <th>
+                  <th class="small-col" >
                     <input v-if="selected_scheme.appropriations.length > 0" type="checkbox" @click="selectAllAppropriation(selected_scheme.appropriations, $event)">
                   </th>
-                  <th>SN.</th>
+                  <th class="small-col">SN.</th>
                   <th>Appropriation Name</th>
                   <th>Department Code</th>
                   <th>Current Percentage ({{ totalAppropriationPercentageValue }} %)</th>
@@ -18,8 +18,8 @@
               </thead>
               <tbody>
                 <tr v-for="(appropriation, i) in selected_scheme.appropriations" :key="i">
-                  <td><input type="checkbox" :value="appropriation.id" v-model="selected_appropriations_to_appropriate"></td>
-                  <td>{{ i + 1 }}</td>
+                  <td class="small-col"><input type="checkbox" :value="appropriation.id" v-model="selected_appropriations_to_appropriate"></td>
+                  <td class="small-col">{{ i + 1 }}</td>
                   <td>{{ appropriation.name }}</td>
                   <td>{{ appropriation.department }}</td>
                   <td>{{appropriation.percentage_dividend }}</td>
@@ -41,8 +41,8 @@
           </div>
         </div>
       </div>
-
-      <table v-show="switchPageOne == 1" class="table table-lg" style="min-width:1000px;">
+      <div  v-if="switchPageOne == 1" >
+      <table class="table mtable table-lg driveInRight" style="min-width:1000px;">
         <thead class="bg-light">
           <tr>
             <th>SN.</th>
@@ -64,45 +64,47 @@
           </tr>
         </tbody>
       </table>
-  
-      <table v-show="switchPageOne == 2" class="table table-lg" :key="selected_fund_category" style="min-width:1000px;">
-        <thead class="">
-          <tr>
-            <th>SN.</th>
-            <th>Appropriation Name</th>
-            <th>Department Code</th>
-            <th>Appropriation Income (<span>&#8358;</span>) </th>
-            <th>Balance (<span>&#8358;</span>) </th>
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(appropriation, i) in selected_month_appropriations" :key="i">
-            <td>{{ i + 1 }}</td>
-            <td>{{ appropriation.name }}</td>
-            <td>{{ appropriation.department }}</td>
-            <td>{{ $globals.currency(appropriation_data_summary?.income?.[appropriation.name] ?? 0) }}</td>
-            <td>{{ $globals.currency(appropriation_data_summary?.balance?.[appropriation.name]??0) }} </td>
-            <td>
-              <button @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
-                <i class="bi bi-columns-gap" style="color:inherit"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      </div>
+      
+        <div  v-if="switchPageOne == 2" >
+          <table class="table mtable table-lg driveInRight " :key="selected_fund_category" style="min-width:1000px;">
+            <thead class="">
+              <tr>
+                <th>SN.</th>
+                <th>Appropriation Name</th>
+                <th>Department Code</th>
+                <th>Appropriation Income (<span>&#8358;</span>) </th>
+                <th>Balance (<span>&#8358;</span>) </th>
+                <th>#</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(appropriation, i) in selected_month_appropriations" :key="i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ appropriation.name }}</td>
+                <td>{{ appropriation.department }}</td>
+                <td>{{ $globals.currency(appropriation_data_summary?.income?.[appropriation.name] ?? 0) }}</td>
+                <td>{{ $globals.currency(appropriation_data_summary?.balance?.[appropriation.name]??0) }} </td>
+                <td>
+                  <button @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
+                    <i class="bi bi-columns-gap" style="color:inherit"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>            
         <Transition name="fade">
             <div v-if="showModal">
                 <sharehoder-modal             
                     :departments="departments"
                     :appropriation_types="appropriation_types"
                     :selected_appropriation="selected_appropriation"
-                    @closeModal="showModal = false"
-                    @resolveAppropriation="resolveAppropriation"
+                    @closeModal="closeModal()"
+                    @addapp="resolveAppropriation($event)" 
                 />
             </div>
         </Transition>
-
     </div>
   </template>
   
@@ -167,27 +169,58 @@
       },
     },
     watch: {
-      'selected_fund_category': function (n, o) {
+      selected_fund_category(newVal, oldVal) {
         this.appropriationHistoriesResolver();    
-      },               
+      },    
+      selected_scheme: {
+        handler(newValue, oldValue) {        
+          this.$nextTick(() => {
+            this.initTable(4000);
+          });
+        },
+        deep: true,
+        immediate: true
+      },
+      switchPageOne: {
+        handler(newValue, oldValue) {        
+          this.$nextTick(() => {
+            this.initTable(0);
+          });
+        },
+        deep: true,
+        immediate: true
+      },
+      '$parent.openAppModal': {
+        handler(newValue, oldValue) {                   
+          if(oldValue !== undefined){
+            this.showModal = newValue
+          }
+        },
+        deep: true,
+        immediate: true
+      }          
+
     },
     methods: {
-        async resolveAppropriation(selected_appropriation) {
+        closeModal(){
+          this.showModal = false
+          this.$emit('closeAppModal')
+          /* output to ScheemScreen */
+        },
+        async resolveAppropriation(selected_appropriation) {          
             try {
-                this.selected_appropriation = selected_appropriation;
-
-                if (!this.selected_scheme) {
-                throw new Error("Please select Programme"); //i.e scheme
+                this.selected_appropriation = selected_appropriation;                
+                if (this.selected_scheme?.id =='' || this.selected_scheme?.id == null) {
+                  throw new Error("Please select Programme"); //i.e scheme
                 }
 
-                if (!this.selected_appropriation.appropriation_type_id) {
-                throw new Error("Name field is required");
+                if (this.selected_appropriation?.appropriation_type_id =='' || this.selected_appropriation?.appropriation_type_id ==null) {
+                  throw new Error("Name field is required");
                 }
 
                 if (this.selected_appropriation.department_id.length < 1) {
-                throw new Error("Department field is required");
+                  throw new Error("Department field is required");
                 }
-
                 const schemeIndex = this.$globals.getIndexOf(this.schemes, this.selected_scheme);
                 const scheme = this.schemes[schemeIndex];
 
@@ -206,19 +239,28 @@
 
                 if (res.status === 200) {
                     const responseData = res.data;
-
-                    if (this.selected_appropriation.id === "") {
-                        scheme.appropriations.pop();
-                        scheme.appropriations.push(responseData.appropriation);
-                        showAlert(responseData.msg);
+                    const app = res.data.appropriation
+                    if (!scheme.appropriations.find(app => app.id === selected_appropriation.id)) {
+                        scheme.appropriations.push(responseData.appropriation); // Reactive way
                     } else {
-                        showAlert(responseData);
+                        const index = scheme.appropriations.findIndex(app => app.id === selected_appropriation.id);
+                        scheme.appropriations[index] = { ...scheme.appropriations[index], ...selected_appropriation }; // Replace with a new object
                     }
+                    
+                    showAlert(responseData.msg);           
+                    this.selected_scheme.appropriations = scheme.appropriations.slice();
+                    this.$emit('updateSchemes',[schemeIndex,scheme.appropriations]);
+                    //this.initTable(500);
+                    /* out to scheme screen */
+                  /*   setTimeout(()=>{
+                      // location.reload();
+                    },2000) */
                     this.showModal = false;
                 }
             } catch (error) {
                 Swal.fire(error.message);
             }
+            this.$emit('closeAppModal')
         },
         selectAllAppropriation(appropriations, e){
             if(e.target.checked){                                                   
@@ -228,7 +270,7 @@
             }
         },      
       appropriationHistoriesResolver() {
-        this.appropriationHistories = this.appropriations_history?.reduce(
+        this.appropriationHistories = this.appropriations_history.data?.reduce(
           (grouped, obj) => ({
             ...grouped,
             [obj.fund_category]: [...(grouped[obj.fund_category] || []), obj],
@@ -284,7 +326,7 @@
         }
 
         if(this.totalPercentage() != 100){
-            Swal.fire('Total percentage dividend expected 100%, ' +this.totalPercentage() +'% given')
+            Swal.fire({title:'Invalid Action',text:'Appropriation Dividend exceeds 100% '+ this.totalPercentage() +'% given',icon:'warning'})
             return false
         }
 
@@ -311,7 +353,11 @@
             return false;
         }
 
-        let res = await postData('/appropriate',{scheme_id:this.selected_scheme.id,appropriation_ids:this.selected_appropriations_to_appropriate},true);
+        let res = await postData('/appropriate',{
+                          scheme_id:this.selected_scheme.id,
+                          fund_category: this.selected_fund_category,
+                          appropriation_ids:this.selected_appropriations_to_appropriate
+                        },true);
         if(res.status == 200){
             //this.selected_scheme = res.data.scheme
             this.selected_scheme.wallet.balance = 0;                      
@@ -320,6 +366,25 @@
         }else{
             showAlert('Appropriation Failed Completed','error');
         }
+    },
+    initTable(timeout=1000){
+      setTimeout(()=>{
+          if($('.mtable').DataTable && true){
+            $('.mtable').DataTable({        
+              scrollY: '50vh',
+              destroy:true,
+              searching: false,
+            ordering: false,
+            paging: false,
+            info:false,
+            scrollCollapse: true,             
+            initComplete: function () {
+              /* this.api().table().header().remove(); */
+              $('.table').css({width:'100%'})
+            }
+          });      
+        }
+      },timeout)
     },
   
       async appropriationLogPage(appropriation, i) {
@@ -335,6 +400,7 @@
       },
     },
     created() {                
+      
       try {
         if(this.selected_fund_category){
             this.appropriationHistoriesResolver();            
@@ -343,11 +409,17 @@
         console.log('Error:' + e);
       }
     },
+    mounted(){
+      //this.initTable(); 
+    }
   };
   </script>
   
   <!-- Add your component-specific styles here if needed -->
   <style scoped>
     /* Add your component-specific styles here if needed */
+    /* .dt-scroll-body table thead{  
+      display: none !important;
+    } */
   </style>
   

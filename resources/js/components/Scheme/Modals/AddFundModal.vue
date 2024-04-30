@@ -8,34 +8,33 @@
           </div>
           <div class="modal-body">
             <div v-if="selected_scheme.fund_type == 'api'" class="mb-3">
-              <label for="fundDate" class="form-label">Select Fund Month and Year:</label>
-              <select @change="fetchFundFunc()" v-model="fund.date" id="fundDate" class="mt-1 w-100 form-control">
-                <option value=""></option>
+              <label for="fundDate" class="form-label">Funding Date:</label>
+              <Dropdown @change="fetchFundFunc()" v-model="fund.date" :options="selected_scheme.funds" id="fundDate" optionLabel="fund_category" optionValue="fund_category" class="mt-1 w-100" />
+                <!-- <option value=""></option>
                 <option v-for="fundDate in selected_scheme.funds" :key="fundDate.fund_category" class="fs-9" :value="fundDate.fund_category">
                   {{ fundDate.fund_category }}
                 </option>
-              </select>
+              </select> -->
             </div>
             <div class="mb-3">
               <label for="amount" class="form-label">Amount
                 <span class="fs-8" v-if="fund.amount > 1000">(<span>&#8358;</span> {{ $globals.currency(fund.amount) }})</span>
               </label>
-              <input v-if="selected_scheme.fund_type == 'api'" disabled :value="$globals.currency(fund.amount)" type="text" step="any" class="form-control">
-              <input v-else v-model="fund.amount" type="number" step="any" class="form-control">
+              <InputText v-if="selected_scheme.fund_type == 'api'" disabled :value="$globals.currency(fund.amount)"  type="text"  step="any" class="w-100" />
+              <InputText v-else v-model="fund.amount" type="number" step="any" class="w-100"  />
             </div>
             <div class="mb-3">
-              <label for="source" class="form-label">Select Source</label>
-              <select v-model="fund.source_id" id="source" class="mt-1 w-100 form-control">
-                <option v-for="source in selected_scheme.sources" :key="source.id" class="fs-9" :value="source.id">{{ source.name }}</option>
-              </select>
+              <label for="source" class="form-label">Source</label>
+              <Dropdown v-model="fund.source_id" id="source" class="mt-1 w-100" :options="selected_scheme.sources" optionLabel="name" optionValue="id"/>
+              
             </div>
             <div v-if="selected_scheme.fund_type === 'entry'" class="mb-3">
-              <label for="fundDate" class="form-label">Select Fund Month and Year:</label>
-              <input v-model="fund.date" type="month" id="fundDate" class="form-control">
+              <label for="fundDate" class="form-label">Funding Date</label>
+              <InputText v-model="fund.date" type="month" id="fundDate" class="w-100" />
             </div>
             <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
-              <input v-model="fund.description" type="text" step="any" id="description" class="form-control">
+              <label for="description" class="form-label">Purpose/Source Description</label>
+              <InputText v-model="fund.description" type="text" step="any" id="description" class="w-100" />
             </div>
           </div>
           <div class="modal-footer">
@@ -47,7 +46,13 @@
   </template>
   
   <script>
+  import Dropdown from 'primevue/dropdown';
+  import InputText from 'primevue/inputtext';
   export default {
+    components:{
+      Dropdown,
+      InputText
+    },
     props: {
       selected_scheme: {
         type: Object,
@@ -111,9 +116,9 @@
                 };
 
                 let res = await postData('/fund_programme', {fund_month_year: this.fund.date,amount: this.fund.amount,source_id: this.fund.source_id,description: this.fund.description,scheme_id: this.selected_scheme.id}, true);
+                console.log(res,444)
                 if (res.status == 200) {
-                    this.$emit('response', res.data)                    
-                   
+                    this.$emit('response', res.data)                                       
                     this.$emit('closeModal')
                 }
 

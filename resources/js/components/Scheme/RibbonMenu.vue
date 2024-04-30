@@ -6,30 +6,46 @@
         "appr_income","appr_current_balance","income","balance","expenditure","general._app._history","debit_fund","report","appro_history"] -->
         <div class="  p-0 d-flex shift-right">
             <div class="" role="group" aria-label="Basic example">
-                <button v-if="canPerformAction('new_appropriation')" title="New Appropriation"
-                    @click="$emit('showAddModal')" class="m-0 fs-9 btn rounded-sm mx-2 color-primary d-inline-block">
-                    <i class="bi bi-journals"></i><span class="mobile-none">New Approp.</span>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('new_appropriationm')" title="New Appropriation"
+                    @click="$emit('showAddModal')" class="m-0 fs-9 btn rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-journals"></i><span class="mobile-none">New Approp.</span>
+                    </div>
                 </button>
-                <button v-if="canPerformAction('projection')" title="Projection" @click="$emit('projectionModal')"
-                    class="m-0 fs-9 btn rounded-sm mx-2 color-primary d-inline-block">
-                    <i class="bi bi-collection"></i><span class="mobile-none">Projection</span>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('projection')" title="Projection" @click="$emit('projectionModal')"
+                    class="m-0 fs-9 btn rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-collection"></i><span class="mobile-none">Projection</span>
+                    </div>
                 </button>
-                <button v-if="canPerformAction('fund_scheme')" title="Fund Programme" @click="$emit('fundModal')"
-                    class="m-0 btn fs-9 rounded-sm mx-2 color-primary d-inline-block">
-                    <i class="bi bi-database-down"></i><span class="mobile-none">Credit</span>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('fund_scheme')" title="Fund Programme" @click="$emit('fundModal')"
+                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="pi pi-wallet"></i><span class="mobile-none">Fund</span>
+                    </div>
                 </button>
-                <button v-if="canPerformAction('debit_fund')" @click="$emit('appropriationModalRemit')" title="Debit Programme"
-                    class="m-0 btn fs-9 rounded-sm mx-2 color-primary d-inline-block">
-                    <i class="bi bi-database-down"></i><span class="mobile-none">Debit</span>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('debit_fund')" @click="$emit('appropriationModalRemit')" title="Debit Programme"
+                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="pi pi-plus"></i><span class="mobile-none">Transact</span>
+                    </div>
                 </button>
-                <button v-if="canPerformAction('report')" title="view report" @click="$emit('report')"
-                    class="m-0 btn fs-9 rounded-sm mx-2 color-primary d-inline-block">
-                    <i class="bi bi-inboxes"></i><span class="mobile-none">Report</span>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('report')"
+                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="pi pi-box"></i><span class="mobile-none">Report</span>
+                    </div>
+                </button>
+                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('config')"
+                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                    <div class="d-flex align-items-center">
+                        <i class="pi pi-cog"></i><span class="mobile-none">Config</span>
+                    </div>
                 </button>
             </div>
         </div>
         <!-- <div class="col-lg-3 pb-2 text-white">
-            <p v-if="canPerformAction('income')" class="m-0 fs-9">
+            <p :disabled="selected_scheme?.id  == null" v-if="canPerformAction('income')" class="m-0 fs-9">
                 <b>{{ selected_scheme.name }}</b> {{ selected_fund_category }} Income: <span>&#8358;</span> <span
                     v-show="selected_fund_category == ''">{{ $globals.currency(selected_scheme.total_collection) }}</span> <span
                     v-show="selected_fund_category != ''"> {{ $globals.currency(category_income) }} </span>
@@ -39,10 +55,10 @@
         </div>
 
         <div class="col-lg-3 pb-2 text-white">
-            <p v-if="canPerformAction('balance')" class="m-0 fs-9"><b>{{ selected_scheme.name }}</b> Balance:
+            <p :disabled="selected_scheme?.id  == null" v-if="canPerformAction('balance')" class="m-0 fs-9"><b>{{ selected_scheme.name }}</b> Balance:
                 <span>&#8358;</span> <span v-if="selected_fund_category == ''">{{ $globals.currency(selected_scheme.balance) }}</span>
                 <span v-show="selected_fund_category != ''">{{ $globals.currency(category_income_balance) }} </span></p>
-            <p v-if="canPerformAction('expenditure')" href="#" class="m-0 fs-9 ">
+            <p :disabled="selected_scheme?.id  == null" v-if="canPerformAction('expenditure')" href="#" class="m-0 fs-9 ">
                 <span class="display-inline-block me-2">
                     Expenditure: <span>&#8358;</span>
                     <span v-if="getCategoryIncomeBalance == 0">0.00</span>
@@ -77,6 +93,9 @@ export default {
         },
         appropriation_data_summary:{}
     },
+    created(){
+        //console.log(this.permissions,3888)
+    },
     computed:{
         category_income(){
             return Object.values(this.appropriation_data_summary.income||{}).reduce((acc, amount) => acc + amount, 0)
@@ -100,7 +119,7 @@ export default {
 </script>
   
 <style scoped>
-.mx-2:first-child{
+.mx-1 mx-sm-2:first-child{
     margin-left:0px !important ;
 }
 /* Add your component-specific styles here if needed */</style>

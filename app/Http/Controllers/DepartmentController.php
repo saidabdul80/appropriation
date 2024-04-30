@@ -19,6 +19,13 @@ class DepartmentController extends Controller
         return view('department');
     }
 
+    public function index()
+    {
+        $departments = Department::all();
+        return response()->json($departments);
+    }
+
+
     public function createUpdate(Request $request){
         try {
             

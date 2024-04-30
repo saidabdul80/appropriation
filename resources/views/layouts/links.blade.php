@@ -11,6 +11,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 		<!-- <link rel="stylesheet" href="/lib/css/select2.css"> -->
 		<link rel="stylesheet" href="/lib/css/swift-menu.css">
+		<link rel="stylesheet" href="/lib/css/vivify.css">
 		<link rel="stylesheet" href="/lib/js/datatable.css">
 		<link rel="stylesheet" href="/lib/css/font-awesome-4.7.0/css/font-awesome.min.css">
 	<!-- <link href="/lib/js/listjs/PagingStyle.css" rel="stylesheet" /> -->
@@ -27,14 +28,14 @@
 	<script src="/lib/js/chart.js"></script>
 	<link rel="stylesheet"  href="/lib/css/sweetalert.css">
 	<!-- <script src="/lib/js/listjs/paging.js"></script> -->
+	
 	<script src="/lib/js/datatable/datatables.min.js" defer></script>
 	<script type="text/javascript" src="/lib/js/datatable/buttons.min.js"></script>	
 	<script type="text/javascript" src="/lib/js/datatable/jszip.min.js"></script>	
 	<script type="text/javascript" src="/lib/js/datatable/pdfmake.min.js"></script>
 	<script type="text/javascript" src="/lib/js/datatable/vfs_fonts.js"></script>	
-	<script type="text/javascript" src="/lib/js/datatable/buttons.html5.min.js"></script>	
-	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>	
-	
+	<!-- <script type="text/javascript" src="/lib/js/datatable/buttons.html5.min.js"></script>	 -->
+	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>			
 	
 	
 <!-- 	<script type="text/javascript" src="/lib/js/select2.js"></script> -->
@@ -59,7 +60,17 @@
 
 	<!-- Styles -->
 	<style>
+table.DTCR_clonedTable.dataTable {
+  position: absolute !important;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 202;
+}
 
+div.DTCR_pointer {
+  width: 1px;
+  background-color: #0259C4;
+  z-index: 201;
+}
 	</style>
 	<script>
 		$(document).ready(function() {
@@ -130,6 +141,29 @@
 					} else {
 						return response;
 					}
+				}).catch(function(error) {
+					//switchPage(1)                   
+					$("#loaderHtml").hide()
+					Swal.fire({
+						text: error.response.data,
+						icon: 'error',
+					})
+				})
+			}catch(e){
+				console.log(e)
+			}
+		}
+
+		async function getData(route, loader =false) {
+			if(loader){
+				$("#loaderHtml").show()
+			}
+			
+			try{
+				return await axios.get(route).then(function(response) {
+					//switchPage(1)
+					$("#loaderHtml").hide()					
+					return response;
 				}).catch(function(error) {
 					//switchPage(1)                   
 					$("#loaderHtml").hide()

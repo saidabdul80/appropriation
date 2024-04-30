@@ -22,7 +22,8 @@ class Transaction extends Model
         "source_id",
         "description",
         "performed_by",
-        "fund_category"
+        "fund_category",
+        "subhead_id"
     ];
     protected $casts = [
         'data'=>AsArrayObject::class,
@@ -76,6 +77,16 @@ class Transaction extends Model
         return $carbonDate->toFormattedDateString();
     }
 
+    public static function sumAmountForSubhead($appropriationId, $subheadId, $fund_category)
+    {
+        return self::where([
+            'owner_id' => $appropriationId,
+            'owner_type' => 'appropriation',
+            'subhead_id' => $subheadId,
+            'fund_category'=> $fund_category
+        ])->sum('amount');
+    }
+    
     protected $appends = [
         'date_added',
         'date_updated'

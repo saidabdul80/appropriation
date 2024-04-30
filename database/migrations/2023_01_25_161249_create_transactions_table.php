@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('owner_id');            
+            $table->unsignedBigInteger('owner_id');          
+            $table->integer('subhead_id');
             $table->enum('owner_type',['scheme','appropriation']);
             $table->enum('action',['credit','debit']);
             $table->float('amount',15,2);            

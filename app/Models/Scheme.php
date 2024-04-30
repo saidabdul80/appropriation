@@ -57,10 +57,10 @@ class Scheme extends Model
         $wallet_details = Wallet::selectRaw('SUM(balance) as balance, SUM(total_collection) as total_collection, fund_category')->whereIn('owner_id',$ids)->where(['owner_type'=>'App\\Models\\Appropriation'])->groupBy('fund_category')->get();
 
         return $wallet_details->count() >0? $wallet_details->groupBy('fund_category'):new stdClass();
-    }
+    } 
 
     public function getTotalCollectionAttribute(){
-        return $this->wallet->total_collection;
+        return $this->wallet?->total_collection;
     }
     
     public function getActivitylogOptions(): LogOptions
@@ -69,7 +69,13 @@ class Scheme extends Model
         ->logOnly(['wallet_number', 'owner_id','owner_type','amount']);
         // Chain fluent methods for configuration options
     }
- 
+
+/*     public function getFundCategoriesAttribute(){
+        return FundCategory::where([
+                    'scheme_id'=>$this->id            
+                ])->get();
+    }
+  */
     protected $appends = ['balance','total_collection','appropriation_wallets','funds','fund_categories'];
     
 }

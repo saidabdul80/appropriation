@@ -4,8 +4,16 @@ export const helpers = {
     closeModal:(callback)=>{
         callback()
     },
-    getIndexOf(arr,scheme,id='id') {
-        return arr.findIndex((item) => item[id] == scheme[id])
+    getIndexOf(arr,scheme,id='id') {      
+      if (!arr.every(item => id in item && id in scheme)) {
+        return {}
+      }
+      
+      try {
+        return arr.findIndex(item => item[id] === scheme[id]);
+      } catch (error) {        
+        return {}
+      }
     },
     currency: (amount) => {
       if (amount) {
@@ -18,24 +26,25 @@ export const helpers = {
       return '0.00';
     },
     dynamic_data:{
-        Subject: { show: 1, activate: 1, value: '', type: 'text', for: '' },
-        Section_of_Work_Plan: { show: 1, activate: 0, value: '', type: 'text', for: '' },
-        File_Name: { show: 1, activate: 0, value: '', type: 'text', for: '' },
-        File_Number: { show: 1, activate: 0, value: '', type: 'text', for: '' },
-        Page_Number: { show: 1, activate: 0, value: '', type: 'text', for: '' },
-        Beneficiary: { show: 1, activate: 0, value: '', type: 'text', for: '' },
-        Account_Number: { show: 1, activate: 0, value: 0, type: 'number', for: '' },
-        Amount: { show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
-        Payment_Date: { show: 1, activate: 1, value: '', type: 'date', for: '' },
-        Trx_Charges: { show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'VAT_%': { show: 1, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'VAT_₦': { show: 0, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'Withholding_Tax_%': { show: 1, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'Withholding_Tax_₦': { show: 0, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'Stamp_Duty_%': { show: 1, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        'Stamp_Duty_₦': { show: 0, activate: 0, value: 0, type: 'number', for: 'tax', amount: 0 },
-        Gross_Amount: { show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
-        Total_Taxes: { show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 }
+        Subject: { required:1, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Approval_Date: { required:1, show: 1, activate: 1, value: '', type: 'date', for: '' },
+        Section_of_Work_Plan: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        File_Name: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        File_Number: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Page_Number: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Beneficiary: { required:1, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Account_Number: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: '' },
+        Amount: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        Payment_Date: { required:1, show: 1, activate: 1, value: '', type: 'date', for: '' },
+        Trx_Charges: { required:0, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'VAT_%': { required:0, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'VAT_₦': { required:0, show: 0, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'Withholding_Tax_%': { required:0, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'Withholding_Tax_₦': { required:0, show: 0, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'Stamp_Duty_%': { required:0, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        'Stamp_Duty_₦': { required:0, show: 0, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        Gross_Amount: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
+        Total_Taxes: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 }
     },
     // Add other global functions or variables here
   };
