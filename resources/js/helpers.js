@@ -15,7 +15,10 @@ export const helpers = {
         return {}
       }
     },
-    currency: (amount) => {
+    currency: (amount, convert=true) => {
+      if(!convert){
+        return amount;
+      }
       if (amount) {
         let res = new Intl.NumberFormat('NGN', {
           style: 'currency',

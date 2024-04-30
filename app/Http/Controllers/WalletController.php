@@ -15,7 +15,7 @@ class WalletController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function getWallet(Request $request)
+    public function getWalletsBalance(Request $request)
     {   
         $request->validate([
             'owner_id' => "required",
@@ -26,12 +26,13 @@ class WalletController extends Controller
         $id = $request->get('owner_id');
     
         if ($request->get('owner_type') == 'appropriation') {
-            $response = Appropriation::with(['wallets' => function ($query) use ($request) {
+            $response = Appropriation::with(['wallet' => function ($query) use ($request) {
                 $query->where('fund_category', $request->get('fund_category'))
                       ->where('owner_type', 'App\\Models\\Appropriation');
-            }])->where('id', $id)->first();  // Use first() to get a single model instance
+            }])->whereIn('id', $id)->get();
+            $response = $response?->sum('wallet.balance');  // Use first() to get a single model instance
     
-            return response($response->wallets[0] ?? new \stdClass(), 200);
+            return response($response?? 0, 200);
 
         }
     

@@ -75,7 +75,11 @@
                 <th>Department Code</th>
                 <th>Appropriation Income (<span>&#8358;</span>) </th>
                 <th>Balance (<span>&#8358;</span>) </th>
-                <th>#</th>
+                <th>
+                  <button @click="appropriationLogPage(null, null)" class="btn me btn-sm btn-success text-white">
+                    <i class="bi bi-columns-gap" style="color:inherit"></i>
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -388,6 +392,17 @@
     },
   
       async appropriationLogPage(appropriation, i) {
+
+        if(appropriation === null){
+          localStorage.setItem('appropriations', JSON.stringify(this.selected_scheme.appropriations));
+          localStorage.setItem('page_type', 'all');
+          this.$emit('openTransaction', {
+              type: 'all',
+              appropriations:this.selected_scheme.appropriations,    
+          });    
+          return;
+        }
+        localStorage.setItem('page_type', 'single');
         this.selected_appropriation = appropriation;
         localStorage.setItem('selected_appropriation', JSON.stringify(appropriation));
         localStorage.setItem('selected_appropriation_index', i);
@@ -395,6 +410,7 @@
         this.selected_appropriation.index = i;
         this.selected_appropriation_balance = appropriation.wallet?.balance;
         this.$emit('openTransaction', {
+          type:'single',
           selected_appropriation: this.selected_appropriation,    
         });        
       },

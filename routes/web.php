@@ -68,7 +68,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/get_transactions', [TransactionsController::class, 'transactions']);
     Route::post('/save_appropriation_transaction', [TransactionsController::class, 'saveAppropriationTransaction']);
     Route::post('/delete_appropriation_transaction', [TransactionsController::class, 'deleteAppropriationTransaction']);
-    Route::post('/get_wallet', [WalletController::class, 'getWallet']);
+    Route::post('/get_wallet_balance', [WalletController::class, 'getWalletsBalance']);
     Route::post('/fetch_expenditures', [TransactionsController::class, 'expenditureDetails']);
     Route::get('/report/{scheme_id}', [HomeController::class, 'report']);
     Route::post('/get_appropriation_transactions', [TransactionsController::class, 'appropriationTransactions']);

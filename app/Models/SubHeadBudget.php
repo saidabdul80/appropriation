@@ -21,6 +21,11 @@ class SubHeadBudget extends Model
         return SubHead::find($this->subhead_id)?->name;
     }
 
+    public function getHeadAttribute(){
+        return Appropriation::find($this->appropriation_id)?->name;
+    }
+
+
     public static function getAmount($appropriationId, $subheadId){
         return self::where(['id'=>$subheadId])->first()?->amount;
     }

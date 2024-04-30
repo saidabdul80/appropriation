@@ -92,7 +92,7 @@
                 <transaction-sheet      
                   :key="selected_fund_category"                               
                   :selected_appropriation="selected_transcation_appropriation"
-                  :fund_category="selected_fund_category"
+                  :fund_category="selected_fund_category"                  
                   agency_name=""                  
                   @switch-page="switchPageFunc"
                   @openDebitModal="openDebitModalForTransaction"

@@ -37,7 +37,7 @@
                 class="w-100 mb-3" /> -->
             </div>
             <div class="col-md-12">
-                <label for="name" class="form-label mb-0">Head Name</label>            
+                <label for="name" class="form-label mb-0">Head Name</label>                            
                 <InputGroup>
                     <!--    <Dropdown v-model="selected_appropriation" :options="selected_scheme.appropriations"
                         optionLabel="name" optionValue="id" @change="loadSubheadBudgets()" placeholder="Select a Head"
@@ -45,9 +45,9 @@
                     <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
                         :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
                         <template #value="slotProps">
-                            <div v-if="slotProps.value?.name" class="flex align-items-center">
+                            <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
                                 <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                        (&#8358;{{ $globals.currency(slotProps.value?.balance) }})</span> </div>
+                                        (&#8358;{{ $globals.currency(slotProps.value?.balance -getTotalAmountSubheadBudget) }})</span> </div>
                                 <div style="font-size: 10px;">Head with Current Balance</div>
                             </div>
                             <span v-else>
@@ -153,6 +153,16 @@ export default {
         this.schemes = [...this.$parent.$parent.$parent.schemes];
         await this.getAllSubhead();
         this.$emit('oncompleted', true);
+    },
+    computed:{
+        getTotalAmountSubheadBudget(){
+            if (Array.isArray(this.sub_head_budgets)) {
+                return this.sub_head_budgets.reduce((total, item) => {                    
+                    return total + (Number(item.amount) || 0);
+                }, 0);
+            }
+            return 0; 
+        }
     },
     methods: {
         async fetchFundYear() {

@@ -12,6 +12,7 @@ use App\Services\BudgetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Budget;
+use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class TransactionsController extends Controller
@@ -67,14 +68,31 @@ class TransactionsController extends Controller
             ]);
 
             if($request->get('owner_type')!='scheme'){
+                $filters = json_decode(json_encode($request->get('filters')));                
+                if(!empty($filters->date)){
+                    if(count($filters->date) <2 || $filters->date_type =='') throw new \Exception('Invlide Date Range Selected');
+                    $dateRange = [
+                        Carbon::parse($filters->date[0])->format('Y-m-d'),
+                        Carbon::parse($filters->date[1])->format('Y-m-d')
+                    ];
+                    //return $dateRange;
+                    if($request->get('fund_category')){
+                        $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
+                                        ->whereBetween('data->'.$filters->date_type."->value", $dateRange)
+                                        ->where(['fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(300);
+                    }else{
+                        $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
+                                            ->whereDate('data->'.$filters->date_type."->value", $dateRange)   
+                                            ->where(["owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(300);
+                    }
+                    return response($response);
+                }                
                 if($request->get('fund_category')){
-                    $response = Transaction::where(['owner_id'=>$request->get('owner_id'),
-                                    "owner_type"=>$request->get('owner_type'), 
-                                    'fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(300);
+                    $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
+                                    ->where(['fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(300);
                 }else{
-                    $response = Transaction::where([
-                                    'owner_id'=>$request->get('owner_id'),
-                                    "owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(300);
+                    $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
+                                        ->where(["owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(300);
                 }
                 return response($response);
             }

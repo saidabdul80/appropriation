@@ -86,9 +86,19 @@ class Transaction extends Model
             'fund_category'=> $fund_category
         ])->sum('amount');
     }
+
+    public function getSubheadAttribute(){
+        return SubHeadBudget::find($this->subhead_id)?->subhead;
+    }
+
+    public function getHeadAttribute(){
+        return SubHeadBudget::find($this->subhead_id)?->head;
+    }
     
     protected $appends = [
         'date_added',
-        'date_updated'
+        'date_updated',
+        'head',
+        'subhead'
     ];
 }
