@@ -5,12 +5,30 @@
                 Head i.e Appropriation must have been completed </span>
         </InlineMessage>
         <div class="row w-100 mx-auto">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
                 <label for="name" class="form-label">Programmes</label>
-                <Dropdown v-model="selected_scheme" @change="fetchFundYear()" :options="schemes" optionLabel="name"
-                    placeholder="Select a Programme" class="w-100 mb-3" />
+                <!--  <Dropdown v-model="selected_scheme" @change="fetchFundYear()" :options="schemes" optionLabel="name"
+                    placeholder="Select a Programme" class="w-100 mb-3" /> -->
+                <Dropdown @change="fetchFundYear()" v-model="selectedScheme" :options="schemes"
+                    placeholder="Select a Scheme" class="w-100 ">
+                    <template #value="slotProps">
+                        <div v-if="slotProps.value?.name" class="flex align-items-center">
+                            <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.wallet?.balance) }})</span> </div>
+                            <div style="font-size: 10px;">Programme (Current Programme fund )</div>
+                        </div>
+                        <span v-else>
+                            Select Programme
+                        </span>
+                    </template>
+
+                    <template #option="slotProps">
+                        <div>{{ slotProps?.option?.name }} ({{ $globals.currency(slotProps.option?.wallet?.balance) }})
+                        </div>
+                    </template>
+                </Dropdown>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
                 <label for="name" class="form-label">Funding Year</label>
                 {{ monthSelected }}
                 <month-year-selector v-model="monthSelected" :fund_categories="fund_categories"
@@ -19,12 +37,30 @@
                 class="w-100 mb-3" /> -->
             </div>
             <div class="col-md-12">
-                <label for="name" class="form-label mb-0">Head Name</label>
+                <label for="name" class="form-label mb-0">Head Name</label>            
                 <InputGroup>
-                    <Dropdown v-model="selected_appropriation" :options="selected_scheme.appropriations"
+                    <!--    <Dropdown v-model="selected_appropriation" :options="selected_scheme.appropriations"
                         optionLabel="name" optionValue="id" @change="loadSubheadBudgets()" placeholder="Select a Head"
-                        class="w-100 " />
-                        
+                        class="w-100 " /> -->
+                    <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
+                        :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value?.name" class="flex align-items-center">
+                                <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
+                                        (&#8358;{{ $globals.currency(slotProps.value?.balance) }})</span> </div>
+                                <div style="font-size: 10px;">Head with Current Balance</div>
+                            </div>
+                            <span v-else>
+                                Select a Head
+                            </span>
+                        </template>
+
+                        <template #option="slotProps">
+                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.balance)}})
+                            </div>
+                        </template>
+                    </Dropdown>
+
                 </InputGroup>
             </div>
             <div class="col-md-12 mt-3">
@@ -60,7 +96,8 @@
                                     <div class="col-2 col-md-3" v-else>
                                         <button @click="saveSubheadBudget(cat)"
                                             class="btn btn-white btn-outline-success btn-sm py-21 rounded-circle"><span
-                                                :class="cat?.isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></span> </button>
+                                                :class="cat?.isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></span>
+                                        </button>
                                     </div>
                                     <div class="col-2 col-md-3" v-if="cat?.isEditing">
                                         <button @click="cat.isEditing = false"
@@ -72,7 +109,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />                                    
+                <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />
             </div>
         </div>
         <!-- <button v-if="selected_appropriation !== null" type="button" @click="addAppropriation()"
@@ -123,7 +160,7 @@ export default {
                 scheme_id: this.selected_scheme.id
             }, true)
             if (fundResponse.data) {
-                this.fund_categories = fundResponse.data?.map(item=> item.fund_category);             ;
+                this.fund_categories = fundResponse.data?.map(item => item.fund_category);;
             }
         },
         addBudget() {
@@ -132,7 +169,7 @@ export default {
                 return false;
             }
             this.sub_head_budgets.push({
-                appropriation_id: this.selected_appropriation,
+                appropriation_id: this.selected_appropriation?.id,
                 subhead_id: '',
                 subhead: '',
                 amount: '',
@@ -152,7 +189,7 @@ export default {
         async loadSubheadBudgets() {
             try {
                 this.$emit('isLoading', true)
-                let res = await getData(`sub_head_budget/appropriation/${this.selected_appropriation}/${this.monthSelected}`);
+                let res = await getData(`sub_head_budget/appropriation/${this.selected_appropriation?.id}/${this.monthSelected}`);
                 this.sub_head_budgets = res?.data || [];
                 this.$emit('isLoading', false)
             } catch (error) {
