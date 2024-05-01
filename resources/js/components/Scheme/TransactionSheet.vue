@@ -1,26 +1,29 @@
 <template>
   <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;overflow: hidden;">
     <v-popup group="templating">
-      <template #container="{ message, acceptCallback, rejectCallback }">
-
-        <table class="table w-100 h-100">
-          <thead>
-            <tr>
-              <th>Subhead</th>
-              <th>Amount (₦)</th>
-              <th>Balance (₦)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(cat, index) in sub_head_budgets" :key="index" style="font-size: 0.9em;">
-              <td>{{ cat.subhead }}</td>
-              <td>{{ $globals.currency(cat.amount) }}</td>
-              <td>{{ $globals.currency(cat.balance) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </template>
-    </v-popup>
+        <template #container="{ message, acceptCallback, rejectCallback }">
+            <div class="scrollable-container" style="height: 260px; overflow-y: auto;cursor: grab;user-select: none;" @mousedown="startDragging" @mouseup="stopDragging" @mouseleave="stopDragging" @mousemove="scrollOnDrag">
+            <div class="scrollable-content" ref="scrollContent" style="width: 100%;">
+                <table class="table w-100 h-100" style="position: relative;">
+                <thead style="position: sticky; top: 0; z-index: 1;" class="bg-white" >
+                    <tr>
+                    <th>Subhead</th>
+                    <th>Amount (₦)</th>
+                    <th>Balance (₦)</th>
+                    </tr>
+                </thead>
+                <tbody style="margin-top: 20px;">
+                    <tr v-for="(cat, index) in sub_head_budgets" :class="cat.amount > cat.balance ? 'text-success' : ''" :key="index" style="font-size: 0.9em;">
+                    <td>{{ cat.subhead }}</td>
+                    <td>{{ $globals.currency(cat.amount) }}</td>
+                    <td>{{ $globals.currency(cat.balance) }}</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </template>
+        </v-popup>
     <div>
       <button @click="$emit('switch-page', 1)" class="btn fs-9 btn-primary text-white rounded" style=""><span
           class="pi pi-arrow-left"></span></button>
@@ -177,7 +180,10 @@ export default {
       transactions: { data: [] },
       confirm: useConfirm(),
       sub_head_budgets: [],
-      converCurrency: true
+      converCurrency: true,
+      isDragging: false,
+      startY: 0,
+      scrollTop: 0
     }
   },
   computed: {
@@ -197,18 +203,32 @@ export default {
 
   },
   methods: {
+    startDragging(event) {
+      this.isDragging = true;
+      this.startY = event.clientY;
+      this.scrollTop = this.$refs.scrollContent.scrollTop;
+    },
+    stopDragging() {
+      this.isDragging = false;
+    },
+    scrollOnDrag(event) {
+      if (this.isDragging) {
+        const deltaY = event.clientY - this.startY;
+        this.$refs.scrollContent.scrollTop = this.scrollTop - deltaY;
+      }
+    },
     exportToExcel() {
       this.converCurrency = false;
       const table = document.getElementById('myTable');
       const wb = utils.table_to_book(table);
       const sheetName = Object.keys(wb.Sheets)[0]; // Assuming only one sheet
       const ws = wb.Sheets[sheetName];
-      /*  const lastRowIndex = ws['!ref'].split(':')[1].replace(/\D/g, '');        
-       ws[`C${parseInt(lastRowIndex) + 1}`] = { t: 's', v: "Balance" }; 
-       ws[`D${parseInt(lastRowIndex) + 1}`] = { t: 'n', v: this.selected_appropriation_balance }; 
+      /*  const lastRowIndex = ws['!ref'].split(':')[1].replace(/\D/g, '');
+       ws[`C${parseInt(lastRowIndex) + 1}`] = { t: 's', v: "Balance" };
+       ws[`D${parseInt(lastRowIndex) + 1}`] = { t: 'n', v: this.selected_appropriation_balance };
        console.log()
-       ws[`C${parseInt(lastRowIndex) + 2}`] = { t: 's', v: "Total Expenditure" }; 
-       ws[`D${parseInt(lastRowIndex) + 2}`] = { t: 'n', v: this.total_expenditure_appropriation }; 
+       ws[`C${parseInt(lastRowIndex) + 2}`] = { t: 's', v: "Total Expenditure" };
+       ws[`D${parseInt(lastRowIndex) + 2}`] = { t: 'n', v: this.total_expenditure_appropriation };
         */
       writeFileXLSX(wb, "transaction_reports.xlsx");
       setTimeout(() => {
@@ -437,6 +457,12 @@ export default {
 
 <!-- Add your component-specific styles here if needed -->
 <style scoped>
+
+  .scrollable-content {
+    width: calc(100% + 17px); /* Adjust for scrollbar width */
+    height: 100%;
+    overflow-y: auto;
+  }
 button.btn.btn-secondary.buttons-print {
   margin-left: 18px !important;
 }

@@ -30,12 +30,12 @@
                         <i class="pi pi-plus"></i><span class="mobile-none">Transact</span>
                     </div>
                 </button>
-                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('report')"
+             <!--    <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('report')"
                     class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
                     <div class="d-flex align-items-center">
                         <i class="pi pi-box"></i><span class="mobile-none">Report</span>
                     </div>
-                </button>
+                </button> -->
                 <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('config')"
                     class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
                     <div class="d-flex align-items-center">
@@ -69,7 +69,7 @@
         </div> -->
     </div>
 </template>
-  
+
 <script>
 export default {
     props: {
@@ -82,7 +82,7 @@ export default {
             default: () => ({ name: '', balance: 0, wallet: { fund_category: '', balance: 0 } }),
         },
         category_income_balance:{
-            
+
         },
         category_income:{
             default:0
@@ -104,7 +104,7 @@ export default {
             return Object.values(this.appropriation_data_summary.balance||{}).reduce((acc, amount) => acc + amount, 0)
         }
     },
-    methods: {       
+    methods: {
         canPerformAction(permission) {
             return this.permissions.includes(permission);
         },
@@ -117,10 +117,9 @@ export default {
     },
 };
 </script>
-  
+
 <style scoped>
 .mx-1 mx-sm-2:first-child{
     margin-left:0px !important ;
 }
 /* Add your component-specific styles here if needed */</style>
-  

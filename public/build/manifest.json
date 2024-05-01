@@ -1,12 +1,40 @@
 {
-  "resources/js/app.css": {
-    "file": "assets/app-4ed30d72.css",
-    "src": "resources/js/app.css"
+  "node_modules/primeicons/fonts/primeicons.eot": {
+    "file": "assets/primeicons-987f23ea.eot",
+    "src": "node_modules/primeicons/fonts/primeicons.eot"
+  },
+  "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-roman.var.woff2": {
+    "file": "assets/Inter-roman.var-17fe38ab.woff2",
+    "src": "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-roman.var.woff2"
+  },
+  "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-italic.var.woff2": {
+    "file": "assets/Inter-italic.var-d1401419.woff2",
+    "src": "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-italic.var.woff2"
+  },
+  "node_modules/primeicons/fonts/primeicons.woff2": {
+    "file": "assets/primeicons-9eea6e0b.woff2",
+    "src": "node_modules/primeicons/fonts/primeicons.woff2"
+  },
+  "node_modules/primeicons/fonts/primeicons.woff": {
+    "file": "assets/primeicons-f5d1d219.woff",
+    "src": "node_modules/primeicons/fonts/primeicons.woff"
+  },
+  "node_modules/primeicons/fonts/primeicons.ttf": {
+    "file": "assets/primeicons-dc895fee.ttf",
+    "src": "node_modules/primeicons/fonts/primeicons.ttf"
+  },
+  "node_modules/primeicons/fonts/primeicons.svg": {
+    "file": "assets/primeicons-36c54cec.svg",
+    "src": "node_modules/primeicons/fonts/primeicons.svg"
   },
   "resources/sass/app.scss": {
     "file": "assets/app-67dcdfd2.css",
     "src": "resources/sass/app.scss",
     "isEntry": true
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-d7af573d.css",
+    "src": "resources/js/app.css"
   },
   "resources/css/app.css": {
     "file": "assets/app-4ed993c7.js",
@@ -14,11 +42,20 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-4ae35ea0.js",
+    "file": "assets/app-ba69e5aa.js",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-4ed30d72.css"
+      "assets/app-d7af573d.css"
+    ],
+    "assets": [
+      "assets/Inter-roman.var-17fe38ab.woff2",
+      "assets/Inter-italic.var-d1401419.woff2",
+      "assets/primeicons-987f23ea.eot",
+      "assets/primeicons-9eea6e0b.woff2",
+      "assets/primeicons-f5d1d219.woff",
+      "assets/primeicons-dc895fee.ttf",
+      "assets/primeicons-36c54cec.svg"
     ]
   }
 }
