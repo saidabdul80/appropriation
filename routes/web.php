@@ -34,7 +34,7 @@ Route::get('/', function () {
 
 Auth::routes();
 Route::group(["middleware"=>['web','auth']],function(){
-    
+
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/user', [UserController::class, 'userIndex'])->name('user');
@@ -51,7 +51,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/undo_fund_programme', [SchemeController::class, 'reverseFundProgramme']);
     Route::post('/fetch_fund', [FundController::class, 'fetchFund']);
     Route::post('/dashborad_data', [DashboardController::class, 'byProgramme']);
-    
+
     Route::post('/direct_fund_scheme', [SchemeController::class, 'directFundScheme']);
 
     Route::post('/appropriate', [SchemeController::class, 'appropriate']);
@@ -59,8 +59,8 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/fund_month_year', [AppropriationController::class, 'fundMonthYear']);
     Route::post('/get_prepared_data', [AppropriationController::class, 'getPreparedData']);
     Route::post('/get_fund_category_appropriations', [AppropriationController::class, 'FundCategoryAppropriations']);
-    Route::post('/get_amount_summary_data', [AppropriationController::class, 'getAmountSummaryData']);    
-    Route::get('/get_appropriation_types', [AppropriationController::class, 'getApproTypes']);    
+    Route::post('/get_amount_summary_data', [AppropriationController::class, 'getAmountSummaryData']);
+    Route::get('/get_appropriation_types', [AppropriationController::class, 'getApproTypes']);
 
     Route::get('/department', [DepartmentController::class, 'index'])->name('department');
     Route::post('/department/create_update', [DepartmentController::class, 'createUpdate']);
@@ -72,14 +72,14 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/fetch_expenditures', [TransactionsController::class, 'expenditureDetails']);
     Route::get('/report/{scheme_id}', [HomeController::class, 'report']);
     Route::post('/get_appropriation_transactions', [TransactionsController::class, 'appropriationTransactions']);
-    Route::get('/sub_head_budgets', [SubHeadBudgetController::class, 'index']);    
-    Route::get('/sub_head_budget/appropriation/{id}/{fund_category}', [SubHeadBudgetController::class, 'getSubHeadBudgetByAppropriation']);    
-    Route::post('/sub_head_budget/save', [SubHeadBudgetController::class, 'updateCreate']);     
-    Route::post('/sub_head_budget/delete/{id}', [SubHeadBudgetController::class, 'destroy']);    
-    Route::post('/subhead/create', [SubHeadController::class, 'store']);    
-    Route::post('/subhead/update/{id}', [SubHeadController::class, 'update']);    
-    Route::get('/subhead', [SubHeadController::class, 'index']);    
-    Route::post('/delete', [SubHeadController::class, 'destroy']);    
-    Route::post('/get_fund_categories', [SchemeController::class, 'fetchFundCategories']);    
-    
+    Route::get('/sub_head_budgets', [SubHeadBudgetController::class, 'index']);
+    Route::get('/sub_head_budget/appropriation/{id}/{fund_category}', [SubHeadBudgetController::class, 'getSubHeadBudgetByAppropriation']);
+    Route::post('/sub_head_budget/save', [SubHeadBudgetController::class, 'updateCreate']);
+    Route::post('/sub_head_budget/delete/{id}', [SubHeadBudgetController::class, 'destroy']);
+    Route::post('/subhead/create', [SubHeadController::class, 'store']);
+    Route::post('/subhead/update/{id}', [SubHeadController::class, 'update']);
+    Route::get('/subhead', [SubHeadController::class, 'index']);
+    Route::post('/delete', [SubHeadController::class, 'destroy']);
+    Route::post('/get_fund_categories', [SchemeController::class, 'fetchFundCategories']);
+
 });

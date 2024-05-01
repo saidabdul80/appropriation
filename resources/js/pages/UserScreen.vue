@@ -17,8 +17,8 @@
                 <!-- User List -->
                 <div class="my-2">
                     <ul class="my-3 px-0 nav nav-pills flex-column mb-auto">
-                    <li v-for="(user, i) in users.data" :key="user.id" @click="selectUser(user, $event)" 
-                                :class="{ 'p-2': true, 'nav-item': true, 'user-items': true, 
+                    <li v-for="(user, i) in users.data" :key="user.id" @click="selectUser(user, $event)"
+                                :class="{ 'p-2': true, 'nav-item': true, 'user-items': true,
                                     'select-none': true, 'active': user.id === selected_user.id }" tabindex="-1">
                         <a class="px-2 py-1 nav-link text-dark a-item" :style="{ 'pointer-events': 'none' }">
                         <div :style="{ 'color': 'inherit' }" class="m-0 p-0" aria-describedby="emailHelp">{{ user.first_name }} {{ user.surname }}</div>
@@ -30,8 +30,8 @@
 
                 <!-- Pagination Controls -->
                 <div class="d-flex justify-content-center">
-                    <a :disabled="users.prev_page_url == null" :href="users.prev_page_url" class="btn btn-secondary py-1 mx-1">Prev</a>
-                    <a :disabled="users.next_page_url == null" :href="users.next_page_url" class="btn btn-secondary py-1 mx-1">Next</a>
+                    <a :disabled="users.prev_page_url == null" @click="getusers(users.prev_page_url)" class="btn btn-secondary py-1 mx-1">Prev</a>
+                    <a :disabled="users.next_page_url == null" @click="getusers(users.next_page_url)" class="btn btn-secondary py-1 mx-1">Next</a>
                 </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
                 </div>
             </div>
             <div class="user-list mx-auto  col-md-8 px-3" v-if="tab == 3">
-                             
+
             </div>
             <div style="height:inherits;" class="user-list mx-auto  col-md-8 px-3" v-if="tab == 4">
                 <div style="overflow: auto;height: 72%;" class="row needs-validation shadow bg-white rounded p-3">
@@ -159,9 +159,6 @@ export default {
         departments:{
             default:[]
         },
-        def_users:{
-            default:[]
-        },
         permissions:{
             default:[]
         },
@@ -170,8 +167,8 @@ export default {
         },
     },
     created(){
-        this.users= this.def_users
-    },
+        this.fetchUsersClick()
+        },
     data() {
         return {
             tab: 1,
@@ -232,7 +229,15 @@ export default {
                 showAlert(res.data, 'error')
             }
         },
-        async fetchUsers(e) {
+        async getusers(url){
+            let res = await postData(url, { search: this.search_keyword, paginateBy: this.paginateBy }, true);
+                if (res.status == 200) {
+                    this.users = res.data
+                } else {
+                    showAlert(res.data, 'error')
+                }
+        },
+        async fetchUsers(event) {
 
             if (event.key === "Enter") {
                 let res = await postData('/get_users', { search: this.search_keyword, paginateBy: this.paginateBy }, true);
@@ -244,14 +249,14 @@ export default {
             }
         },
         async fetchUsersClick(e) {
-            let res = await postData('/get_users', { search: this.search_keyword, paginateBy: this.paginateBy }, true);            
+            let res = await postData('/get_users', { search: this.search_keyword, paginateBy: this.paginateBy }, true);
             if (res.status == 200) {
                 this.users = res.data
             } else {
                 showAlert(res.data, 'error')
             }
         },
-        selectUser(user, e) {            
+        selectUser(user, e) {
             this.permission_ids = user.permission_ids
             this.role_ids = user.role_ids
             this.selected_user.first_name = user.first_name
@@ -382,7 +387,7 @@ export default {
                 $(this).find('i').toggleClass('bi-chevron-up')
                 $('.cards-container').slideToggle();
             })
-                
+
             var forms = document.querySelectorAll('.needs-validation')
             Array.prototype.slice.call(forms)
                 .forEach(function (form) {
@@ -395,7 +400,7 @@ export default {
 
                         form.classList.add('was-validated')
                     }, false)
-                })                
+                })
 
 
         })
@@ -410,7 +415,7 @@ export default {
     color: white !important;
 }
 .active {
-  background-color: var(--primary-c) !important; /* Add your preferred active background color */  
+  background-color: var(--primary-c) !important; /* Add your preferred active background color */
   color: #fff !important; /* Add your preferred active text color */
 }
 .nav-pills{
