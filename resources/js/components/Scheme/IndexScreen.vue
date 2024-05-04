@@ -65,7 +65,7 @@
         </tbody>
       </table>
       </div>
-      
+
         <div  v-if="switchPageOne == 2" >
           <table class="table mtable table-lg driveInRight " :key="selected_fund_category" style="min-width:1000px;">
             <thead class="">
@@ -76,7 +76,7 @@
                 <th>Appropriation Income (<span>&#8358;</span>) </th>
                 <th>Balance (<span>&#8358;</span>) </th>
                 <th>
-                  <button @click="appropriationLogPage(null, null)" class="btn me btn-sm btn-success text-white">
+                  <button v-if="canPerformAction('report')" @click="appropriationLogPage(null, null)" class="btn me btn-sm btn-success text-white">
                     <i class="bi bi-columns-gap" style="color:inherit"></i>
                   </button>
                 </th>
@@ -90,28 +90,28 @@
                 <td>{{ $globals.currency(appropriation_data_summary?.income?.[appropriation.name] ?? 0) }}</td>
                 <td>{{ $globals.currency(appropriation_data_summary?.balance?.[appropriation.name]??0) }} </td>
                 <td>
-                  <button @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
+                  <button v-if="canPerformAction('report')" @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
                     <i class="bi bi-columns-gap" style="color:inherit"></i>
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>            
+        </div>
         <Transition name="fade">
             <div v-if="showModal">
-                <sharehoder-modal             
+                <sharehoder-modal
                     :departments="departments"
                     :appropriation_types="appropriation_types"
                     :selected_appropriation="selected_appropriation"
                     @closeModal="closeModal()"
-                    @addapp="resolveAppropriation($event)" 
+                    @addapp="resolveAppropriation($event)"
                 />
             </div>
         </Transition>
     </div>
   </template>
-  
+
   <script>
   import SharehoderModal from './Modals/SharehoderModal.vue'
   export default {
@@ -174,10 +174,10 @@
     },
     watch: {
       selected_fund_category(newVal, oldVal) {
-        this.appropriationHistoriesResolver();    
-      },    
+        this.appropriationHistoriesResolver();
+      },
       selected_scheme: {
-        handler(newValue, oldValue) {        
+        handler(newValue, oldValue) {
           this.$nextTick(() => {
             this.initTable(4000);
           });
@@ -186,7 +186,7 @@
         immediate: true
       },
       switchPageOne: {
-        handler(newValue, oldValue) {        
+        handler(newValue, oldValue) {
           this.$nextTick(() => {
             this.initTable(0);
           });
@@ -195,14 +195,14 @@
         immediate: true
       },
       '$parent.openAppModal': {
-        handler(newValue, oldValue) {                   
+        handler(newValue, oldValue) {
           if(oldValue !== undefined){
             this.showModal = newValue
           }
         },
         deep: true,
         immediate: true
-      }          
+      }
 
     },
     methods: {
@@ -211,9 +211,9 @@
           this.$emit('closeAppModal')
           /* output to ScheemScreen */
         },
-        async resolveAppropriation(selected_appropriation) {          
+        async resolveAppropriation(selected_appropriation) {
             try {
-                this.selected_appropriation = selected_appropriation;                
+                this.selected_appropriation = selected_appropriation;
                 if (this.selected_scheme?.id =='' || this.selected_scheme?.id == null) {
                   throw new Error("Please select Programme"); //i.e scheme
                 }
@@ -250,8 +250,8 @@
                         const index = scheme.appropriations.findIndex(app => app.id === selected_appropriation.id);
                         scheme.appropriations[index] = { ...scheme.appropriations[index], ...selected_appropriation }; // Replace with a new object
                     }
-                    
-                    showAlert(responseData.msg);           
+
+                    showAlert(responseData.msg);
                     this.selected_scheme.appropriations = scheme.appropriations.slice();
                     this.$emit('updateSchemes',[schemeIndex,scheme.appropriations]);
                     //this.initTable(500);
@@ -267,12 +267,12 @@
             this.$emit('closeAppModal')
         },
         selectAllAppropriation(appropriations, e){
-            if(e.target.checked){                                                   
+            if(e.target.checked){
                 this.selected_appropriations_to_appropriate = appropriations.map((item)=>item.id)
             }else{
                 this.selected_appropriations_to_appropriate =[]
             }
-        },      
+        },
       appropriationHistoriesResolver() {
         this.appropriationHistories = this.appropriations_history.data?.reduce(
           (grouped, obj) => ({
@@ -283,31 +283,31 @@
       },
       getAppropriationIncome(name) {
         let total = 0;
-  
+
         if (this.selected_fund_category !== '') {
           const appropriationHistory = this.appropriationHistories[this.selected_fund_category];
-  
+
           if (appropriationHistory) {
             appropriationHistory.forEach(historyItem => {
               const appropriationItem = historyItem.appropriation.find(item => {
                 return item.name.toLowerCase() === name.toLowerCase();
               });
-  
+
               if (appropriationItem) {
                 total += appropriationItem.amount;
               }
             });
           }
         }
-  
+
         return total;
       },
       canPerformAction(permission) {
-        //console.log(this.permissions,222)
+        console.log(this.permissions,222)
         return this.permissions.includes(permission);
-      },    
+      },
       appropriationModalUpdate(appropriation, index) {
-        this.showModal = true 
+        this.showModal = true
         this.selected_appropriation = appropriation
       },
       totalPercentage(){
@@ -319,7 +319,7 @@
                 }
                 })
             return total.toFixed(2)
-        }else{                            
+        }else{
             return 0
         }
     },
@@ -341,11 +341,11 @@
             confirmButtonText:'Continue',
             cancelButtonText:'Cancel',
         })
-    
+
         if(!resp.isConfirmed){
             return false;
-        };               
-            
+        };
+
 
         if(this.selected_scheme.wallet.balance <1){
             Swal.fire('Insufficent balance')
@@ -364,7 +364,7 @@
                         },true);
         if(res.status == 200){
             //this.selected_scheme = res.data.scheme
-            this.selected_scheme.wallet.balance = 0;                      
+            this.selected_scheme.wallet.balance = 0;
             showAlert('Appropriation Completed');
             location.reload();
         }else{
@@ -374,23 +374,23 @@
     initTable(timeout=1000){
       setTimeout(()=>{
           if($('.mtable').DataTable && true){
-            $('.mtable').DataTable({        
+            $('.mtable').DataTable({
               scrollY: '50vh',
               destroy:true,
               searching: false,
             ordering: false,
             paging: false,
             info:false,
-            scrollCollapse: true,             
+            scrollCollapse: true,
             initComplete: function () {
               /* this.api().table().header().remove(); */
               $('.table').css({width:'100%'})
             }
-          });      
+          });
         }
       },timeout)
     },
-  
+
       async appropriationLogPage(appropriation, i) {
 
         if(appropriation === null){
@@ -398,44 +398,43 @@
           localStorage.setItem('page_type', 'all');
           this.$emit('openTransaction', {
               type: 'all',
-              appropriations:this.selected_scheme.appropriations,    
-          });    
+              appropriations:this.selected_scheme.appropriations,
+          });
           return;
         }
         localStorage.setItem('page_type', 'single');
         this.selected_appropriation = appropriation;
         localStorage.setItem('selected_appropriation', JSON.stringify(appropriation));
         localStorage.setItem('selected_appropriation_index', i);
-  
+
         this.selected_appropriation.index = i;
         this.selected_appropriation_balance = appropriation.wallet?.balance;
         this.$emit('openTransaction', {
           type:'single',
-          selected_appropriation: this.selected_appropriation,    
-        });        
+          selected_appropriation: this.selected_appropriation,
+        });
       },
     },
-    created() {                
-      
+    created() {
+
       try {
         if(this.selected_fund_category){
-            this.appropriationHistoriesResolver();            
+            this.appropriationHistoriesResolver();
         }
       } catch (e) {
         console.log('Error:' + e);
       }
     },
     mounted(){
-      //this.initTable(); 
+      //this.initTable();
     }
   };
   </script>
-  
+
   <!-- Add your component-specific styles here if needed -->
   <style scoped>
     /* Add your component-specific styles here if needed */
-    /* .dt-scroll-body table thead{  
+    /* .dt-scroll-body table thead{
       display: none !important;
     } */
   </style>
-  

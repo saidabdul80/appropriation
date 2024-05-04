@@ -1,36 +1,40 @@
 <template>
-  <div class="modal show" id="config-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered ">
-      <div class="modal-content">
-        <div class="w-100 d-flex justify-space-between" style="justify-content: space-between;">
+  <div class="" style="height: 95vh;" id="config-modal" >
+    <div class="bg-white rounded w-100" >
+      <div class="w-100 d-flex justify-space-between" style="justify-content: space-between;">
           <TabMenu :model="items" class="m-1 w-100">
             <template #item="{ item, props }">
+                <a v-if="item.type == 'exp-item'" v-ripple v-bind="props.action" class="p-3 text-center" @click="changeTab(item.type)">
+                <span class="font-bold">Subhead</span>
+                <span class="pi pi-spin mx-1  pi-spinner" v-if="tabLoader == item.type"></span>
+                <span class="pi mx-1 pi-arrow-right-arrow-left" v-else></span>
+                <span class="font-bold">Item</span>
+              </a>
               <a v-if="item.type == 'exp-dept'" v-ripple v-bind="props.action" class="p-3 text-center" @click="changeTab(item.type)">
                 <span class="font-bold">Head</span>
                 <span class="pi pi-spin mx-1  pi-spinner" v-if="tabLoader == item.type"></span>
                 <span class="pi mx-1 pi-arrow-right-arrow-left" v-else></span>
                 <span class="font-bold">Subhead</span>
               </a>
-              <a v-else v-ripple v-bind="props.action" class="p-3 text-center" @click="changeTab(item.type)">
+              <a v-if="item.type=='dept'" v-ripple v-bind="props.action" class="p-3 text-center" @click="changeTab(item.type)">
                 <span class="font-bold">{{ item.name }}</span>
                 <span class="pi pi-spin  pi-spinner" v-if="tabLoader == item.type"></span>
               </a>
             </template>
           </TabMenu>
           <div class="p-3">
-            <button @click="$emit('closeModal')" type="button" class="btn-close" data-bs-dismiss="modal"
+            <button @click="$emit('closeModal')" type="button" class="btn-close md-close" data-bs-dismiss="modal"
               aria-label="Close"></button>
           </div>
         </div>
-        <div class="modal-body mt-0 px-3" style="min-height: 400px;">          
-          <Heads @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>    
+        <div class="modal-body mt-0 px-3" style="height: 95%;overflow-y: auto;">
+          <Heads @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>
           <SubHead @oncompleted="oncompleted"     v-if="selectedTab == 'exp'" />
           <HeadSubHeadSync @isLoading="loader($event,'exp-dept')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-dept'"  />
+          <SubHeadItemSync @isLoading="loader($event,'exp-item')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-item'"  />
         </div>
         <div class="modal-footer" v-if="activeTab === 'update'">
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -46,6 +50,8 @@ import DepartmentComponent from './../Config/DepartmentComponent.vue';
 import SubHead from './../Config/SubHead.vue';
 import Heads from './../Config/Heads.vue';
 import HeadSubHeadSync from './../Config/HeadSubHeadSync.vue'
+import SubHeadItemSync from './../Config/SubHeadItemSync.vue'
+
 SubHead
 export default {
   props: {
@@ -61,7 +67,8 @@ export default {
     Dropdown,
     InputText,
     Heads,
-    HeadSubHeadSync
+    HeadSubHeadSync,
+    SubHeadItemSync
   },
   data() {
     return {
@@ -69,19 +76,21 @@ export default {
         { name: 'Heads', image: 'amyelsner.png', type: 'dept' },
         { name: 'Subhead', image: 'annafali.png', type: 'exp' },
         { name: '-', image: 'annafali.png', type: 'exp-dept' },
+        { name: '-', image: 'annafali.png', type: 'exp-item' },
+
 
         /* { name: 'Expenditure Units', image: 'amyelsner.png', type: 'dept' }, */
         /* { name: 'Expenditure Categories', image: 'annafali.png', type: 'exp' } */
-      ],      
+      ],
       expenditure_categories: [],
       tabLoader: '',
       selectedTab: 'dept',
       activeTab: 'update', // Default to 'update' tab
     };
   },
-  created() {        
+  created() {
   },
-  methods: {  
+  methods: {
     loader(e,type){
       if(e){
         this.tabLoader = type
@@ -91,7 +100,7 @@ export default {
     },
     async changeTab(type) {
       this.tabLoader = type
-      this.selectedTab = type             
+      this.selectedTab = type
     },
     oncompleted(){
       this.tabLoader = ''

@@ -7,47 +7,49 @@
 	<link rel="shortcut icon" href="/images/e_portal.png">
 	<link rel="stylesheet" href="/lib/bootstrap-icons/font/bootstrap-icons.css">
 	<!-- <link rel="stylesheet" href="/lib/css/bootstrap.min.css"> -->
-	 
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 		<!-- <link rel="stylesheet" href="/lib/css/select2.css"> -->
 		<link rel="stylesheet" href="/lib/css/swift-menu.css">
 		<link rel="stylesheet" href="/lib/css/vivify.css">
 		<link rel="stylesheet" href="/lib/js/datatable.css">
+		<link rel="stylesheet" href="/lib/css/components.css">
+
 		<link rel="stylesheet" href="/lib/css/font-awesome-4.7.0/css/font-awesome.min.css">
 	<!-- <link href="/lib/js/listjs/PagingStyle.css" rel="stylesheet" /> -->
 		<!-- <link rel="stylesheet" href="/lib/css/vue-tagin.css"> -->
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
-	
+
 	<link rel="stylesheet"  href="/lib/css/style3.css">
-	
+
 	<link rel="stylesheet" href="/lib/css/boostrap4.css">
 	@if(request()->path() !== 'login')
-	
+
 	<script src="/lib/js/swift-menu.js"></script>
 	<!-- <script src="/lib/js/jspdf.js"></script> -->
 	<script src="/lib/js/chart.js"></script>
 	<link rel="stylesheet"  href="/lib/css/sweetalert.css">
 	<!-- <script src="/lib/js/listjs/paging.js"></script> -->
-	
+
 	<script src="/lib/js/datatable/datatables.min.js" defer></script>
-	<script type="text/javascript" src="/lib/js/datatable/buttons.min.js"></script>	
-	<script type="text/javascript" src="/lib/js/datatable/jszip.min.js"></script>	
+	<script type="text/javascript" src="/lib/js/datatable/buttons.min.js"></script>
+	<script type="text/javascript" src="/lib/js/datatable/jszip.min.js"></script>
 	<script type="text/javascript" src="/lib/js/datatable/pdfmake.min.js"></script>
-	<script type="text/javascript" src="/lib/js/datatable/vfs_fonts.js"></script>	
+	<script type="text/javascript" src="/lib/js/datatable/vfs_fonts.js"></script>
 	<!-- <script type="text/javascript" src="/lib/js/datatable/buttons.html5.min.js"></script>	 -->
-	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>			
-	
-	
+	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>
+
+
 <!-- 	<script type="text/javascript" src="/lib/js/select2.js"></script> -->
 	<!-- <script src="/lib/js/jqueryvalidate.js"></script> -->
 	<!-- <script src="/lib/js/propper.js"></script> -->
 	<script src="/lib/js/sweetalert.js"></script>
-	
+
 	<script src="/lib/js/bootstrap4.js"></script>
 <!-- 	<script src="/lib/js/vue.js"></script>
 	<script type="module" src="/lib/js/vue-currency.js"></script>
 	<script src="/lib/js/vue-tagins.js" ></script> -->
-	
+
 	<script src="/lib/js/axios.js"></script>
 	<!-- <script src="/lib/js/datatable.css"></script> -->
 	<link rel="stylesheet" href="/lib/css/styles.css">
@@ -75,7 +77,7 @@ div.DTCR_pointer {
 	<script>
 		$(document).ready(function() {
 			var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
-			var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {				
+			var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
 				return new bootstrap.Dropdown(dropdownToggleEl)
 			})
 
@@ -142,7 +144,7 @@ div.DTCR_pointer {
 						return response;
 					}
 				}).catch(function(error) {
-					//switchPage(1)                   
+					//switchPage(1)
 					$("#loaderHtml").hide()
 					Swal.fire({
 						text: error.response.data,
@@ -158,14 +160,14 @@ div.DTCR_pointer {
 			if(loader){
 				$("#loaderHtml").show()
 			}
-			
+
 			try{
 				return await axios.get(route).then(function(response) {
 					//switchPage(1)
-					$("#loaderHtml").hide()					
+					$("#loaderHtml").hide()
 					return response;
 				}).catch(function(error) {
-					//switchPage(1)                   
+					//switchPage(1)
 					$("#loaderHtml").hide()
 					Swal.fire({
 						text: error.response.data,
@@ -177,12 +179,12 @@ div.DTCR_pointer {
 			}
 		}
 
-		async function postDataWithoutLoader(route, data) {			
+		async function postDataWithoutLoader(route, data) {
 			return await axios.post(route, data).then(function(response) {
-				//switchPage(1)				
-					return response;				
+				//switchPage(1)
+					return response;
 			}).catch(function(error) {
-				//switchPage(1)                   
+				//switchPage(1)
 				$("#loaderHtml").hide()
 				Swal.fire({
 					text: error.response.data,
@@ -218,7 +220,7 @@ div.DTCR_pointer {
 			}, 2000);
 			return true;
 		}
-	
+
 		async function postDataWithAlert(url, data,elt ,wmsg='Are you sure you want to continue', smsg='success') {
 				Swal.fire({
 					text: wmsg,
@@ -244,8 +246,8 @@ div.DTCR_pointer {
 	</script>
 </head>
 
-<body class="background-primary px-2 w-100">	
+<body class="background-primary px-2 w-100">
 		@yield('body')
-</body>
 
+</body>
 </html>

@@ -75,7 +75,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 		overflow: hidden;
 	}
 
-	/* gets the actual input out of the way; 
+	/* gets the actual input out of the way;
 	we're going to style the label instead */
 
 	#drawer-toggle {
@@ -131,7 +131,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 		top: 0;
 		left: -300px;
 		height: 100%;
-		width: 300px;		
+		width: 300px;
 		overflow-x: hidden;
 		overflow-y: hidden;
 		padding: 20px;
@@ -141,10 +141,10 @@ $routename = str_replace('#','', Route::currentRouteName());
 	/* actual page content pane */
 
 	#page-content {
-		margin-left: 0px;		
+		margin-left: 0px;
 		width: 100%;
 		height: 100vh;
-		overflow: hidden;		
+		overflow: hidden;
 		-webkit-overflow-scrolling: touch;
 		padding: 0px 60px;
 	}
@@ -154,7 +154,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 		position: fixed;
 		left: 10px;
 	}
-	
+
 	.nav-logo{
 		position: fixed;
 		/* left: 17px; */
@@ -203,9 +203,9 @@ $routename = str_replace('#','', Route::currentRouteName());
 	}
 
 	#drawer-toggle:checked~#drawer div .nav-pills li a .nav-name2{
-		display: inline-block !important;		
-	}	
-	
+		display: inline-block !important;
+	}
+
 	#drawer-toggle:checked~#drawer div .nav-pills li a .menu-icon {
 		color: var(--primary-c) !important;
 		display: inline-flex !important;
@@ -247,8 +247,8 @@ $routename = str_replace('#','', Route::currentRouteName());
 		#drawer-toggle-label{
 			position: fixed;
 		}
-		
-		.nav{			
+
+		.nav{
 			flex-direction: column-reverse !important;
 		}
 		#drawer-toggle:checked~#drawer-toggle-label {
@@ -269,8 +269,8 @@ $routename = str_replace('#','', Route::currentRouteName());
 		#drawer-toggle:checked~#page-content {
 			margin-left: calc(100% - 50px);
 		}
-		
-	
+
+
 	}
 	.line-mobile{
 		display: none;
@@ -283,10 +283,10 @@ $routename = str_replace('#','', Route::currentRouteName());
 		.nicare-logo-right{
 			display: none !important;
 		}
-		div#page-content {		
+		div#page-content {
 			padding: 0px 10px 0px 10px !important;
 		}
-		
+
 		.nav-name2{
 			display: none !important;
 		}
@@ -295,18 +295,18 @@ $routename = str_replace('#','', Route::currentRouteName());
 		.line-mobile{
 			display: block !important;
 		}
-		#page-content {		
+		#page-content {
 			padding: 0px 10px 0px 60px !important;
 		}
 		#page-content {
 			overflow-y:scroll !important ;
 		}
-		
+
 	}
 </style>
 <!-- <main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-	
-</main> 
+
+</main>
 <div class="w-100" style="height: 62px;"></div>
 <nav class="navbar w-100 mx-auto d-flex justify-content-center py-2 px-4 pb-0 shadow-sm" style="position: fixed;top:0px; z-index: 8;">
 	<div class="background-primary-light container-fluid rounded-lg">
@@ -322,9 +322,9 @@ $routename = str_replace('#','', Route::currentRouteName());
 <input type="checkbox" id="drawer-toggle" name="drawer-toggle" />
 <label for="drawer-toggle" id="drawer-toggle-label"></label>
 <nav id="drawer" class="background-primary">
-	<div class="bg-white rounded-lg"> 
+	<div class="bg-white rounded-lg">
 
-	
+
 	<div class="offcanvas-header bg-white justify-between">
 		<span>
 			<a href="/" class="d-flex nicare-logo-right align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
@@ -332,20 +332,20 @@ $routename = str_replace('#','', Route::currentRouteName());
 				<span class="fs-6 ms-2">FMS</span>
 			</a>
 		</span>
-		
-		<label for="drawer-toggle" class="btn-close" id="drawer-toggle-label2"></label>		
+
+		<label for="drawer-toggle" class="btn-close" id="drawer-toggle-label2"></label>
 	</div>
 	<hr class="m-0">
 	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative">
 		<ul class="nav nav-pills flex-column mb-auto">
 			<li data-bs-toggle="tooltip" title="Home" class="nav-item">
-				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">				
+				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">
 					<i class=" nav-name2 fa fa-home menu-icon "></i>
 					<span class="nav-name">Home</span>
 				</a>
 			</li>
 			<li data-bs-toggle="tooltip" title="Dashboard" >
-				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">				
+				<a href="{{route('dashboard')}}" class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<i class=" nav-name2 fa fa-dashboard menu-icon "></i>
 					<span class="nav-name">Dashboard</span>
 				</a>
@@ -371,15 +371,15 @@ $routename = str_replace('#','', Route::currentRouteName());
 				<!--
 					<ul class="nav nav-pills flex-column mb-auto">
 						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> New</a></li>
-						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>					
-					</ul> 
+						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>
+					</ul>
 				-->
 			</li>
 			<!-- <li>
 				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
 					<svg class="bi me-2" width="16" height="16">
 						<use xlink:href="#people-circle" />
-					</svg> nav-name2 
+					</svg> nav-name2
 					<span class="nav-name">Users</span>
 				</a>
 			</li> -->
@@ -391,7 +391,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 				<img src="{{asset('/images/default.jpg')}}" alt="" width="32" height="32" class="rounded-circle me-2">
 				<strong>{{auth()->user()->fullname}}</strong>
 			</a>
-			<ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">				
+			<ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
 				<li><a class="dropdown-item nav-item" href="#">Profile</a></li>
 				<li>
 					<hr class="dropdown-divider">
@@ -423,7 +423,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 
 			}
 		})
-		/*  $("#dropdownUser2").click(function(e){		
+		/*  $("#dropdownUser2").click(function(e){
 		e.stopPropagation();
 		if(e.target !== e.currentTarget){
 			$(this).parent().next().toggleClass('show');

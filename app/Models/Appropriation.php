@@ -19,7 +19,7 @@ class Appropriation extends Model
         "percentage_dividend",
         "identifier"
     ];
-    
+
     protected $casts = [
         "department_id"=>ToArray::class
     ];
@@ -60,17 +60,25 @@ class Appropriation extends Model
 
     /*public function department_ids(){
         return explode(',',$this->department_id);
-       } 
+       }
     */
 
-    public function getDepartmentAttribute(){        
+    public function getDepartmentAttribute(){
        return implode(',', Department::whereIn("id", $this->department_id)->get()->pluck('short_name')->toArray());
     }
 
-    public function scopeWithWallet($query,$fundCategory){
-       return $query->with(['wallet' => function ($query) use ($fundCategory) {
-            $query->where(['fund_category' => $fundCategory, 'owner_type' => 'App\\Models\\Appropriation']);
-        }]);
+    public function scopeWithWallet($query,$fundCategory =null,){
+        $scheme =Scheme::find($this->scheme_id);
+        if ($scheme && $scheme->fund_category == 'month') {
+            // For any scheme with fund category = month
+            return $query->with(['wallet' => function ($query) {
+                $query->where('owner_type', 'App\\Models\\Appropriation');
+            }]);
+        }
+
+        return $query->with(['wallet' => function ($query) use ($fundCategory) {
+                $query->where(['fund_category' => $fundCategory, 'owner_type' => 'App\\Models\\Appropriation']);
+            }]);
     }
 
     public function getNameAttribute()
@@ -78,6 +86,6 @@ class Appropriation extends Model
         return   AppropriationType::find($this->appropriation_type_id)?->name;
     }
     protected $appends = ['total_collection','name','department', 'department_id','balance', 'main_wallet'];
-    
+
 }
 

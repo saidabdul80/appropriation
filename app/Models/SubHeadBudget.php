@@ -10,6 +10,7 @@ class SubHeadBudget extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $with =["subheadBudgetItems"];
     protected $fillable = [
         'subhead_id',
         'appropriation_id',
@@ -26,12 +27,17 @@ class SubHeadBudget extends Model
     }
 
 
-    public static function getAmount($appropriationId, $subheadId){
-        return self::where(['id'=>$subheadId])->first()?->amount;
+    public static function getAmount($id){
+        return self::where(['id'=>$id])->first()?->amount;
     }
 
     public function  getBalanceAttribute(){
         return $this->amount -Transaction::sumAmountForSubhead($this->appropriation_id, $this->id, $this->fund_category);
+    }
+
+    public function subheadBudgetItems()
+    {
+        return $this->hasMany(SubheadBudgetItem::class,'subhead_budget_id');
     }
 
     protected $appends = ['subhead', 'balance'];

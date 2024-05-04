@@ -17,9 +17,9 @@
               </li>
               <li class="nav-item" @click="activeTab = 'transactions'; fetchTransactions()" v-if="selected_scheme.id !== ''">
                 <a class="nav-link" :class="{ active: activeTab === 'transactions' }" href="#">View Transactions</a>
-              </li>          
+              </li>
             </ul>
-  
+
             <!-- Update Scheme Form -->
             <div v-show="activeTab === 'update'" class="p-3">
               <div class="mb-3">
@@ -27,24 +27,26 @@
                 <input v-model="selected_scheme.name" type="text" class="form-control" id="name">
               </div>
             </div>
-  
+
             <!-- View Transactions Section -->
-            <div v-if="selected_scheme.id !== '' && activeTab === 'transactions'" class="overflow-x pb-5">                              
+            <div v-if="selected_scheme.id !== '' && activeTab === 'transactions'" class="overflow-x pb-5">
               <table class="table table-sm fs-8 table-bordered ">
                 <tr class="fw-bold">
                     <td>Action</td>
+                    <td class="nobreak">Fund Date</td>
                     <td class="nobreak">Date Created</td>
                     <td class="nobreak">Date Updated</td>
                     <td>Amount</td>
                 </tr>
                 <tr v-for="(transaction,i) in transactions?.credit?.data" :key="transaction.id">
-                  <td>{{ transaction.action=='undo credit'?'Deleted':'Credit' }} 
+                  <td>{{ transaction.action=='undo credit'?'Deleted':'Credit' }}
                     <span v-if="transaction?.state=='  '" class="text-danger" style="font-size: 0.9em;">(Not Appropriated)</span></td>
+                  <td>{{ transaction.fund_date }}</td>
                   <td>{{ transaction.date_added }}</td>
                   <td>{{ transaction.date_updated}}</td>
                   <td> {{ $globals.currency(transaction.amount) }}</td>
-                  <td>                    
-                     <button v-if="transaction?.state==='used'" disabled class="btn btn-primary bg-primary pi pi-undo"></button>                   
+                  <td>
+                     <button v-if="transaction?.state==='used'" disabled class="btn btn-primary bg-primary pi pi-undo"></button>
                      <button @click="rollbackWithConfirmation(transaction.id)" v-else class="btn btn-primary bg-primary pi pi-undo"></button>
                    </td>
                 </tr>
@@ -53,15 +55,17 @@
               <table class="table table-sm fs-8 table-bordered ">
                 <tr class="fw-bold">
                     <td>Action</td>
+                    <td class="nobreak">Fund Date</td>
                     <td class="nobreak">Date Created</td>
                     <td class="nobreak">Date Updated</td>
                     <td>Amount</td>
                 </tr>
                 <tr v-for="(transaction,i) in transactions?.undo?.data" :key="transaction.id">
                   <td>Deleted</td>
+                  <td>{{ transaction.fund_date }}</td>
                   <td>{{ transaction.date_added }}</td>
                   <td>{{ transaction.date_updated}}</td>
-                  <td> {{ $globals.currency(transaction.amount) }}</td>                 
+                  <td> {{ $globals.currency(transaction.amount) }}</td>
                 </tr>
               </table>
             </div>
@@ -74,7 +78,7 @@
       </div>
     </div>
   </template>
-  
+
   <script>
   export default {
     props: {
@@ -90,7 +94,7 @@
       };
     },
     created() {
-      // Fetch transactions for the selected scheme      
+      // Fetch transactions for the selected scheme
     },
     methods: {
         async rollbackWithConfirmation(transaction_id) {
@@ -137,15 +141,15 @@
         // Replace this with your API call to fetch transactions
         // Example: Assume there's an API endpoint /get_transactions
         const response = await postData('/get_transactions',{owner_id:this.selected_scheme.id,'owner_type':'scheme'}, true);
-        
-        if(response.status == 200){            
+
+        if(response.status == 200){
             this.transactions =response.data;
         }
       },
     },
   };
   </script>
-  
+
   <!-- Add your component-specific styles here if needed -->
   <style scoped>
     .modal {
@@ -159,4 +163,3 @@
         white-space: nowrap;
     }
   </style>
-  

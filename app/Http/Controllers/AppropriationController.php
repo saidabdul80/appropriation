@@ -27,61 +27,71 @@ class AppropriationController extends Controller
     public function getPreparedData(Request $request)
     {
         try{
-            $request->validate([                
-                "scheme_id"=>"required",       
-//                "fund_category"=>""         
+            $request->validate([
+                "scheme_id"=>"required",
+//                "fund_category"=>""
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
             //return $fund_category;
-            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme','fund_category'=>$fund_category])->orderBy('id','desc')->paginate(20);
-            $appropriations = Appropriation::with(['wallet'=>function($query) use($fund_category){
-                $query->where(['fund_category'=>$fund_category, 'owner_type'=>'App\\Models\\Appropriation']);
+            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme','fund_category'=>$fund_category])->orderBy('id','desc')->paginate(100);
+            $appropriations = Appropriation::withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+            /* if(!empty($fund_category)){
+            }
+            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme'])->orderBy('id','desc')->paginate(100);
+            $appropriations = Appropriation::with(['wallet'=>function($query){
+                $query->where(['owner_type'=>'App\\Models\\Appropriation']);
             }])->where('scheme_id', $scheme_id)->get();
-
+ */
             return response(['appropriations'=>$appropriations, 'appropriations_histories'=>$appropriation_histories],200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e,500);                
+                return response($e,500);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
-    
+
    public function fundCategoryAppropriations(Request $request){
         try{
-            $request->validate([                
-                "scheme_id"=>"required",         
+            $request->validate([
+                "scheme_id"=>"required",
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
-            //return $fund_category;            
-            $appropriations = Appropriation::with(['subheads'=>function($query) use($fund_category){
-                $query->where('fund_category',$fund_category);
-            }])->withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+            $scheme = Scheme::find($scheme_id);
+            //return $fund_category;
+            if(!empty($fund_category)){
+
+                $appropriations = Appropriation::with(['subheads'=>function($query) use($fund_category){
+                    $query->where('fund_category',$fund_category);
+                }])->withWallet()->where('scheme_id', $scheme_id)->get();
+            }else{
+                $appropriations = Appropriation::with(['subheads'])->withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+            }
 
             return response($appropriations,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e,500);                
+                return response($e,500);
             }else{
                 return response('failed',400);
             }
-        } 
+        }
     }
 
     public function getAmountSummaryData(Request $request)
     {
         try{
-            
-            $request->validate([                
-                "scheme_id"=>"required",       
-//                "fund_category"=>""         
+
+            $request->validate([
+                "scheme_id"=>"required",
+//                "fund_category"=>""
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
@@ -91,59 +101,59 @@ class AppropriationController extends Controller
                 'owner_type' => 'scheme',
                 'fund_category' => $fund_category,
             ])->get();
-            
+
             $result1 = [];
-            
+
             foreach ($appropriation_histories as $history) {
                 foreach ($history->appropriation as $appr) {
                     $result1[$appr['name']] = ($result1[$appr['name']] ?? 0) + $appr['amount'];
                 }
             }
             // Now $result is an associative array with 'name' as key and 'total_amount' as value
-            
-            
+
+
             $appropriations = Appropriation::withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
             $result2 = [];
-            
+
             foreach ($appropriations as $appropriation) {
                 $totalAmount = $appropriation->wallet?->balance ?? 0;
                 $result2[$appropriation->name] = $totalAmount;
             }
-            
-            
-            // Now $result is an associative array with 'name' as key and 'total_amount' as value            
+
+
+            // Now $result is an associative array with 'name' as key and 'total_amount' as value
 
             return response(['balance'=>$result2, 'income'=>$result1],200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e,500);                
+                return response($e,500);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     public function fundMonthYear(Request $request)
     {
         try{
-            $request->validate([                
-                "scheme_id"=>"required",                
+            $request->validate([
+                "scheme_id"=>"required",
             ]);
-            $scheme_id = $request->get('scheme_id');          
+            $scheme_id = $request->get('scheme_id');
             $ids = Appropriation::where('scheme_id', $scheme_id)->pluck('id');
             $response = Wallet::whereIn('owner_id',$ids)->where('owner_type','App\\Models\\Appropriation')->pluck('fund_category')->unique();
             return response($response,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     public function getAppropriations(Request $request)
@@ -156,17 +166,17 @@ class AppropriationController extends Controller
             ->orderBy('fund_category', 'desc')
             ->orderBy('owner_id', 'desc')  // Add more columns if needed
             ->paginate(1);
-        
+
             return response($response,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
 
@@ -179,7 +189,7 @@ class AppropriationController extends Controller
     public function getAppropriationsProjection(Request $request){
         try{
 
-            $request->validate([                
+            $request->validate([
                 "scheme_id"=>"required"
             ]);
             $scheme = Scheme::find($request->get('scheme_id'));
@@ -190,14 +200,14 @@ class AppropriationController extends Controller
                 throw new \Exception('There is no Projection for this programme', 400);
             }
 
-            $date = Carbon::now();            
+            $date = Carbon::now();
             $thisMonth = $date->year.'-'.$date->month;
             $thisMonth = '2020-07';
             $response = TblRequest::where(DB::raw('LEFT(payment_date,7)'), '=', $thisMonth )->where('payment_status','paid')->sum('amount');
             return response($response,400);
-          
+
             if(count($scheme->appropriations) <1){
-                throw new Exception('No appropriation available',400);                
+                throw new Exception('No appropriation available',400);
             }
 
 
@@ -207,9 +217,9 @@ class AppropriationController extends Controller
                 "amount"=>$expectedFund,
                 "appropriations" =>[]
             ];
-            
+
             foreach($scheme->appropriations as $appropriation){
-                $amount = ($expectedFund * $appropriation->percentage_dividend) /100;                
+                $amount = ($expectedFund * $appropriation->percentage_dividend) /100;
                 $total_amount += round($amount,2);
                 $record["appropriations"][]=[
                     "id"=>$appropriation->id,
@@ -217,18 +227,18 @@ class AppropriationController extends Controller
                     "department"=>$appropriation->department,
                     "amount"=>$amount,
                     "percentage_dividend" => $appropriation->percentage_dividend
-                ];                
+                ];
             }
             return response($record,200); */
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }  
+        }
     }
 
     public function getApproTypes(){
@@ -238,11 +248,11 @@ class AppropriationController extends Controller
             return response()->json($app_types);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }  
+        }
     }
 
     /**

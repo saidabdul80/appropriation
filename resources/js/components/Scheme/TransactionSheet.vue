@@ -1,44 +1,85 @@
 <template>
   <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;overflow: hidden;">
-    <v-popup group="templating">
-        <template #container="{ message, acceptCallback, rejectCallback }">
-            <div class="scrollable-container" style="height: 260px; overflow-y: auto;cursor: grab;user-select: none;" @mousedown="startDragging" @mouseup="stopDragging" @mouseleave="stopDragging" @mousemove="scrollOnDrag">
-            <div class="scrollable-content" ref="scrollContent" style="width: 100%;">
-                <table class="table w-100 h-100" style="position: relative;">
-                <thead style="position: sticky; top: 0; z-index: 1;" class="bg-white" >
-                    <tr>
-                    <th>Subhead</th>
-                    <th>Amount (₦)</th>
-                    <th>Balance (₦)</th>
-                    </tr>
-                </thead>
-                <tbody style="margin-top: 20px;">
-                    <tr v-for="(cat, index) in sub_head_budgets" :class="cat.amount > cat.balance ? 'text-success' : ''" :key="index" style="font-size: 0.9em;">
-                    <td>{{ cat.subhead }}</td>
-                    <td>{{ $globals.currency(cat.amount) }}</td>
-                    <td>{{ $globals.currency(cat.balance) }}</td>
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-            </div>
-        </template>
-        </v-popup>
+ <!--    <v-popup group="templating">
+      <template #container="{ message, acceptCallback, rejectCallback }">
+        <div class="scrollable-container" style="height: 260px; overflow-y: auto;cursor: grab;user-select: none;"
+          @mousedown="startDragging" @mouseup="stopDragging" @mouseleave="stopDragging" @mousemove="scrollOnDrag">
+          <div class="scrollable-content" ref="scrollContent" style="width: 100%;">
+            <table class="table w-100 h-100" style="position: relative;">
+              <thead style="position: sticky; top: 0; z-index: 1;" class="bg-white">
+                <tr>
+                  <th>Subhead</th>
+                  <th>Amount (₦)</th>
+                  <th>Balance (₦)</th>
+                </tr>
+              </thead>
+              <tbody style="margin-top: 20px;">
+                <tr v-for="(cat, index) in sub_head_budgets" :class="cat.amount > cat.balance ? 'text-success' : ''"
+                  :key="index" style="font-size: 0.9em;">
+                  <td>{{ cat.subhead }}</td>
+                  <td>{{ $globals.currency(cat.amount) }}</td>
+                  <td>{{ $globals.currency(cat.balance) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+    </v-popup> -->
+
     <div>
-      <button @click="$emit('switch-page', 1)" class="btn fs-9 btn-primary text-white rounded" style=""><span
-          class="pi pi-arrow-left"></span></button>
-      <button @click="reloadTransaction()" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
-          class="pi pi-refresh"></span></button>
-      <button @click="exportToExcel()" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
-          class="pi pi-file-export"></span></button>
-      <h5 class="text-center text-secondary"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department
-          }}</b>
-        Transactions</h5>
+      <div class="row w-100">
+        <div class="col-md-4 col-lg-3">
+          <button @click="$emit('switch-page', 1)" class="btn fs-9 btn-primary text-white rounded" style=""><span
+              class="pi pi-arrow-left"></span></button>
+          <button @click="reloadTransaction()" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
+              class="pi pi-refresh"></span></button>
+          <button @click="exportToExcel()" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
+              class="pi pi-file-export"></span></button>
+        </div>
+        <div class="col-md-5 col-lg-6 mb-3">
+
+          <h5 class="text-center text-secondary"><b>{{ selected_appropriation.name }} / {{
+            selected_appropriation.department }}</b>
+            Transactions</h5>
+        </div>
+        <div class="col-lg-12 row">
+          <div class="col-md-8 row">
+            <div class="col-md-12">
+                <InlineMessage severity="info" class="p-1 w-100">
+                    <span style="font-size: 0.8em;" class="ms-1"> <b>Note:</b> Please Select filter by Date along with Date Category to generate report </span>
+                </InlineMessage>
+            </div>
+            <div class="col-md-6 mb-3">
+                <Calendar v-model="filters.date" selectionMode="range" placeholder="Filter by date" :manualInput="false"
+                dateFormat="yy-mm-dd" class="w-100"
+                :pt="{ root: { class: 'mt-2' }, input: { style: 'padding:4px !important;' } }">
+                <template #footer="{ clickCallback }">
+                </template>
+                </Calendar>
+            </div>
+
+          <div class="col-md-6 mb-3">
+            <Dropdown :pt="{ input: { style: 'padding:4px !important;' } }" v-model="filters.date_type"
+              @change="filterTransaction()" :options="filters_date" optionLabel="name" optionValue="id"
+              placeholder="Date Category" class="w-100 my-2" />
+          </div>
+          </div>
+          <div class="col-md-4">
+            <Dropdown :pt="{ input: { style: 'padding:4px !important;' } }" v-model="filters.group"
+              @change="filterTransaction()" :options="filters_grouping" optionLabel="name" optionValue="id"
+              placeholder="Group By" class="w-100 my-2" />
+
+          </div>
+        </div>
+      </div>
       <!-- <div class="btn-group" role="group" aria-label="Basic example2">
         </div> -->
       <Divider />
       <div class="row">
         <div class="col-md-3">
+          <p class="inline-block mb-2 me-4"><b>Income:</b><span>&#8358;</span>
+            {{ $globals.currency(selected_appropriation_income, converCurrency) }}</p>
           <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span>
             {{ $globals.currency(selected_appropriation_balance, converCurrency) }}</p>
         </div>
@@ -46,28 +87,30 @@
           <p class="inline-block mb-0"><b>Total Expenditure: <span>&#8358;</span></b>
             {{ $globals.currency(total_expenditure_appropriation, converCurrency) }}</p>
         </div>
-        <div class="col-md-3"><a class="mb-2" style="cursor: pointer;" @click="subheadDetails($event)">More details</a>
-        </div>
         <div class="col-md-3">
-          <Calendar v-model="filters.date" selectionMode="range" :manualInput="false" dateFormat="yy-mm-dd" class="w-75">
-            <template #footer="{ clickCallback }">
-            </template>
-          </Calendar>
-          <Dropdown v-model="filters.date_type" @change="filterTransaction()" :options="filters_date"
-            optionLabel="name" optionValue="id" placeholder="With" class="w-100 my-2" />
+            <PopUp label="More details" :items="transformData(sub_head_budgets)" />
         </div>
       </div>
-      <Divider />
+      <!-- <Divider /> -->
     </div>
-    <div style="overflow: scroll;height: 68%">
-      <table class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
+    <div style="overflow: scroll;height: 68%" :key="tableKey">
+      <table v-if="filters.group !='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
         style="min-width:1000px;">
         <thead>
+          <!--   <tr :class="!converCurrency?'':'d-none'">
+                <th colspan="6"></th>
+                <th colspan="6"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department}}</b>Transactions</th>
+            </tr> -->
           <tr>
             <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
             <th class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
             <th class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
-            <th v-for="header in Object.keys($globals.dynamic_data)" class="fs-8 fw-bold" style="white-space: nowrap;">
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
+            <th v-for="header in Object.keys(dynamicData)" :data-name="header"
+              class="fs-8 fw-bold position-relative" style="white-space: nowrap;">
+              <div class="thoverlay" @click="removeColumn(header)">
+                <span class="pi pi-times "></span>
+              </div>
               {{ header.replaceAll('_', ' ') }}
             </th>
             <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
@@ -80,9 +123,11 @@
             <td>{{ parseInt(i + 1) }} </td>
             <td>{{ appr.head }}</td>
             <td>{{ appr.subhead }}</td>
-            <td v-for="key in Object.keys($globals.dynamic_data)" class="" style="white-space: nowrap;">
+            <td>{{ appr.subhead_item }}</td>
+            <td v-for="key in Object.keys(dynamicData)" class="" style="white-space: nowrap;">
               <span v-if="key.includes('₦')">
-                {{ $globals.currency(appr.data && appr.data[key] ? appr.data[key] : 0, converCurrency) }}
+                {{ $globals.currency(appr.data && appr.data[key] ? appr.data[key] : 0, converCurrency)
+                }}
               </span>
               <span v-else>
                 <span v-if="appr.data[key] && (appr.data[key].type || 'text') === 'number'">
@@ -112,17 +157,59 @@
             <td></td>
             <td></td>
             <td></td>
-            <td v-for="(key, index) in Object.keys($globals.dynamic_data)">
-              <span v-if="index == Object.keys($globals.dynamic_data)?.length - 2">Total</span>
-              <span v-if="index == Object.keys($globals.dynamic_data)?.length - 1">{{
-        $globals.currency(total_expenditure_appropriation, converCurrency) }}</span>
+            <td v-for="(key, index) in Object.keys(dynamicData)">
+              <span v-if="index == Object.keys(dynamicData)?.length - 2">Total</span>
+              <span v-if="index == Object.keys(dynamicData)?.length - 1">{{
+                $globals.currency(total_expenditure_appropriation, converCurrency) }}</span>
             </td>
           </tr>
+
           <tr>
-            <td class="inline-block mb-2 me-4"><b>Balance:</b></td>
-            <td><span>&#8358;</span> {{ $globals.currency(selected_appropriation_balance, converCurrency) }}</td>
-            <td class="inline-block mb-0"><b>Total Expenditure: </b></td>
-            <td><span>&#8358;</span> {{ $globals.currency(total_expenditure_appropriation,converCurrency) }}</td>
+            <td colspan="6"></td>
+            <td colspan="2" class="inline-block mb-2 me-4"><b>Income:</b></td>
+            <td colspan="2"><span>&#8358;</span> {{ $globals.currency(selected_appropriation_income,
+              converCurrency)
+              }}</td>
+
+          </tr>
+          <tr>
+            <td colspan="6"></td>
+            <td colspan="2" class="inline-block mb-0"><b>Total Expenditure: </b></td>
+            <td colspan="2"><span>&#8358;</span> {{
+              $globals.currency(total_expenditure_appropriation, converCurrency) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <table v-if="filters.group =='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable">
+        <thead>
+          <tr>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Date</th>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Particulars</th>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Payment</th>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Total</th>
+            <th class="fs-8 fw-bold" style="white-space: nowrap;">Balance</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(tra,i) in transactions?.data">
+            <td>{{ i+1 }}</td>
+            <td>{{ tra.payment_date }}</td>
+            <td>{{ tra.name }}</td>
+            <td>{{ $globals.currency( tra.amount,converCurrency ) }}</td>
+            <td>{{ $globals.currency( tra.total, converCurrency) }}</td>
+            <td>{{ $globals.currency( tra.balance, converCurrency) }}</td>
+          </tr>
+        </tbody>
+        <tfoot class="d-none">
+          <tr></tr>
+          <tr>
+            <td></td><td></td>
+            <td><span>APPROPRIATION:</span></td>
+            <td></td>
+            <td><span >{{$globals.currency(selected_appropriation_income, converCurrency) }}</span></td>
+            <td><span >{{$globals.currency(selected_appropriation_income -total_expenditure_appropriation, converCurrency) }}</span></td>
           </tr>
         </tfoot>
       </table>
@@ -131,7 +218,6 @@
 </template>
 
 <script>
-import { useConfirm } from "primevue/useconfirm";
 import ConfirmPopup from 'primevue/confirmpopup';
 import Divider from 'primevue/divider';
 import Calendar from 'primevue/calendar';
@@ -139,7 +225,10 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import { utils, writeFileXLSX } from "xlsx";
 
+import InlineMessage from 'primevue/InlineMessage';
+import TreeSelect from 'primevue/treeselect';
 
+import PopUp from '../PopUp/PopUp.vue'
 
 import Dropdown from 'primevue/dropdown';
 
@@ -150,7 +239,10 @@ export default {
     Calendar,
     Dropdown,
     InputGroup,
-    InputGroupAddon
+    InputGroupAddon,
+    TreeSelect,
+    PopUp,
+    InlineMessage
   },
   props: {
     agency_name: {
@@ -174,16 +266,35 @@ export default {
   },
   data() {
     return {
-      filters_date: [{ id: 'Payment_Date', name: "Payment Date" }, { id: 'Approval_Date', name: 'Approval Date' }],
-      filters: { date: null },
+      filters_date: [{ id: 'Payment_Date', name: "Payment Date" }, { id: 'Approval_Date', name: 'Approval Date' }, { id: 'created_at', name: 'Created Date' }],
+      filters_grouping: [
+        {
+          name: 'Heads',
+          id: 'head',
+        },
+        {
+          name: 'Subheads',
+          id: 'subhead',
+        },
+        {
+          name: 'Heads -> Subheads',
+          id: 'head&subhead',
+        },
+        {
+          name: 'Vote Book',
+          id: 'vote_book',
+        }
+      ],
+      filters: { date: null, group:null },
       selected_appropriation_balance: 0,
+      selected_appropriation_income: 0,
       transactions: { data: [] },
-      confirm: useConfirm(),
+      tableKey:0,
+      dynamicData: {...this.$globals.dynamic_data},
       sub_head_budgets: [],
       converCurrency: true,
-      isDragging: false,
-      startY: 0,
-      scrollTop: 0
+      deletedColumns: [],
+      deletedCellsMap: new Map(),
     }
   },
   computed: {
@@ -203,20 +314,7 @@ export default {
 
   },
   methods: {
-    startDragging(event) {
-      this.isDragging = true;
-      this.startY = event.clientY;
-      this.scrollTop = this.$refs.scrollContent.scrollTop;
-    },
-    stopDragging() {
-      this.isDragging = false;
-    },
-    scrollOnDrag(event) {
-      if (this.isDragging) {
-        const deltaY = event.clientY - this.startY;
-        this.$refs.scrollContent.scrollTop = this.scrollTop - deltaY;
-      }
-    },
+
     exportToExcel() {
       this.converCurrency = false;
       const table = document.getElementById('myTable');
@@ -236,20 +334,15 @@ export default {
       }, 1000)
     },
     async filterTransaction() {
-      alert(3)
-      this.reloadTransaction()
-    },
-    async reloadTransaction() {
-      await this.fetchWalletBalance()
+        await this.fetchWalletBalance()
       await this.fetchTransactions()
     },
-    subheadDetails(event) {
-      this.confirm.require({
-        target: event.currentTarget,
-        group: 'templating',
-        message: 'Are you sure you want to proceed?',
-        icon: 'pi pi-exclamation-triangle',
-      });
+    async reloadTransaction() {
+        //console.log(this.dynamicData,232323)
+        this.filters= { date: null, group:null }
+        await this.fetchWalletBalance()
+        await this.fetchTransactions()
+        this.tableKey++
     },
     editAppropriationTransaction(appr, i) {
       this.$emit('openDebitModal', {
@@ -263,8 +356,8 @@ export default {
 
         let page_type = localStorage.getItem('page_type')
         let owner_ids = []
-        if (page_type == 'sigle') {
-          owner_ids = [this.selected_appropriation.id]
+        if (page_type == 'single') {
+            owner_ids = [this.selected_appropriation.id]
         } else {
           let appropriations = JSON.parse(localStorage.getItem('appropriations'));
           owner_ids = appropriations.map(item => item.id);
@@ -287,13 +380,34 @@ export default {
 
         if (page_type === 'single') {
           let res2 = await getData(`sub_head_budget/appropriation/${this.selected_appropriation.id}/${this.fund_category}`);
+          let res3 = await getData(`sub_head_budget/appropriation/${this.selected_appropriation.id}/${this.fund_category}`);
           this.sub_head_budgets = res2?.data || [];
+          //this.sub_head_budgets = res2?.data || [];
         } else {
           this.sub_head_budgets = []
         }
       } catch (e) {
-        console.log('tranx error: '+e )
+        console.log('tranx error: ' + e)
       }
+    },
+    transformData(data) {
+         const transformedData =[]
+        data.forEach((subheadBudget,index) => {
+            const subheadBudgetItemChildren = subheadBudget.subhead_budget_items.map((subheadBudgetItem,inddex) => ({
+                  name: subheadBudgetItem.subhead_item,
+                  amount:subheadBudgetItem.amount,
+                  balance:subheadBudgetItem.balance
+            }));
+
+            transformedData.push({
+                name: subheadBudget.subhead,
+                amount:subheadBudget.amount,
+                balance:subheadBudget.balance,
+                children: subheadBudgetItemChildren
+            });
+        });
+
+        return transformedData;
     },
     async fetchWalletBalance() {
       let page_type = localStorage.getItem('page_type')
@@ -304,13 +418,14 @@ export default {
         let appropriations = JSON.parse(localStorage.getItem('appropriations'));
         owner_ids = appropriations.map(item => item.id);
       }
-      let res = await postData('/get_wallet_balance', {
+      let res = await postData('/get_wallet_detail', {
         fund_category: this.fund_category,
         owner_id: owner_ids,
         owner_type: 'appropriation'
       }, true)
       if (res.status == 200) {
-        this.selected_appropriation_balance = res.data
+        this.selected_appropriation_balance = res.data?.balance
+        this.selected_appropriation_income = res.data?.income
       }
     },
     resetTotalExpenditureForAppropriation() {
@@ -389,9 +504,22 @@ export default {
       // Implement your logic for switching pages
       this.$emit('switch-page', page);
     },
+    removeColumn(refname) {
+      const table = document.getElementById('myTable');
+      const colIndex = Array.from(table.rows[0].children).findIndex(th => th.getAttribute('data-name') === refname);
+
+      if (colIndex !== -1) {
+        for (let i = 0; i < table.rows.length; i++) {
+          const cell = table.rows[i].cells[colIndex];
+          table.rows[i].deleteCell(colIndex);
+        }
+      }
+    }
+
 
   },
   mounted() {
+    //document.addEventListener('keydown', this.handleUndo);
     this.$nextTick(() => {
       const table = document.getElementById('myTable');
       let draggingCol = null;
@@ -430,12 +558,12 @@ export default {
           this.classList.remove('dragging');
         });
 
-        th.addEventListener('dblclick', function () {
-          const colIndex = this.cellIndex;
-          table.querySelectorAll('tr').forEach(row => {
-            row.deleteCell(colIndex);
-          });
-        });
+        /*   th.addEventListener('dblclick', function () {
+            const colIndex = this.cellIndex;
+            table.querySelectorAll('tr').forEach(row => {
+              row.deleteCell(colIndex);
+            });
+          }); */
       });
 
       function swapColumns(table, fromIndex, toIndex) {
@@ -457,12 +585,13 @@ export default {
 
 <!-- Add your component-specific styles here if needed -->
 <style scoped>
+.scrollable-content {
+  width: calc(100% + 17px);
+  /* Adjust for scrollbar width */
+  height: 100%;
+  overflow-y: auto;
+}
 
-  .scrollable-content {
-    width: calc(100% + 17px); /* Adjust for scrollbar width */
-    height: 100%;
-    overflow-y: auto;
-  }
 button.btn.btn-secondary.buttons-print {
   margin-left: 18px !important;
 }
@@ -471,6 +600,28 @@ button.btn.btn-secondary.buttons-print {
   max-height: 50px;
   /* Adjust the height as needed */
   overflow-y: auto;
+}
+
+th:hover .thoverlay {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+th {
+  cursor: pointer;
+}
+
+.thoverlay {
+  background-color: rgba(206, 19, 19, .5);
+  color: white;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 4;
 }
 </style>
 

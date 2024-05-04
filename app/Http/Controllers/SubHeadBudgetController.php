@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appropriation;
 use App\Models\SubHeadBudget;
+use App\Models\SubheadBudgetItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -28,7 +29,7 @@ class SubHeadBudgetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
+    {
         try{
             $validated = $request->validate([
                 'name' => 'required|string|max:199|unique:subHeadBudgets,name,NULL,id,appropriation_id,' . $request->appropriation_id,
@@ -38,14 +39,14 @@ class SubHeadBudgetController extends Controller
             $subHeadBudget = SubHeadBudget::create($validated);
             return response()->json( 'SubHeadBudget created successfully');
         }catch(ValidationException $e){
-            return response(collect($e->getMessage())->first() ?? $e->getMessage() ,400);   
+            return response(collect($e->getMessage())->first() ?? $e->getMessage() ,400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     /**
@@ -84,7 +85,7 @@ class SubHeadBudgetController extends Controller
             ]);
             DB::beginTransaction();
 
-            $head = Appropriation::withWallet($validated['fund_category'])->where('id',$validated['appropriation_id'])->first();            
+            $head = Appropriation::withWallet($validated['fund_category'])->where('id',$validated['appropriation_id'])->first();
             if($head?->wallet?->balance < $validated['amount']){
                 throw new \Exception('Insufficient Fund on '. ($head->name?? 'the selected Head'). ' (Fund Available: '.number_format($head->wallet->balance,2).')');
             }
@@ -95,7 +96,7 @@ class SubHeadBudgetController extends Controller
             );
 
             $subHeadBudget->update($validated);
-            
+
             if($head->budget_location === 'head'){
                 $head->budget_location = 'subhead';
                 $head->save();
@@ -104,36 +105,40 @@ class SubHeadBudgetController extends Controller
             DB::commit();
             return response()->json('SubHeadBudget updated successfully');
         }catch(ValidationException $e){
-            return response(collect($e->getMessage())->first()[0] ?? $e->getMessage() ,400);   
+            return response(collect($e->getMessage())->first()[0] ?? $e->getMessage() ,400);
         }catch(\Exception $e){
             DB::rollBack();
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     public function getSubHeadBudgetByAppropriation($id,$fund_category)
     {
-        try{           
-            $subHeadBudgets = SubHeadBudget::where('appropriation_id',$id)->where('fund_category',$fund_category)->get();        
+        try{
+            $subHeadBudgets = SubHeadBudget::where('appropriation_id',$id)->where('fund_category',$fund_category)->get();
             return response()->json($subHeadBudgets);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
-    public function destroy(SubHeadBudget $SubHeadBudget)
+    public function destroy($id)
     {
         try {
-            $SubHeadBudget->delete();
-            return response()->json('Category deleted successfully.', 200);
+            //condition that subheadbudget not having subheadBudgetItem\
+            if(SubheadBudgetItem::where('subhead_budget_id',$id)->exists()){
+                throw new \Exception('Cannot delete this subhead budget');
+            }
+            SubHeadBudget::find(intval($id))->delete();
+            return response()->json('Subhead budget deleted successfully.', 200);
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 400);
         }

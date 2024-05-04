@@ -36,8 +36,8 @@
                         <i class="pi pi-box"></i><span class="mobile-none">Report</span>
                     </div>
                 </button> -->
-                <button  :disabled="selected_scheme?.id  == null" v-if="canPerformAction('report')" title="view report" @click="$emit('config')"
-                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1">
+                <button  :disabled="selected_scheme?.id  == null"  data-modal="modal-10" v-if="canPerformAction('report')" title="view report" @click="$emit('config')"
+                    class="m-0 btn fs-9 rounded-sm mx-1 mx-sm-2 color-primary d-inline-block mb-1 md-trigger">
                     <div class="d-flex align-items-center">
                         <i class="pi pi-cog"></i><span class="mobile-none">Config</span>
                     </div>
@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { ModalEffects } from './../../modalEffects.js';
 export default {
     props: {
         permissions: {
@@ -95,6 +96,11 @@ export default {
     },
     created(){
         //console.log(this.permissions,3888)
+    },
+    mounted(){
+        this.$nextTick(()=>{
+            ModalEffects()
+        })
     },
     computed:{
         category_income(){

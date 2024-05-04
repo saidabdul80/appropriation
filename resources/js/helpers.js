@@ -4,14 +4,14 @@ export const helpers = {
     closeModal:(callback)=>{
         callback()
     },
-    getIndexOf(arr,scheme,id='id') {      
+    getIndexOf(arr,scheme,id='id') {
       if (!arr.every(item => id in item && id in scheme)) {
         return {}
       }
-      
+
       try {
         return arr.findIndex(item => item[id] === scheme[id]);
-      } catch (error) {        
+      } catch (error) {
         return {}
       }
     },
@@ -31,12 +31,17 @@ export const helpers = {
     dynamic_data:{
         Subject: { required:1, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Approval_Date: { required:1, show: 1, activate: 1, value: '', type: 'date', for: '' },
+
+        Participants: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Number_of_Days: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Frequency: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
+        Unit_Cost: { required:0, show: 1, activate: 1, value: '', type: 'number', for: '' },
         Section_of_Work_Plan: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         File_Name: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         File_Number: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Page_Number: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Beneficiary: { required:1, show: 1, activate: 1, value: '', type: 'text', for: '' },
-        Account_Number: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: '' },
+        Account_Number: { required:1, show: 1, activate: 1, value: 0, type: 'text', for: '' },
         Amount: { required:1, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
         Payment_Date: { required:1, show: 1, activate: 1, value: '', type: 'date', for: '' },
         Trx_Charges: { required:0, show: 1, activate: 1, value: 0, type: 'number', for: 'tax', amount: 0 },
@@ -51,4 +56,3 @@ export const helpers = {
     },
     // Add other global functions or variables here
   };
-  

@@ -1,9 +1,9 @@
 <template>
     <div class="">
-        <InlineMessage severity="info" class="p-1 mb-3">
+      <!--   <InlineMessage severity="info" class="p-1 mb-3">
             <span style="font-size: 0.8em;" class="ms-1"> <b>Note:</b> Ensure fund already available on the selected
                 Head i.e Appropriation must have been completed </span>
-        </InlineMessage>
+        </InlineMessage> -->
         <div class="row w-100 mx-auto">
             <div class="col-md-6 mb-2">
                 <label for="name" class="form-label">Programmes</label>
@@ -36,36 +36,52 @@
                 <!-- <Dropdown v-model="selected_scheme" :options="schemes" optionLabel="name" placeholder="Select a Department"
                 class="w-100 mb-3" /> -->
             </div>
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <label for="name" class="form-label mb-0">Head Name</label>
-                <InputGroup>
-                    <!--    <Dropdown v-model="selected_appropriation" :options="selected_scheme.appropriations"
-                        optionLabel="name" optionValue="id" @change="loadSubheadBudgets()" placeholder="Select a Head"
-                        class="w-100 " /> -->
-                    <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
-                        :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
-                                <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                        (&#8358;{{ $globals.currency(slotProps.value?.balance -getTotalAmountSubheadBudget) }})</span> </div>
-                                <div style="font-size: 10px;">Head with Current Balance</div>
-                            </div>
-                            <span v-else>
-                                Select a Head
-                            </span>
-                        </template>
+                <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
+                    :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
+                    <template #value="slotProps">
+                        <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance) <0?'text-danger':''">
+                            <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.balance) }})</span> </div>
+                            <div style="font-size: 10px;">Head with Current Balance</div>
+                        </div>
+                        <span v-else>
+                            Select a Head
+                        </span>
+                    </template>
 
-                        <template #option="slotProps">
-                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.balance)}})
-                            </div>
-                        </template>
-                    </Dropdown>
+                    <template #option="slotProps">
+                        <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.balance)}})
+                        </div>
+                    </template>
+                </Dropdown>
+            </div>
+            <div class="col-md-6">
+                <label for="name" class="form-label mb-0">Subhead Budget Name</label>
+                {{ sub_head_budgets[0]?.subhead }}
+                <Dropdown @change="loadSubheadBudgetItems()" v-model="selected_sub_head_budget"
+                    :options="sub_head_budgets" placeholder="Select a Budget" class="w-100 ">
+                    <template #value="slotProps">
+                        <div v-if="slotProps.value?.subhead" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
+                            <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.subhead }} <span>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.balance - getTotalAmountSubheadBudget) }})</span> </div>
+                            <div style="font-size: 10px;">Subhead Budget Current Balance</div>
+                        </div>
+                        <span v-else>
+                            Select a Subhead Budget
+                        </span>
+                    </template>
 
-                </InputGroup>
+                    <template #option="slotProps">
+                        <div>{{ slotProps?.option?.subhead }} ({{$globals.currency(slotProps.option?.balance)}})
+                        </div>
+                    </template>
+                </Dropdown>
             </div>
             <div class="col-md-12 mt-3">
 
-                <table class="table table-bordered w-100">
+                <table class="table table-bordered w-100 table-condensed">
                     <thead>
                         <tr>
                             <th>S/N</th>
@@ -75,13 +91,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(cat, index) in sub_head_budgets" :key="index">
+                        <tr v-for="(cat, index) in sub_head_budget_items" :key="index" style="font-size: 14px;">
                             <td>{{ index + 1 }}</td>
                             <td>
-                                <span v-if="!cat?.isEditing">{{ cat.subhead }}</span>
+                                <span v-if="!cat?.isEditing">{{ cat.subhead_item }}</span>
                                 <!--<Dropdown v-else v-model="cat.subhead_id" :options="subheads" optionLabel="name"
                                     optionValue="id" placeholder="Select a subhead" class="w-100" /> -->
-                                    <BaseItemSelect v-else v-model="cat.subhead_id" url="subhead" optionLabel="name"
+                                    <BaseItemSelect v-else v-model="cat.item_name_id" url="subhead_item_name" optionLabel="name"
                                     optionValue="id" />
                             </td>
                             <td>
@@ -96,7 +112,7 @@
                                                 class="pi pi-pencil"></span> </button>
                                     </div>
                                     <div class="col-2 col-md-5 px-2" v-else>
-                                        <button @click="saveSubheadBudget(cat)"
+                                        <button @click="saveSubheadBudgetItem(cat)"
                                             class="btn btn-white btn-outline-success btn-sm py-21 rounded-circle"><span
                                                 :class="cat?.isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></span>
                                         </button>
@@ -145,11 +161,13 @@ export default {
         return {
             selected_appropriation: null,
             sub_head_budgets: [],
+            sub_head_budget_items:[],
             subheads: [],
             schemes: [],
             selected_scheme: null,
             fund_categories: [],
             monthSelected: null,
+            selected_sub_head_budget:null,
         }
     },
     async created() {
@@ -160,8 +178,8 @@ export default {
     },
     computed:{
         getTotalAmountSubheadBudget(){
-            if (Array.isArray(this.sub_head_budgets)) {
-                return this.sub_head_budgets.reduce((total, item) => {
+            if (Array.isArray(this.sub_head_budget_items)) {
+                return this.sub_head_budget_items.reduce((total, item) => {
                     return total + (Number(item.amount) || 0);
                 }, 0);
             }
@@ -172,9 +190,9 @@ export default {
         async removeItem(cat,index){
             if(cat?.id, index){
                 cat.isEditing = false;
-                await postData('sub_head_budget/delete/'+cat.id)
+                await postData('sub_head_budget_item/delete/'+cat.id)
             }
-            this.sub_head_budgets.splice(index,1)
+            this.sub_head_budget_items.splice(index,1)
         },
         async fetchFundYear() {
             const fundResponse = await postData('/get_fund_categories', {
@@ -186,15 +204,13 @@ export default {
         },
         addBudget() {
             if (this.selected_appropriation == null) {
-                Swal.fire('Select a Head');
+                Swal.fire('Select a Subhead Budget');
                 return false;
             }
-            this.sub_head_budgets.push({
-                appropriation_id: this.selected_appropriation?.id,
-                subhead_id: '',
-                subhead: '',
+            this.sub_head_budget_items.push({
+                subhead_budget_id: this.selected_sub_head_budget?.id,
+                item_name_id:'',
                 amount: '',
-                fund_category: this.monthSelected,
                 isEditing: true,
             });
         },
@@ -219,27 +235,34 @@ export default {
                 Swal.fire("Failed to load budgets");
             }
         },
-        async saveSubheadBudget(subHeadBudget) {
-            if (!subHeadBudget.amount || subHeadBudget.amount === '') {
+        async loadSubheadBudgetItems() {
+            try {
+                this.$emit('isLoading', true)
+                let res = await getData(`sub_head_budget_item/subhead_budget/${this.selected_sub_head_budget?.id}`);
+                this.sub_head_budget_items = res?.data || [];
+                this.$emit('isLoading', false)
+            } catch (error) {
+                this.$emit('isLoading', false)
+                console.error("Failed to load budgets", error);
+                Swal.fire("Failed to load budgets");
+            }
+        },
+        async saveSubheadBudgetItem(subHeadBudgetItem) {
+            if (!subHeadBudgetItem.amount || subHeadBudgetItem.amount === '') {
                 Swal.fire("Amount is required");
                 return false;
             }
 
-            if (!subHeadBudget.fund_category || subHeadBudget.fund_category === '') {
-                Swal.fire("Funding Year is required");
+            if (!subHeadBudgetItem.subhead_budget_id || subHeadBudgetItem.subhead_budget_id === '') {
+                Swal.fire("Subhead Budget is required");
                 return false;
             }
 
-            if (!subHeadBudget.subhead_id || subHeadBudget.subhead_id === '') {
-                Swal.fire("Subhead is required");
-                return false;
-            }
-
-            subHeadBudget.isLoading = true;
+            subHeadBudgetItem.isLoading = true;
             try {
-                await postData('sub_head_budget/save', subHeadBudget);
-                await this.loadSubheadBudgets()
-                subHeadBudget.isEditing = false;  // Assume you want to stop editing on save
+                await postData('sub_head_budget_item/save', subHeadBudgetItem);
+                await this.loadSubheadBudgetItems()
+                subHeadBudgetItem.isEditing = false;  // Assume you want to stop editing on save
             } catch (error) {
                 console.error("Failed to save budget", error);
                 Swal.fire("Failed to save budget");

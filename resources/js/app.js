@@ -28,7 +28,7 @@ import SchemeModal from './components/Scheme/Modals/SchemeModal.vue';
 import SharehoderModal from './components/Scheme/Modals/SharehoderModal.vue';
 import DashboardScreen from './pages/DashboardScreen.vue';
 
-import ConfirmPopup from 'primevue/confirmpopup';
+
 import ConfirmationService from 'primevue/confirmationservice';
 
 const app = createApp({});
@@ -37,12 +37,12 @@ app.config.globalProperties.$globals = helpers;
 app.component('scheme-screen', SchemeScreen);
 app.component('report-screen', ReportScreen);
 app.component('user-screen', UserScreen);
-app.component('dashboard-screen', DashboardScreen);
-app.component( 'v-popup',ConfirmPopup);
+app.component('dashboard-screen', DashboardScreen);/*
+app.component( 'v-popup', ConfirmPopup); */
 app.use(ConfirmationService);
 
 //app.component('scheme-selector', schemeSelector); // Corrected camelCase component name
-/* 
+/*
 app.component('transaction-sheet', TransactionSheet);
 app.component('ribbon-menu', RibbonMenu);
 app.component('nav-tabs', NavTabs);
@@ -58,4 +58,3 @@ app.component('shareholder-modal', ShareholderModal); // Corrected component nam
 app.component('swift-button', SwiftButton); // Corrected component name
 app.use(PrimeVue);
 app.mount('#page-content');
- 

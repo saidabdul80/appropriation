@@ -1,12 +1,12 @@
 <template>
-    <div class="row position-relative mx-0">        
-        <div class="col-lg-6 pb-2 text-white">                
-            <p v-if="canPerformAction('income')" class="m-0 fs-9">                           
+    <div class="row position-relative mx-0">
+        <div class="col-lg-6 pb-2 text-white">
+            <p v-if="canPerformAction('income')" class="m-0 fs-9">
                 <b>{{ selected_scheme?.name }}</b> {{ selected_fund_category }} Income: <span>&#8358;</span>
-                 <span v-show="selected_fund_category == ''">{{ $globals.currency(selected_scheme?.total_collection) }}</span> 
+                 <span v-show="selected_fund_category == ''">{{ $globals.currency(selected_scheme?.total_collection) }}</span>
                  <span v-show="selected_fund_category != ''"> {{ $globals.currency(fund?.total_collection) }} </span>
             </p>
-            <p class="m-0 fs-9">Available Income Across the years.: <span>&#8358;</span>
+            <p class="m-0 fs-9">Total Income Across the years.: <span>&#8358;</span>
                 {{ $globals.currency(selected_scheme?.balance) }} </p>
         </div>
 
@@ -20,7 +20,7 @@
                     <span v-if="getCategoryIncomeBalance == 0">0.00</span>
                     <span v-else>{{ $globals.currency(fund?.total_collection - fund?.balance) }} </span>
                 </span>
-                <a @click="$emit('openExpenditure',{category_income:fund?.total_collection||0,category_income_balance:fund?.balance||0})" class="d-inline-block fs-8 underline text-white" href="#">View Details 
+                <a @click="$emit('openExpenditure',{category_income:fund?.total_collection||0,category_income_balance:fund?.balance||0})" class="d-inline-block fs-8 underline text-white" href="#">View Details
                     <i class="fa fa-caret-right mt-1"></i>
                 </a>
             </p>
@@ -43,14 +43,14 @@ export default {
         return {
             fund:{}
         }
-    },    
+    },
     watch:{
         'selected_fund_category':function (n,o){
             this.fund = this.selected_scheme.fund_categories?.[this.selected_fund_category]?.[0]
         }
     },
     methods: {
-        canPerformAction(permission) {            
+        canPerformAction(permission) {
             return this.permissions.includes(permission);
         },
         openExpenditureDetails() {
@@ -59,6 +59,6 @@ export default {
                 category_income_balance: this.category_income_balance || 0,
             });
         },
-    },    
+    },
 };
 </script>

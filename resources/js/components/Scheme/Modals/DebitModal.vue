@@ -6,11 +6,12 @@
             <h5 class="modal-title" id="staticBackdropLabel3"><b>{{ appropriation?.name }} / {{ appropriation?.department }}</b> Transactions</h5>
             <button @click="$emit('closeModal')" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">            
+          <div class="modal-body">
             <InlineMessage severity="error" v-if="!$parent?.$parent?.selected_scheme?.id" class="p-1 mb-3">
                 <span style="font-size: 0.8em;" class="ms-1"> <b>Note:</b> Please Select a Programme to add a transaction </span>
             </InlineMessage>
-            <div class="mb-3 input-group">
+
+            <div class="mb-3 input-group"  v-if="$parent?.$parent?.selected_scheme?.fund_category == 'year'">
               <span class="input-group-text">Funding Year</span>
               <select v-model="selected_fund_category" @input="monthYearTriggered($event)" class="form-control">
                 <option value=""></option>
@@ -18,21 +19,28 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="forApp" class="form-label">Select Head Exp.</label>              
-              <Dropdown v-model="appropriation" class="w-100" :options="appropriations"   optionLabel="name" />                
+              <label for="forApp" class="form-label">Head Budget (Appropriation).</label>
+              <Dropdown v-model="appropriation" class="w-100" :options="appropriations"   optionLabel="name" />
             </div>
-            <div v-if="appropriation?.budget_location ==='subhead'" class="mb-3">              
-              <label for="forApp" class="form-label">Select Subhead Exp.</label>
-              <Dropdown v-model="selected_subhead" class="w-100" :options="appropriation.subheads"   optionLabel="subhead" />                
+            <div v-if="appropriation?.budget_location ==='subhead'" >
+                <div class="mb-3">
+                    <label for="forApp" class="form-label">Subhead Budget.</label>
+                    <Dropdown v-model="selected_subhead" class="w-100" :options="appropriation.subheads"   optionLabel="subhead" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="forApp" class="form-label">Subhead Budage Activity .</label>
+                    <Dropdown v-model="selected_subhead_item" class="w-100" :options="selected_subhead.subhead_budget_items"   optionLabel="subhead_item" />
+                </div>
             </div>
             <div v-if="reloadDynamicData" class="mb-3 w-100 d-flex">
-              <!-- <button for="name" class="btn btn-sm btn-outline"> 
+              <!-- <button for="name" class="btn btn-sm btn-outline">
                 <span class="pi pi-filter me-1"></span>Filter
               </button>               -->
               <MultiSelect filter v-model="dynamicDataSelected" icon="pi pi-filter" display="chip" @update:model-value="dynamicDataSelectedFunc" :options="data_columns"  placeholder="Select Cities"
-                :maxSelectedLabels="2" class="w-100" /><!-- 
+                :maxSelectedLabels="2" class="w-100" /><!--
                   <template #optiongroup="slotProps">
-                    <div class="flex align-items-center">                      
+                    <div class="flex align-items-center">
                         <div>{{ slotProps.option }}</div>
                     </div>
                 </template>
@@ -117,9 +125,9 @@
       </div>
     </div>
   </template>
-  
+
   <script>
-  
+
 
   import MultiSelect from 'primevue/multiselect';
   import Dropdown from 'primevue/dropdown';
@@ -157,39 +165,44 @@
         },
         appropriation_log2: {
           data: {},
-        },   
+        },
         dynamicDataSelected:[],
         dynamic_data:this.$globals.dynamic_data,
         expanded: false,
         reloadDynamicData: true,
-        selected_fund_category:'',        
-        selected_subhead:{}
+        selected_fund_category:'',
+        selected_subhead:{},
+        selected_subhead_item:{}
       };
     },
-   async created(){        
+   async created(){
 
         if(this.appropriation_log?.id)
         {
             this.appropriation_log2 = {...this.appropriation_log}
             this.selected_fund_category = this.appropriation_log2.fund_category
-            await this.requestPreparedData(this.selected_fund_category);            
-            this.appropriation =  this.appropriations.find(item=>item.id === this.appropriation_log2.owner_id)          
-            this.selected_subhead = this.appropriation?.subheads?.find(item=>item.subhead_id === this.appropriation_log2.subhead_id)            
-        }else{                                  
+            await this.requestPreparedData(this.selected_fund_category);
+            this.appropriation =  this.appropriations.find(item=>item.id === this.appropriation_log2.owner_id)
+            this.selected_subhead = this.appropriation?.subheads?.find(item=>item.id === this.appropriation_log2.subhead_id)
+            this.selected_subhead_item =this.selected_subhead?.subhead_budget_items?.find(item=>item.id === this.appropriation_log2.subhead_item_id)
+        }else{
             const fundCategories = Object.values(this.fund_categories || {});
             if(fundCategories.length >0){
-              this.selected_fund_category = fundCategories[fundCategories.length-1];              
-              await this.requestPreparedData(this.selected_fund_category);            
+              this.selected_fund_category = fundCategories[fundCategories.length-1];
+              await this.requestPreparedData(this.selected_fund_category);
               this.appropriation =  this.appropriations.find(item=>item.id === this.appropriation_log2.owner_id)
             }
-            
-            this.appropriation_log.data = this.dynamic_data            
-            this.appropriation_log2.data = this.appropriation_log.data 
+
+            this.appropriation_log.data = this.dynamic_data
+            this.appropriation_log2.data = this.appropriation_log.data
         }
         // this.data_columns = Object.keys(this.dynamic_data);
-        this.data_columns = Object.keys(this.dynamic_data).filter(key => this.dynamic_data[key].required === 0);      
-        this.data_columns = this.data_columns.filter(key => this.dynamic_data[key].show === 1);      
+        this.data_columns = Object.keys(this.dynamic_data).filter(key => this.dynamic_data[key].required === 0);
+        this.data_columns = this.data_columns.filter(key => this.dynamic_data[key].show === 1);
         this.markSelectedDynamicField();
+        if($parent?.$parent?.selected_scheme?.fund_category == 'month'){
+            this.requestPreparedData()
+        }
     },
     computed: {
         calculatedValues() {
@@ -220,13 +233,13 @@
             };
         },
       leftAmountApp() {
-        return this.availableBalance - this.calculatedValues.gross;        
+        return this.availableBalance - this.calculatedValues.gross;
       },
-      availableBalance() {        
-        if (this.appropriation && this.appropriation.budget_location === 'subhead' && this.selected_subhead) {
-            return this.selected_subhead.balance;
+      availableBalance() {
+        if (this.appropriation && this.appropriation.budget_location === 'subhead' && this.selected_subhead_item) {
+            return this.selected_subhead_item.balance;
         } else if (this.appropriation && this.appropriation.wallet) {
-            return this.appropriation.wallet.balance; 
+            return this.appropriation.wallet.balance;
         }
         return 0;
       },
@@ -239,16 +252,16 @@
     methods: {
         async monthYearTriggered(e) { //1 means from the right source
             this.selected_fund_category = e.target.value
-            this.requestPreparedData(this.selected_fund_category)            
+            this.requestPreparedData(this.selected_fund_category)
         },
-        async requestPreparedData(fund_category){
-          const res =  await postData('/get_fund_category_appropriations', {
+        async requestPreparedData(fund_category=null){
+          const res =  await postData('/get_appropriations', {
                 scheme_id: this.selected_scheme_id,
                 fund_category: fund_category
             }, true);
-            if (res?.status == 200) {                             
-                this.$nextTick(() => {                    
-                    this.appropriations = res.data                                   
+            if (res?.status == 200) {
+                this.$nextTick(() => {
+                    this.appropriations = res.data
                 })
             } else {
                 showAlert('Something went wrong');
@@ -271,19 +284,19 @@
         this.expanded = !this.expanded;
       },
       removeField(key){
-        this.dynamicDataSelected.splice(this.dynamicDataSelected.indexOf(key),1);        
+        this.dynamicDataSelected.splice(this.dynamicDataSelected.indexOf(key),1);
         this.dynamicDataSelectedFunc(this.dynamicDataSelected)
       },
       dynamicDataSelectedFunc(e) {
              const newData = {
                 ...this.appropriation_log.data
             };
-            Object.keys(newData).forEach(item => {     
+            Object.keys(newData).forEach(item => {
               if(newData[item].required ===0 )         {
                 newData[item].activate = 0;
               }
             });
-            
+
             e.forEach(item => {
                 newData[item].activate = 1;
             });
@@ -302,48 +315,48 @@
                 return false;
             };
 
-            if (this.leftAmountApp < 0 && !this.selected_subhead?.id) {
+            if (this.leftAmountApp < 0 ) {
                 Swal.fire('Insufficent balance')
                 return false
-            } 
+            }
             if (this.appropriation_log2.data['Subject'].value == '') {
                 Swal.fire('Subject field is required')
                 return false
             }
+            try{
+                //this.clearAppropriationGarbages();
+                this.appropriation_log2.data['VAT_₦'] = this.calculatedValues.vatCalculate
+                this.appropriation_log2.data['Withholding_Tax_₦'] = this.calculatedValues.withholdingCalculate
+                this.appropriation_log2.data['Stamp_Duty_₦'] = this.calculatedValues.stampDutyCalculate
+                this.appropriation_log2.total_amount = this.calculatedValues.gross;
+                let res = await postData('/save_appropriation_transaction', {
+                    fund_category: this.selected_fund_category,
+                    owner_id: this.appropriation.id,
+                    owner_type: 'appropriation',
+                    subhead_id: this.selected_subhead.id,
+                    subhead_item_id: this.selected_subhead_item.id,
+                    transaction: this.appropriation_log2
+                }, true);
+                if (res.status == 200) {
+                    if (this.appropriation_log2.id === '') {
+                        //   this.appropriation_transactions?.data?.unshift(res.data)
+                        showAlert('Transaction Successful');
+                        // location.reload()
+                    } else {
+                        showAlert('Transaction Updated');
+                    }
 
-            //this.clearAppropriationGarbages();
-            this.appropriation_log2.data['VAT_₦'] = this.calculatedValues.vatCalculate
-            this.appropriation_log2.data['Withholding_Tax_₦'] = this.calculatedValues.withholdingCalculate
-            this.appropriation_log2.data['Stamp_Duty_₦'] = this.calculatedValues.stampDutyCalculate
-            this.appropriation_log2.total_amount = this.calculatedValues.gross;             
-            let res = await postData('/save_appropriation_transaction', {
-                fund_category: this.selected_fund_category,
-                owner_id: this.appropriation.id,
-                owner_type: 'appropriation',
-                subhead_id: this.selected_subhead?.id,
-                transaction: this.appropriation_log2
-            }, true);
-            if (res.status == 200) {
-                if (this.appropriation_log2.id === '') {
-                    //   this.appropriation_transactions?.data?.unshift(res.data)
-                    showAlert('Transaction Successful');
-                    // location.reload()
+                    $('#debit-modal').modal('hide');
                 } else {
-                    //   this.appropriation_transactions.data[this.appropriation_transactions_index] = res.data
-                    //location.reload()
-                    showAlert('Transaction Updated');
+                    showAlert('Something went wrong', 'danger');
+                    return false;
                 }
-                //let fund_category = this.selected_fund_category;
-                //this.selected_fund_category = ''
-                /* this.monthYearTriggered();
-                this.fetchWalletBalance(this.appropriation.id, 'appropriation'); */
-                $('#debit-modal').modal('hide');
-            } else {
-                showAlert('Something went wrong', 'danger');
-                return false;
+            }catch(e){
+                Swal.fire(e)
+                console.log(e)
             }
         },
-      
+
     },
     mounted(){
         try{
@@ -364,7 +377,7 @@
     }
   };
   </script>
-  
+
   <style scoped>
   .disabled {
     user-select: none;
@@ -394,7 +407,7 @@
     height: 43px;
     color:white;
     display: flex;
-    align-items: center;    
+    align-items: center;
     background-color: #c35;
     padding:3px;
     z-index: 1;
@@ -403,6 +416,6 @@
   }
   input, select{
     height: 43px;
-  }  
+  }
   </style>
 

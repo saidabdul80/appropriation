@@ -26,11 +26,11 @@
             <div class="mb-3">
               <label for="source" class="form-label">Source</label>
               <Dropdown v-model="fund.source_id" id="source" class="mt-1 w-100" :options="selected_scheme.sources" optionLabel="name" optionValue="id"/>
-              
+
             </div>
             <div v-if="selected_scheme.fund_type === 'entry'" class="mb-3">
               <label for="fundDate" class="form-label">Funding Date</label>
-              <InputText v-model="fund.date" type="month" id="fundDate" class="w-100" />
+              <InputText v-model="fund.date" type="date" id="fundDate" class="w-100" />
             </div>
             <div class="mb-3">
               <label for="description" class="form-label">Purpose/Source Description</label>
@@ -44,7 +44,7 @@
       </div>
     </div>
   </template>
-  
+
   <script>
   import Dropdown from 'primevue/dropdown';
   import InputText from 'primevue/inputtext';
@@ -88,10 +88,10 @@
         },
       async fundNow() {
                 let $this = this;
-                
+
                 if (this.selected_scheme?.id == '' || this.selected_scheme?.id == undefined) {
                     Swal.fire("Please select Programme") //i.e scheme
-                    
+
                     this.$emit('closeModal')
                     return 0
                 }
@@ -118,16 +118,16 @@
                 let res = await postData('/fund_programme', {fund_month_year: this.fund.date,amount: this.fund.amount,source_id: this.fund.source_id,description: this.fund.description,scheme_id: this.selected_scheme.id}, true);
                 console.log(res,444)
                 if (res.status == 200) {
-                    this.$emit('response', res.data)                                       
+                    this.$emit('response', res.data)
                     this.$emit('closeModal')
                 }
 
 
-            }, 
+            },
     },
   };
   </script>
-  
+
   <style scoped>
   .modal{
     display: block;
@@ -135,4 +135,3 @@
   }
     /* Add your component-specific styles here if needed */
   </style>
-  

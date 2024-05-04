@@ -1,42 +1,42 @@
 <template>
   <div style="height:100vh" >
-    <!-- //Ribbon -->  
+    <!-- //Ribbon -->
     <div class="row mx-0 mt-3">
       <div class="col-md-6 px-0 mb-4 mt-4 mt-sm-0">
         <ribbon-menu
-          @projectionModal="openModalProjection = true"            
+          @projectionModal="openModalProjection = true"
           @fundModal="openModalFund= true"
           @appropriationModalRemit="openTransactionModal()"
           @report="openReport()"
           @openExpenditure="openExpenditureModal"
-          @config="openConfig=true"
           @showAddModal="openAppModalFunc()"
-          :category_income_balance="0"          
-          :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme" 
+          :category_income_balance="0"
+          :permissions="permissions" :category_income="category_income"  :selected_scheme="selected_scheme"
           />
-      </div>
+        </div>
+        <!-- @config="openConfig=true" -->
       <div class="col-md-6 px-0">
-        <scheme-selector 
-          @month-selected="monthYearTriggered" 
-          :fund_categories="fund_categories" 
-          @openModal="openModalScheme = true" 
-          :schemes="schemes" 
+        <scheme-selector
+          @month-selected="monthYearTriggered"
+          :fund_categories="fund_categories"
+          @openModal="openModalScheme = true"
+          :schemes="schemes"
           :scheme_changed="scheme_changed"
-          @scheme-selected="changeScheme" 
+          @scheme-selected="changeScheme"
           />
-         
+
       </div>
-    </div>          
+    </div>
     <div class="row mx-0 mt-3">
       <div class="col-md-6 px-0">
-        <nav-tab v-show="switchPage == 1" 
-              @switch-page="handlePageSwitch" 
-              :appropriations="selected_scheme.appropriations" 
+        <nav-tab v-show="switchPage == 1"
+              @switch-page="handlePageSwitch"
+              :appropriations="selected_scheme.appropriations"
               :selected_fund_category ="selected_fund_category"
               />
       </div>
       <div class="col-md-6 px-0">
-        <summary-data 
+        <summary-data
           :permissions="permissions"
           :selected_scheme="selected_scheme"
           :selected_fund_category="selected_fund_category"
@@ -50,7 +50,7 @@
     <div class=" pb-2 pt-3" style="height: inherit; z-index: 1">
       <!-- <div class="bg-light pageTitleCard w-15 fs-9 text-danger ps-4">::{{ pageName }}</div> -->
       <div class="position-relative">
-      
+
         <div class="py-2">
           <div class="" style="height: inherit;">
           <!--   <div class="mb-3 input-group">
@@ -60,11 +60,11 @@
                 <option v-for="month_year in fund_categories" :value="month_year">{{ month_year }}</option>
               </select>
             </div> -->
-            
+
             <div id="pagerContainer"  style="height:65vh">
               <div v-if="switchPage === 1" style="height: inherit;">
-                  <index-screen     
-                  :permissions="permissions"              
+                  <index-screen
+                  :permissions="permissions"
                   :key="selected_scheme.id"
                   :switchPageOne="switchPageOne"
                   :selected_scheme="selected_scheme"
@@ -83,17 +83,17 @@
                   />
               </div>
               <div v-if="switchPage === 2" style="height: inherit; min-width:1000px; overflow-x: auto">
-                <appropriation-history 
+                <appropriation-history
                   :appropriationHistories="appropriations_history"
                   :selected_scheme="selected_scheme"
                 />
-              </div>              
+              </div>
               <div v-if="switchPage === 3" class="position-relative " style="height: inherit; min-width:1000px; overflow-x: auto" id="transaction-sheet">
-                <transaction-sheet      
-                  :key="selected_fund_category"                               
+                <transaction-sheet
+                  :key="selected_fund_category"
                   :selected_appropriation="selected_transcation_appropriation"
-                  :fund_category="selected_fund_category"                  
-                  agency_name=""                  
+                  :fund_category="selected_fund_category"
+                  agency_name=""
                   @switch-page="switchPageFunc"
                   @openDebitModal="openDebitModalForTransaction"
                 />
@@ -105,48 +105,48 @@
         </div>
 
         <!-- Use proper registration for swift-button -->
-        
+
       </div>
     </div>
     <Transition name="fade">
-      <projection-modal 
-        v-if="openModalProjection" 
+      <projection-modal
+        v-if="openModalProjection"
         @category-income-balance="handleCategoryIncomeBalance"
-        @appropriations="appropriations" 
-        :selected_scheme="selected_scheme" 
-        @closeProjection="openModalProjection = false"   
+        @appropriations="appropriations"
+        :selected_scheme="selected_scheme"
+        @closeProjection="openModalProjection = false"
         />
-    </Transition> 
+    </Transition>
     <Transition name="fade">
       <add-fund-modal
-        v-if="openModalFund" 
+        v-if="openModalFund"
         @response="fundAdded"
-        :selected_scheme="selected_scheme" 
-        @closeModal="openModalFund = false"   
+        :selected_scheme="selected_scheme"
+        @closeModal="openModalFund = false"
       />
     </Transition>
     <Transition name="fade">
       <debit-modal
-        v-if="openModalApprRemit" 
+        v-if="openModalApprRemit"
         @response="fundAdded"
         @appropriation="selected_appropriation"
         :appropriation_log="transaction"
-        :selected_scheme_id="selected_scheme?.id" 
+        :selected_scheme_id="selected_scheme?.id"
         :fund_categories="fund_categories"
-        @closeModal="openModalApprRemit = false"   
+        @closeModal="openModalApprRemit = false"
       />
     </Transition>
     <Transition name="fade">
       <scheme-modal
-        v-if="openModalScheme"         
-        :selected_scheme="selected_scheme" 
+        v-if="openModalScheme"
+        :selected_scheme="selected_scheme"
         :fund_categories="fund_categories"
-        @closeModal="openModalScheme = false"   
+        @closeModal="openModalScheme = false"
       />
     </Transition>
     <Transition name="fade">
-      <expenditure-details-modal 
-        v-if="openModalExpenditure"         
+      <expenditure-details-modal
+        v-if="openModalExpenditure"
         @closeModal="openModalExpenditure= false"
         :selected_fund_category="selected_fund_category"
         :selected_scheme="selected_scheme"
@@ -154,13 +154,16 @@
         :category_income_balance="category_income_balance"
       />
     </Transition>
-    <Transition name="fade">
-      <config-modal v-if="openConfig" @closeModal="openConfig = false" />
-    </Transition>
-<!--     <Transition name="fade">      
-      <sharehoder-modal  v-if="openAppModal" @closeModal="openAppModal = false" />
+    <!-- <Transition name="fade">
     </Transition> -->
-  </div>
+    <!--     <Transition name="fade">
+        <sharehoder-modal  v-if="openAppModal" @closeModal="openAppModal = false" />
+    </Transition> -->
+</div>
+<div id="modal-10" class="effect-modal md-effect-10" style="min-width: 80% !important;">
+    <config-modal  class="effect-content"  />
+</div>
+<div class="md-overlay"></div>
 </template>
 
 <script>
@@ -180,7 +183,7 @@ import ExpenditureDetailsModal from './../components/Scheme/Modals/ExpenditureDe
 import SummaryData from '../components/Scheme/SummaryData.vue';
 import AppropriationHistory from '../components/Scheme/AppropriationHistory.vue';
 export default {
-  components: {    
+  components: {
     'scheme-modal':SchemeModal,
     'scheme-selector':SchemeSelector,
     'index-screen':IndexScreen,
@@ -202,13 +205,13 @@ export default {
       switchPageOne:'0',
       pageName:'',
       selected_scheme: null,
-      switchPage: 1,       
-      fund_category:'', 
-      fund_categories:[],      
+      switchPage: 1,
+      fund_category:'',
+      fund_categories:[],
       appropriations:[],
       appropriationHistories:[],
       appropriations_history:[],
-      selected_fund_category:'',            
+      selected_fund_category:'',
       category_income:0,
       expenditure_amount:0,
       category_income_balance:0,
@@ -226,7 +229,7 @@ export default {
           appropriation_type_id: '',
           department_id: [],
           percentage_dividend: '',
-      },      
+      },
       selected_transcation_appropriation:{},
       pageSwitched:10,
       transaction:{},
@@ -251,7 +254,7 @@ export default {
       type: Array,
       default: [],
     },
-    
+
     dyear: {
       default: '',
     },
@@ -259,21 +262,21 @@ export default {
       default: '',
     },
   },
-  computed:{ 
+  computed:{
   },
-  methods: {  
+  methods: {
     openTransactionModal(){
       this.transaction = {id:''}
       this.openModalApprRemit= true
     },
-    openAppModalFunc(){      
+    openAppModalFunc(){
       this.openAppModal = true;
     },
     openExpenditureModal(data){
       if(this.selected_scheme?.id =='' || this.selected_scheme?.id  == undefined){
               Swal.fire('Select a programme')
               return false
-      }      
+      }
       this.category_income = data.category_income
       this.category_income_balance = data.category_income_balance
       this.openModalExpenditure=true
@@ -297,33 +300,33 @@ export default {
           scheme_id: this.selected_scheme.id,
           fund_category: this.selected_fund_category,
         }, true);
-        if (res.status == 200) {          
+        if (res.status == 200) {
           this.appropriation_data_summary = res.data;
-        }   
+        }
       },
-    async openDebitModalForTransaction(data){            
+    async openDebitModalForTransaction(data){
         this.transaction = {}
         //$("#loaderHtml").show()
-        
-        this.transaction = data.transaction        
+
+        this.transaction = data.transaction
         this.transaction.total_amount = data.transaction.amount
         this.transaction.index = data.index
         this.openModalApprRemit = true
       /*   setTimeout(()=>{
-          $("#loaderHtml").hide() 
+          $("#loaderHtml").hide()
         },100) */
     },
     updateSchemes(data){
       this.$forceUpdate();
     },
     handleOpenTransaction(data){
-      this.switchPageFunc(3)      
+      this.switchPageFunc(3)
       this.transactions_table_toggle = true
-      this.selected_transcation_appropriation = data.selected_appropriation      
+      this.selected_transcation_appropriation = data.selected_appropriation
     },
     switchPageFunc(num) {
         this.switchPage = num
-        
+
         //localStorage.setItem('pageNum', num)
     },
     handlePageSwitch(data){
@@ -336,7 +339,7 @@ export default {
       this.selected_scheme = res.scheme
       showAlert(res.msg)
     },
-    ProjectionModal(){  
+    ProjectionModal(){
       this.openModalProjection = true
     },
     getSchemeIndex(scheme) {
@@ -345,17 +348,17 @@ export default {
     async monthYearTriggered(data) { //1 means from the right source
       //console.log(data)
       this.selected_fund_category = data.selected_month
-        this.appropriationSummaryResolver();                
+        this.appropriationSummaryResolver();
         /* console.log(data) */
-        //this.appropriations_history = data.appropriations_history        
-        this.appropriations = data.appropriations                                                      
+        //this.appropriations_history = data.appropriations_history
+        this.appropriations = data.appropriations
         setTimeout(() => {
             this.getCategoryIncome()
             this.getCategoryIncomeBalance()
         }, 10)
       },
-    async changeScheme(data) {      
-         this.selected_scheme = data;      
+    async changeScheme(data) {
+         this.selected_scheme = data;
             try {
                 const [fundResponse, appropriationHistoryResponse, ] = await Promise.all([
                     postData('/get_fund_categories', {
@@ -364,14 +367,15 @@ export default {
                     postData('/get_appropriation_histories', {
                         owner_id: this.selected_scheme.id,
                         owner_type: 'scheme'
-                    }, true),
-                ]);                  
+                    },true),
+                ]);
+
                 if (fundResponse?.status === 200) {
-                    this.fund_categories = fundResponse.data?.map(item=> item.fund_category);             
+                    this.fund_categories = fundResponse.data?.map(item=> item.fund_category);
                 } else {
                     showAlert('Something went wrong');
                     return false;
-                }                
+                }
                 if (appropriationHistoryResponse?.status === 200) {
                     this.appropriations_history = appropriationHistoryResponse.data;
                     this.appropriations = [];
@@ -388,7 +392,7 @@ export default {
         this.expenditure_amount = 0;
         this.category_income_balance = 0;
         this.getCategoryIncome();
-        this.getCategoryIncomeBalance();       
+        this.getCategoryIncomeBalance();
     },
     getCategoryIncomeBalance() {
         this.category_income_balance = this.appropriations.reduce((total, appropriation) => {
@@ -404,7 +408,7 @@ export default {
       // Implement the logic for month/year change if needed
     },
   },
-  created(){    
+  created(){
     this.selected_scheme = { name: '', balance: 0, wallet: { fund_category: '', balance: 0 }, appropriations:[] }
   },
   mounted() {
@@ -415,8 +419,8 @@ export default {
 
 
 <style>
-.p-inputtext {    
-    
+.p-inputtext {
+
     color: #334155;
     background: #ffffff;
     padding: 0.5rem 0.75rem !important;
@@ -448,7 +452,6 @@ export default {
     padding: 0.25rem 0.75rem !important;
 }
 select.form-control:hover, input:hover{
-  border: 1px solid #ccc !important; 
-}  
+  border: 1px solid #ccc !important;
+}
 </style>
-  

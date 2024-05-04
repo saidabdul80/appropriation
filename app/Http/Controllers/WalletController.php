@@ -16,30 +16,28 @@ class WalletController extends Controller
      */
 
     public function getWalletsBalance(Request $request)
-    {   
+    {
         $request->validate([
             'owner_id' => "required",
-            'owner_type' => "required",
-            'fund_category' => "required"            
+            'owner_type' => "required"
         ]);
-    
-        $id = $request->get('owner_id');
-    
-        if ($request->get('owner_type') == 'appropriation') {
-            $response = Appropriation::with(['wallet' => function ($query) use ($request) {
-                $query->where('fund_category', $request->get('fund_category'))
-                      ->where('owner_type', 'App\\Models\\Appropriation');
-            }])->whereIn('id', $id)->get();
-            $response = $response?->sum('wallet.balance');  // Use first() to get a single model instance
-    
-            return response($response?? 0, 200);
 
+        $id = $request->get('owner_id');
+
+        if ($request->get('owner_type') == 'appropriation') {
+            $response = Appropriation::withWallet( $request->get('fund_category'))->whereIn('id', $id)->get();
+            $balance = $response?->sum('wallet.balance')??0;  // Use first() to get a single model instance
+            $income = $response?->sum('wallet.total_collection')??0;  // Use first() to get a single model instance
+            return response([
+                "balance"=>$balance,
+                "income"=>$income,
+            ], 200);
         }
-    
+
         // Handle other cases or return an appropriate response
         return response("Invalid owner_type", 400);
     }
-    
+
 
     /**
      * Show the form for creating a new resource.

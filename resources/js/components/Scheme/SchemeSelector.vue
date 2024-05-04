@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="col-sm-4 px-0 px-sm-0 px-md-2" style="/* position: fixed; top: 5px; z-index: 9; padding-left: 20px */">
-      <div class="mb-2  w-100  d-inline-block rounded-sm p-0">
+      <div class="mb-2  w-75  d-inline-block rounded-sm p-0">
         <month-year-selector :selected_scheme_id="selectedScheme.id" @month-selected="monthSelected"
           :fund_categories="fund_categories" />
       </div>
@@ -81,13 +81,13 @@ export default {
   },
   watch:{
     scheme_changed: {
-        handler(newValue, oldValue) {                  
+        handler(newValue, oldValue) {
           if (!this.selectedScheme?.id) return; // Early return if no selected scheme
           const foundScheme = this.schemes.find(item => item.id === this.selectedScheme.id);
           if (foundScheme) {
             this.selectedScheme = foundScheme;
           }
-        }            
+        }
       },
   },
   methods: {

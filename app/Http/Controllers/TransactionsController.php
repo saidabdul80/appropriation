@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appropriation;
 use App\Models\MainWallet;
+use App\Models\Wallet;
 use App\Models\Scheme;
 use App\Models\SubHeadBudget;
 use App\Models\Transaction;
@@ -25,8 +26,8 @@ class TransactionsController extends Controller
     public function expenditureDetails(Request $request)
     {
         try{
-            $request->validate([                
-                "scheme_id"=>"required",                
+            $request->validate([
+                "scheme_id"=>"required",
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
@@ -34,24 +35,24 @@ class TransactionsController extends Controller
             if($fund_category){
                 foreach($appropriations as $key => &$appropriation){
                     $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation', 'fund_category'=>$fund_category])->sum('amount');
-                    $appropriation->expenditure_total_amount = $totalAmount;            
-                }            
+                    $appropriation->expenditure_total_amount = $totalAmount;
+                }
             }else{
                 foreach($appropriations as $key => &$appropriation){
                     $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation'])->sum('amount');
-                    $appropriation->expenditure_total_amount = $totalAmount;            
-                }            
+                    $appropriation->expenditure_total_amount = $totalAmount;
+                }
             }
             return response($appropriations,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     /**
@@ -59,16 +60,16 @@ class TransactionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function transactions(Request $request)
+   /*  public function transactions(Request $request)
     {
         try{
-            $request->validate([                
+            $request->validate([
                 "owner_id"=>"required",
-                "owner_type"=>"required",                
+                "owner_type"=>"required",
             ]);
 
             if($request->get('owner_type')!='scheme'){
-                $filters = json_decode(json_encode($request->get('filters')));                
+                $filters = json_decode(json_encode($request->get('filters')));
                 if(!empty($filters->date)){
                     if(count($filters->date) <2 || $filters->date_type =='') throw new \Exception('Invlide Date Range Selected');
                     $dateRange = [
@@ -76,17 +77,23 @@ class TransactionsController extends Controller
                         Carbon::parse($filters->date[1])->format('Y-m-d')
                     ];
                     //return $dateRange;
+                    $column = 'data->'.$filters->date_type."->value";
+                    if($filters->date_type =='created_at'){
+                        $column = "created_at";
+                    }
+
                     if($request->get('fund_category')){
+
                         $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
-                                        ->whereBetween('data->'.$filters->date_type."->value", $dateRange)
+                                        ->whereBetween($column, $dateRange)
                                         ->where(['fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(300);
                     }else{
                         $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
-                                            ->whereDate('data->'.$filters->date_type."->value", $dateRange)   
+                                            ->whereDate($column, $dateRange)
                                             ->where(["owner_type"=>$request->get('owner_type')])->orderBy('id','desc')->paginate(300);
                     }
                     return response($response);
-                }                
+                }
                 if($request->get('fund_category')){
                     $response = Transaction::whereIn('owner_id',$request->get('owner_id'))
                                     ->where(['fund_category'=>$request->get('fund_category')])->orderBy('id','desc')->paginate(300);
@@ -108,16 +115,16 @@ class TransactionsController extends Controller
                                             "owner_type"=>$request->get('owner_type'),
                                             'fund_category'=>$request->get('fund_category'),
                                             'action'=>'undo credit'
-                                            ])->orderBy('id','desc')->paginate(300);                                            
+                                            ])->orderBy('id','desc')->paginate(300);
             }else{
                 $response_credit = Transaction::where(['owner_id'=>$request->get('owner_id'),
                                             "owner_type"=>$request->get('owner_type'),
-                                            'action'=>'credit'                                            
+                                            'action'=>'credit'
                                             ])->orderBy('id','desc')->paginate(300);
 
                 $response_undo = Transaction::where(['owner_id'=>$request->get('owner_id'),
-                                            "owner_type"=>$request->get('owner_type'),     
-                                            'action'=>'undo credit'                                       
+                                            "owner_type"=>$request->get('owner_type'),
+                                            'action'=>'undo credit'
                                             ])->orderBy('id','desc')->paginate(300);
             }
             return response([
@@ -125,26 +132,126 @@ class TransactionsController extends Controller
                 'undo'=>$response_undo
             ],200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
+    } */
+
+    public function transactions(Request $request)
+    {
+        try {
+            $request->validate([
+                "owner_id" => "required",
+                "owner_type" => "required",
+            ]);
+
+            $ownerId = $request->get('owner_id');
+            $ownerType = $request->get('owner_type');
+            $fundCategory = $request->get('fund_category');
+            $filters = json_decode(json_encode($request->get('filters')));
+
+            if ($ownerType != 'scheme') {
+                $query = Transaction::select('*','data->Beneficiary->value as Beneficiary')->whereIn('owner_id', $ownerId)
+                    ->where('owner_type', $ownerType);
+
+                if (!empty($filters->date)) {
+                    $dateRange = [
+                        Carbon::parse($filters->date[0])->format('Y-m-d'),
+                        Carbon::parse($filters->date[1])->format('Y-m-d')
+                    ];
+
+                    $column = $filters->date_type == 'created_at' ? 'created_at' : 'data->'.$filters->date_type.'->value';
+                    $query->whereBetween($column, $dateRange);
+                }
+
+
+                if ($fundCategory) {
+                    $query->where('fund_category', $fundCategory);
+                }
+
+                $response = $query->orderBy('id', 'desc')->get();
+
+                if (!empty($filters->group) && $filters->group == 'vote_book') {
+                    $wallet = Wallet::whereIn('owner_id', $ownerId)
+                                    ->where('fund_category', $fundCategory)
+                                    ->where('owner_type', 'App\\Models\\Appropriation')
+                                    ->sum('total_collection');
+
+                    $responseGrouped = $response->groupBy('Beneficiary');
+                    $total = 0;
+                    $results = [];
+
+                    $responseGrouped->each(function ($group, $key) use (&$total, $wallet, &$results) {
+                        $amount = $group->sum('amount');
+                        $total += $amount;
+                        $results[] = [
+                            "name" => $key, // Assuming $key holds the Beneficiary name
+                            "amount" => $amount,
+                            "total" => $total,
+                            "balance" => $wallet - $total, // Adjusted the calculation here
+                            "Account_Number" => $group->first()->data['Account_Number']['value'],
+                            "payment_date" => $group->first()->data['Payment_Date']['value'],
+                        ];
+                    });
+
+                    $response = $results;
+                }
+
+
+                // Now, $responseSummed contains the summed amounts grouped by 'Beneficiary'
+
+
+                return response(["data"=>$response ]);
+            }
+
+            $response_credit = Transaction::where([
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'action' => 'credit'
+            ])->orderBy('id', 'desc')->paginate(300);
+
+            $response_undo = Transaction::where([
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'action' => 'undo credit'
+            ])->orderBy('id', 'desc')->paginate(300);
+
+            if ($fundCategory) {
+                $response_credit = $response_credit->where('fund_category', $fundCategory)->paginate(300);
+                $response_undo = $response_undo->where('fund_category', $fundCategory)->paginate(300);
+            }
+
+            return response([
+                'credit' => $response_credit,
+                'undo' => $response_undo
+            ], 200);
+        } catch (ValidationException $e) {
+            return response($e->getMessage(), 400);
+        } catch (\Exception $e) {
+            if (env('APP_DEBUG')) {
+                return response($e->getMessage(), 400);
+            } else {
+                return response('Failed', 400);
+            }
+        }
     }
+
 
     public function appropriationTransactions(Request $request)
     {
         try{
-            $request->validate([                
+            $request->validate([
                 "owner_id"=>"required",//
-                "owner_type"=>"required",                
-                "fund_category"=>"required",                
+                "owner_type"=>"required",
+                "fund_category"=>"required",
             ]);
             $owner_id = $request->get('owner_id');
-            $owner_type = $request->get('owner_type');            
+            $owner_type = $request->get('owner_type');
             $appropriations = Appropriation::where('scheme_id',$owner_id)->get();
             foreach($appropriations as $key => &$appropriation){
                 $res = Transaction::where(['owner_id'=>$appropriation->id,"owner_type"=>$owner_type])->orderBy('id','desc')->get();
@@ -152,14 +259,14 @@ class TransactionsController extends Controller
             }
             return response($appropriations,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }   
+        }
     }
 
     /**
@@ -170,7 +277,7 @@ class TransactionsController extends Controller
      */
     /* public function deleteAppropriationTransaction(Request $request)
     {
-        $request->validate([                
+        $request->validate([
             "id"=>"required"
         ]);
         DB::beginTransaction();
@@ -189,7 +296,6 @@ class TransactionsController extends Controller
             $request->validate([
                 "transaction_id" => "required",
                 "owner_id" => "required",
-                "fund_category" => "required",
             ]);
 
             $transactionId = $request->get("transaction_id");
@@ -234,7 +340,7 @@ class TransactionsController extends Controller
 
     public function saveAppropriationTransaction(Request $request)
     {
-        try {            
+        try {
             $request->validate([
                 "owner_id" => "required",
                 "fund_category" => "required",
@@ -262,7 +368,7 @@ class TransactionsController extends Controller
             return response($response, 200);
         } catch (ValidationException $e) {
             return response($e->getMessage(), 400);
-        } catch (\Exception $e) {            
+        } catch (\Exception $e) {
             if (env('APP_DEBUG')) {
                 return response($e->getMessage(), 400);
             } else {
@@ -284,11 +390,11 @@ class TransactionsController extends Controller
         }else{
             BudgetService::validateTransaction(
                 $appropriation->id,
-                $transactionData['subhead_id'], //subhead_budget_id
+                $transactionData['subhead_item_id'], //subhead_budget_id
                 $oldTransaction->amount,
                 $transactionData['total_amount'],
                 $request->get('fund_category'),
-            );            
+            );
         }
 
         $oldTransaction->amount = $transactionData['total_amount'];
@@ -306,19 +412,19 @@ class TransactionsController extends Controller
 
     private function createTransaction($transactionData, $appropriation, $mainWallet,$request)
     {
-        
+
         if($appropriation->budget_location =='head'){
             if ($appropriation->wallet->balance < $transactionData['total_amount']) {
                 throw new \Exception('Insufficient balance');
-            }                    
-        }else{            
+            }
+        }else{
             BudgetService::validateTransaction(
                 $appropriation->id,
-                $request->get('subhead_id'), //subhead_budget_id
+                $request->get('subhead_item_id'), //subhead_budget_id
                 0,
                 $transactionData['total_amount'],
                 $request->get('fund_category'),
-            );            
+            );
         }
 
         $appropriation->wallet->balance -= $transactionData['total_amount'];
@@ -346,13 +452,13 @@ class TransactionsController extends Controller
    /*  public function saveAppropriationTransaction(Request $request)
     {
         try{
-            $request->validate([                
-                "owner_id"=>"required",       
+            $request->validate([
+                "owner_id"=>"required",
                 "fund_category"=>"required",
                 "transaction"=>"required"
             ]);
 
-            $transaction = $request->get("transaction");        
+            $transaction = $request->get("transaction");
             $fund_category = $request->get('fund_category');
             $owner_id = $request->get('owner_id');
             $appropriation = Appropriation::with(['wallet'=>function($query) use($fund_category,){
@@ -365,31 +471,31 @@ class TransactionsController extends Controller
                         $oldTransaction = Transaction::find($transaction['id']);
                         $currentWalletBalance = $appropriation->wallet->balance + $oldTransaction->amount - $transaction['total_amount'];
                         $currentMainWalletBalance = $mainWallet->balance + $oldTransaction->amount - $transaction['total_amount'];
-                    
-                        if(($mainWallet->balance + $oldTransaction->amount) < $transaction['total_amount']){
-                            throw new \Exception('Insufficient balance');                
-                        }                                   
 
-                        $oldTransaction->amount = $transaction['total_amount'];                    
+                        if(($mainWallet->balance + $oldTransaction->amount) < $transaction['total_amount']){
+                            throw new \Exception('Insufficient balance');
+                        }
+
+                        $oldTransaction->amount = $transaction['total_amount'];
                         $oldTransaction->data = $transaction['data'];
                         $oldTransaction->save();
-                        
+
                         $appropriation->wallet->balance = $currentWalletBalance;
                         $appropriation->wallet->save();
-                        
-                        $mainWallet->balance += $currentMainWalletBalance;                    
+
+                        $mainWallet->balance += $currentMainWalletBalance;
                         $mainWallet->save();
-                        
+
                         $response = $oldTransaction;
                 }else{
                     if($appropriation->wallet->balance < $transaction['total_amount']){
-                        throw new \Exception('Insufficient balance');                
+                        throw new \Exception('Insufficient balance');
                     }
-                    
+
                     $appropriation->wallet->balance -= $transaction['total_amount'];
                     $appropriation->wallet->save();
 
-                    $mainWallet->balance -= $transaction['total_amount'];                    
+                    $mainWallet->balance -= $transaction['total_amount'];
                     $mainWallet->save();
 
                     $response = Transaction::create([
@@ -405,18 +511,18 @@ class TransactionsController extends Controller
                     ]);
                 }
             DB::commit();
-        
+
             return response($response,200);
         }catch(ValidationException $e){
-            return response($e->getMessage(),400);   
+            return response($e->getMessage(),400);
         }catch(\Exception $e){
             if(env('APP_DEBUG')){
                 return $e;
-                return response($e->getMessage(),400);                
+                return response($e->getMessage(),400);
             }else{
                 return response('failed',400);
             }
-        }  
+        }
     } */
 
     /**
@@ -441,7 +547,7 @@ class TransactionsController extends Controller
      * @param  \App\Models\Transactions  $transactions
      * @return \Illuminate\Http\Response
      */
-    
+
 
     /**
      * Remove the specified resource from storage.
@@ -449,5 +555,5 @@ class TransactionsController extends Controller
      * @param  \App\Models\Transactions  $transactions
      * @return \Illuminate\Http\Response
      */
- 
+
 }

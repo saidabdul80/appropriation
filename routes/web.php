@@ -10,6 +10,8 @@ use App\Http\Controllers\SubHeadController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\SubHeadBudgetController;
+use App\Http\Controllers\SubheadBudgetItemController;
+use App\Http\Controllers\SubheadBudgetItemNameController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +60,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/get_appropriation_histories', [AppropriationController::class, 'getAppropriations']);
     Route::post('/fund_month_year', [AppropriationController::class, 'fundMonthYear']);
     Route::post('/get_prepared_data', [AppropriationController::class, 'getPreparedData']);
-    Route::post('/get_fund_category_appropriations', [AppropriationController::class, 'FundCategoryAppropriations']);
+    Route::post('/get_appropriations', [AppropriationController::class, 'FundCategoryAppropriations']);
     Route::post('/get_amount_summary_data', [AppropriationController::class, 'getAmountSummaryData']);
     Route::get('/get_appropriation_types', [AppropriationController::class, 'getApproTypes']);
 
@@ -68,17 +70,31 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/get_transactions', [TransactionsController::class, 'transactions']);
     Route::post('/save_appropriation_transaction', [TransactionsController::class, 'saveAppropriationTransaction']);
     Route::post('/delete_appropriation_transaction', [TransactionsController::class, 'deleteAppropriationTransaction']);
-    Route::post('/get_wallet_balance', [WalletController::class, 'getWalletsBalance']);
+    Route::post('/get_wallet_detail', [WalletController::class, 'getWalletsBalance']);
     Route::post('/fetch_expenditures', [TransactionsController::class, 'expenditureDetails']);
     Route::get('/report/{scheme_id}', [HomeController::class, 'report']);
     Route::post('/get_appropriation_transactions', [TransactionsController::class, 'appropriationTransactions']);
+
     Route::get('/sub_head_budgets', [SubHeadBudgetController::class, 'index']);
     Route::get('/sub_head_budget/appropriation/{id}/{fund_category}', [SubHeadBudgetController::class, 'getSubHeadBudgetByAppropriation']);
     Route::post('/sub_head_budget/save', [SubHeadBudgetController::class, 'updateCreate']);
     Route::post('/sub_head_budget/delete/{id}', [SubHeadBudgetController::class, 'destroy']);
+
     Route::post('/subhead/create', [SubHeadController::class, 'store']);
     Route::post('/subhead/update/{id}', [SubHeadController::class, 'update']);
-    Route::get('/subhead', [SubHeadController::class, 'index']);
+    Route::get('/subhead/{search?}', [SubHeadController::class, 'index']);
+
+    Route::get('/sub_head_budget_item', [SubheadBudgetItemController::class, 'index']);
+    Route::get('/sub_head_budget_item/subhead_budget/{id}', [SubheadBudgetItemController::class, 'bySubheadBudgetId']);
+    Route::post('/sub_head_budget_item/save', [SubheadBudgetItemController::class, 'updateCreate']);
+    Route::post('/sub_head_budget_item/delete/{id}', [SubheadBudgetItemController::class, 'destroy']);
+
+
+    Route::post('/subhead_item_name/create', [SubheadBudgetItemNameController::class, 'store']);
+    Route::post('/subhead_item_name/delete/{id}', [SubheadBudgetItemNameController::class, 'destroy']);
+    Route::get('/subhead_item_name/{search?}', [SubheadBudgetItemNameController::class, 'index']);
+
+    /* Route::post('/search_subhead', [SubHeadController::class, 'searchSubhead']); */
     Route::post('/delete', [SubHeadController::class, 'destroy']);
     Route::post('/get_fund_categories', [SchemeController::class, 'fetchFundCategories']);
 
