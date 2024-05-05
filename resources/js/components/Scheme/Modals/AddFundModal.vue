@@ -28,13 +28,13 @@
               <Dropdown v-model="fund.source_id" id="source" class="mt-1 w-100" :options="selected_scheme.sources" optionLabel="name" optionValue="id"/>
 
             </div>
-            <div v-if="selected_scheme.fund_type === 'entry'" class="mb-3">
-              <label for="fundDate" class="form-label">Funding Date</label>
-              <InputText v-model="fund.date" type="date" id="fundDate" class="w-100" />
-            </div>
             <div class="mb-3">
               <label for="description" class="form-label">Purpose/Source Description</label>
               <InputText v-model="fund.description" type="text" step="any" id="description" class="w-100" />
+            </div>
+            <div v-if="selected_scheme.fund_type === 'entry'" class="mb-3">
+              <label for="fundDate" class="form-label">Funding Date</label>
+              <InputText v-model="fund.date" type="date" id="fundDate" class="w-100" />
             </div>
           </div>
           <div class="modal-footer">

@@ -63,9 +63,9 @@
                 <Dropdown @change="loadSubheadBudgetItems()" v-model="selected_sub_head_budget"
                     :options="sub_head_budgets" placeholder="Select a Budget" class="w-100 ">
                     <template #value="slotProps">
-                        <div v-if="slotProps.value?.subhead" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
+                        <div v-if="slotProps.value?.subhead" class="flex align-items-center" :class="(slotProps.value?.amount -getTotalAmountSubheadBudget) <0?'text-danger':''">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.subhead }} <span>
-                                    (&#8358;{{ $globals.currency(slotProps.value?.balance - getTotalAmountSubheadBudget) }})</span> </div>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.amount - getTotalAmountSubheadBudget) }})</span> </div>
                             <div style="font-size: 10px;">Subhead Budget Current Balance</div>
                         </div>
                         <span v-else>

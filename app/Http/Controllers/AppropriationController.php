@@ -34,8 +34,9 @@ class AppropriationController extends Controller
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
             //return $fund_category;
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
             $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme','fund_category'=>$fund_category])->orderBy('id','desc')->paginate(100);
-            $appropriations = Appropriation::withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+            $appropriations = Appropriation::withWallet($fund_category, $scheme_fund_category)->where('scheme_id', $scheme_id)->get();
             /* if(!empty($fund_category)){
             }
             $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme'])->orderBy('id','desc')->paginate(100);
@@ -62,15 +63,15 @@ class AppropriationController extends Controller
             ]);
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
-            $scheme = Scheme::find($scheme_id);
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
             //return $fund_category;
             if(!empty($fund_category)){
 
                 $appropriations = Appropriation::with(['subheads'=>function($query) use($fund_category){
                     $query->where('fund_category',$fund_category);
-                }])->withWallet()->where('scheme_id', $scheme_id)->get();
+                }])->withWallet(null, $scheme_fund_category)->where('scheme_id', $scheme_id)->get();
             }else{
-                $appropriations = Appropriation::with(['subheads'])->withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+                $appropriations = Appropriation::with(['subheads'])->withWallet($fund_category,$scheme_fund_category)->where('scheme_id', $scheme_id)->get();
             }
 
             return response($appropriations,200);
@@ -96,11 +97,21 @@ class AppropriationController extends Controller
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
             //return $fund_category;
-            $appropriation_histories = AppropriationHistory::where([
-                'owner_id' => $scheme_id,
-                'owner_type' => 'scheme',
-                'fund_category' => $fund_category,
-            ])->get();
+            $scheme = Scheme::find($scheme_id);
+            $scheme_fund_category = $scheme?->fund_category;
+
+            if($scheme_fund_category =='year'){
+                $appropriation_histories = AppropriationHistory::where([
+                    'owner_id' => $scheme_id,
+                    'owner_type' => 'scheme',
+                    'fund_category' => $fund_category,
+                    ])->get();
+            }else{
+                $appropriation_histories = AppropriationHistory::where([
+                    'owner_id' => $scheme_id,
+                    'owner_type' => 'scheme'
+                    ])->get();
+            }
 
             $result1 = [];
 
@@ -112,7 +123,9 @@ class AppropriationController extends Controller
             // Now $result is an associative array with 'name' as key and 'total_amount' as value
 
 
-            $appropriations = Appropriation::withWallet($fund_category)->where('scheme_id', $scheme_id)->get();
+
+            $appropriations = Appropriation::withWallet($fund_category, $scheme_fund_category)->where('scheme_id', $scheme_id)->get();
+
             $result2 = [];
 
             foreach ($appropriations as $appropriation) {

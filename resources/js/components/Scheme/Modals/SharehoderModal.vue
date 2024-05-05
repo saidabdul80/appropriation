@@ -12,7 +12,7 @@
               <label for="name" class="form-label">Departments</label>
               <MultiSelect :options="departments"  display="chip" optionValue="id"  v-model="selected_appropriation2.department_id" optionLabel="short_name" placeholder="Departments"
                   :maxSelectedLabels="3" class="w-100" />
-<!-- 
+<!--
               <span v-for="department in departments" class="d-flex fs-9 p-2 bg-light text-dark rounded m-2 d-inline-block">
                 <input class="me-1" type="checkbox" :value="department.id">{{department.short_name}}
               </span> -->
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="modal-footer">          
+          <div class="modal-footer">
             <button v-if="selected_appropriation2.id === '' || selected_appropriation2.id == null " type="button" @click="addAppropriation()" class="btn btn-secondary">Add</button>
             <button v-else type="button" @click="addAppropriation()" class="btn btn-primary text-white">Update</button>
           </div>
@@ -40,7 +40,7 @@
       </div>
     </div>
   </template>
-  
+
   <script>
   import Dropdown from 'primevue/dropdown';
   import MultiSelect from 'primevue/multiselect';
@@ -51,10 +51,13 @@
       MultiSelect
     },
     props: {
+      new_app_request:{
+        default:false,
+      },
       departments: {
         type: Array,
         default: () => [],
-      },   
+      },
       selected_appropriation: {
         type: Object,
         default: () => ({ id: '', department_id: [], appropriation_type_id: '', percentage_dividend: '' }),
@@ -66,23 +69,25 @@
         selected_appropriation2:{ id: '', department_id: [], appropriation_type_id: '', percentage_dividend: '' },
       }
     },
-    created(){        
-      this.selected_appropriation2 = {...this.selected_appropriation};
+    created(){
+        if(!this.new_app_request){
+            this.selected_appropriation2 = {...this.selected_appropriation};
+        }
       this.getAppType()
     },
     methods: {
       async getAppType(){
-        let res = await getData('get_appropriation_types');        
+        let res = await getData('get_appropriation_types');
         this.appropriation_types = res?.data
       },
-      addAppropriation() {              
-        this.$emit('addapp', this.selected_appropriation2);        
+      addAppropriation() {
+        this.$emit('addapp', this.selected_appropriation2);
         /* out to IndexScreen */
       },
     },
   };
   </script>
-  
+
   <!-- Add your component-specific styles here if needed -->
   <style scoped>
     .modal{
@@ -90,4 +95,3 @@
         background: #000a;
     }
   </style>
-  

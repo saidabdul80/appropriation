@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appropriation;
+use App\Models\Scheme;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use stdClass;
@@ -25,17 +26,24 @@ class WalletController extends Controller
         $id = $request->get('owner_id');
 
         if ($request->get('owner_type') == 'appropriation') {
-            $response = Appropriation::withWallet( $request->get('fund_category'))->whereIn('id', $id)->get();
+            try{
+                $scheme_id =  Appropriation::find($id[0])?->scheme_id;
+            }catch(\Exception $e){
+                return response()->json("Select an Appropriation",400);
+            }
+
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+            $response = Appropriation::withWallet( $request->get('fund_category'),$scheme_fund_category)->whereIn('id', $id)->get();
             $balance = $response?->sum('wallet.balance')??0;  // Use first() to get a single model instance
             $income = $response?->sum('wallet.total_collection')??0;  // Use first() to get a single model instance
-            return response([
+            return response()->json([
                 "balance"=>$balance,
                 "income"=>$income,
             ], 200);
         }
 
         // Handle other cases or return an appropriate response
-        return response("Invalid owner_type", 400);
+        return response()->json("Invalid owner_type", 400);
     }
 
 

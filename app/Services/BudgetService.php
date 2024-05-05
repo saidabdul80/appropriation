@@ -16,14 +16,15 @@ class BudgetService
      * @param float $newAmount
      * @throws \Exception
      */
-    public static function validateTransaction($appropriationId, $subheadItemId, $oldAmount, $newAmount, $fundCategory)
+    public static function validateTransaction($subheadItemId, $oldAmount, $newAmount)
     {
         if(empty($subheadItemId)){
             throw new \Exception('Invalid Tranx: Subhead required');
         }
 
         $subheadBudget = SubheadBudgetItem::getAmount($subheadItemId);
-        $spent = Transaction::sumAmountForSubheadItem($appropriationId, $subheadItemId, $fundCategory);
+//        throw new \Exception($subheadBudget);
+        $spent = Transaction::sumAmountForSubheadItem($subheadItemId);
         $left = $subheadBudget - $spent;
 
         if (($left + $oldAmount) < $newAmount) {

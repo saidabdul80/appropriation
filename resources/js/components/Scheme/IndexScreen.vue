@@ -34,8 +34,8 @@
           </div>
           <div class="p-3" style="height: 15%;">
             <div v-if="canPerformAction('appropriate')">
-              <button v-if="selected_scheme?.id !== '' || selected_scheme?.id !== null" title="Appropriate" @click="appropriate()" class="m-0 fs-9 btn btn-secondary text-white d-inline-block">
-                <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Appropriate</span>
+              <button v-if="selected_scheme?.id !== '' || selected_scheme?.id !== null" title="Run Appropriation" @click="appropriate()" class="m-0 fs-9 btn btn-success text-white d-inline-block">
+                <i class="bi bi-bar-chart-steps"></i> <span class="mobile-none">Run Appropriation</span>
               </button>
             </div>
           </div>
@@ -104,6 +104,7 @@
                     :departments="departments"
                     :appropriation_types="appropriation_types"
                     :selected_appropriation="selected_appropriation"
+                    :new_app_request ="newAppropriation"
                     @closeModal="closeModal()"
                     @addapp="resolveAppropriation($event)"
                 />
@@ -165,6 +166,7 @@
         appropriations: [],
         selected_appropriations_to_appropriate:[],
         showModal:false,
+        newAppropriation:false,
       };
     },
     computed: {
@@ -198,6 +200,7 @@
         handler(newValue, oldValue) {
           if(oldValue !== undefined){
             this.showModal = newValue
+            this.newAppropriation = true;
           }
         },
         deep: true,
@@ -217,17 +220,21 @@
                 if (this.selected_scheme?.id =='' || this.selected_scheme?.id == null) {
                   throw new Error("Please select Programme"); //i.e scheme
                 }
-
+                this.selected_appropriation.scheme_id = this.selected_scheme.id;
                 if (this.selected_appropriation?.appropriation_type_id =='' || this.selected_appropriation?.appropriation_type_id ==null) {
                   throw new Error("Name field is required");
                 }
 
                 if (this.selected_appropriation.department_id.length < 1) {
                   throw new Error("Department field is required");
-                }
+                 }
+
                 const schemeIndex = this.$globals.getIndexOf(this.schemes, this.selected_scheme);
                 const scheme = this.schemes[schemeIndex];
 
+                if (scheme.appropriations.findIndex(app =>app.appropriation_type_id == this.selected_appropriation.appropriation_type_id ) !=-1 && this.newAppropriation) {
+                        throw new Error("Appropriation Already exist");
+                    }
                 scheme.appropriations.push(this.selected_appropriation);
 
                 $("#totalDividend").removeClass("bg-danger text-white");
@@ -244,11 +251,11 @@
                 if (res.status === 200) {
                     const responseData = res.data;
                     const app = res.data.appropriation
-                    if (!scheme.appropriations.find(app => app.id === selected_appropriation.id)) {
+                    if (!scheme.appropriations.find(app => app.scheme_id !== this.selected_appropriation.scheme_id || app.appropriation_type_id !== this.selected_appropriation.appropriation_type_id)) {
                         scheme.appropriations.push(responseData.appropriation); // Reactive way
                     } else {
-                        const index = scheme.appropriations.findIndex(app => app.id === selected_appropriation.id);
-                        scheme.appropriations[index] = { ...scheme.appropriations[index], ...selected_appropriation }; // Replace with a new object
+                        const index = scheme.appropriations.findIndex(app => app.id === this.selected_appropriation.id);
+                        scheme.appropriations[index] = { ...scheme.appropriations[index], ...this.selected_appropriation }; // Replace with a new object
                     }
 
                     showAlert(responseData.msg);
@@ -308,6 +315,7 @@
       },
       appropriationModalUpdate(appropriation, index) {
         this.showModal = true
+        this.newAppropriation = false
         this.selected_appropriation = appropriation
       },
       totalPercentage(){

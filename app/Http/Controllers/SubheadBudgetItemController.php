@@ -25,7 +25,7 @@ class SubheadBudgetItemController extends Controller
             ]);
 
             // Fetch the total amount of the subhead budget
-            $subheadBudgetAmount = SubHeadBudget::getAmount($validated['subhead_budget_id']);
+            $subheadBudgetBalance = SubHeadBudget::getBalanceAfterAllocation($validated['subhead_budget_id']);
 
             // Retrieve the existing subhead budget item
             $subheadItem = SubheadBudgetItem::where('item_name_id', $validated['item_name_id'])
@@ -33,13 +33,20 @@ class SubheadBudgetItemController extends Controller
                 ->first();
 
             if (!empty($subheadItem)) {
-                // Check if adding the new amount exceeds the total subhead budget amount
-                if ($subheadItem->amount + $validated['amount'] > $subheadBudgetAmount) {
-                    throw new \Exception('Insufficient Fund on Subhead Budget');
+                //$totalAllocated = SubheadBudgetItem::getItemsAmount($validated['subhead_budget_id']) - $subheadItem->amount;
+                //  dd($subheadBudgetAmount);
+                $usedAmount = SubheadBudgetItem::usedAmount($subheadItem->id);
+                $balance  = $subheadItem->amount - $usedAmount;
+
+                if($validated['amount'] > $balance){
+                    throw new \Exception('Insufficient Fund on Subhead Budget Item');
                 }
+
+
             } else {
+
                 // Check if the new amount exceeds the total subhead budget amount
-                if ($validated['amount'] > $subheadBudgetAmount) {
+                if ($validated['amount'] > $subheadBudgetBalance) {
                     throw new \Exception('Insufficient Fund on Subhead Budget');
                 }
             }

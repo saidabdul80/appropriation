@@ -31,8 +31,19 @@ class SubHeadBudget extends Model
         return self::where(['id'=>$id])->first()?->amount;
     }
 
+    public static function usedAmount($id){
+        return Transaction::where('subhead_item_id', $id)->sum('amount');
+    }
+
+
+    public static function getBalanceAfterAllocation($id){
+        return self::where(['id'=>$id])->first()?->amount - SubheadBudgetItem::where('subhead_budget_id', $id)->sum('amount');
+    }
+
+
+
     public function  getBalanceAttribute(){
-        return $this->amount -Transaction::sumAmountForSubhead($this->appropriation_id, $this->id, $this->fund_category);
+        return $this->amount - SubheadBudgetItem::getItemsAmount($this->id);
     }
 
     public function subheadBudgetItems()

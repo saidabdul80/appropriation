@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appropriation;
+use App\Models\Scheme;
 use App\Models\SubHeadBudget;
 use App\Models\SubheadBudgetItem;
 use Illuminate\Http\Request;
@@ -85,7 +86,11 @@ class SubHeadBudgetController extends Controller
             ]);
             DB::beginTransaction();
 
-            $head = Appropriation::withWallet($validated['fund_category'])->where('id',$validated['appropriation_id'])->first();
+
+            $scheme_id =  Appropriation::find($validated['appropriation_id'])?->scheme_id;
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+
+            $head = Appropriation::withWallet($validated['fund_category'],$scheme_fund_category)->where('id',$validated['appropriation_id'])->first();
             if($head?->wallet?->balance < $validated['amount']){
                 throw new \Exception('Insufficient Fund on '. ($head->name?? 'the selected Head'). ' (Fund Available: '.number_format($head->wallet->balance,2).')');
             }

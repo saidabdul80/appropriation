@@ -96,7 +96,7 @@ class Transaction extends Model
     {
         return Attribute::make(
             get: fn ( $value) =>  empty($value)?'':  Carbon::parse($value)->format('d F, Y'),
-            set: fn (string $value) => $value,
+            set: fn ( $value) => $value,
         );
     }
 

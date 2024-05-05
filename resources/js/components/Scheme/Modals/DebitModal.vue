@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="forApp" class="form-label">Subhead Budage Activity .</label>
+                    <label for="forApp" class="form-label">Subhead Budget Activity .</label>
                     <Dropdown v-model="selected_subhead_item" class="w-100" :options="selected_subhead.subhead_budget_items"   optionLabel="subhead_item" />
                 </div>
             </div>
@@ -37,7 +37,7 @@
               <!-- <button for="name" class="btn btn-sm btn-outline">
                 <span class="pi pi-filter me-1"></span>Filter
               </button>               -->
-              <MultiSelect filter v-model="dynamicDataSelected" icon="pi pi-filter" display="chip" @update:model-value="dynamicDataSelectedFunc" :options="data_columns"  placeholder="Select Cities"
+              <MultiSelect filter v-model="dynamicDataSelected" icon="pi pi-filter" display="chip" @update:model-value="dynamicDataSelectedFunc" :options="data_columns"  placeholder="Other Fields (Optional) Filter"
                 :maxSelectedLabels="2" class="w-100" /><!--
                   <template #optiongroup="slotProps">
                     <div class="flex align-items-center">
@@ -72,9 +72,9 @@
                     <span class="input-group-text">&#8358;</span>
                     <span @click="removeField(key)" class="pi fs1 close_item" :class="appropriation_log.data[key].required ===0?'pi-times':'pi-ban'" ></span>
                     <input v-model="appropriation_log2.data.Amount.value" id="percentage_dividend" type="number" step="any" class="form-control" aria-label="Amount (to the nearest dollar)">
-                    <span v-if="appropriation_log.id === ''" id="schemeBalanceOver" class="input-group-text">{{ $globals.currency(availableBalance - calculatedValues.gross) }}</span>
+                    <span v-if="appropriation_log.id === ''" id="schemeBalanceOver" class="input-group-text">{{availableBalance <0?'0.00': $globals.currency(availableBalance - calculatedValues.gross) }}</span>
                     <span v-else id="schemeBalanceOver" class="input-group-text">{{ $globals.currency((availableBalance + appropriation_log.total_amount) - calculatedValues.gross) }}</span>
-                    <span class="d-none">{{ leftAmountApp }}</span>
+                    <span class="d-none">{{ leftAmountApp <1?0.00:leftAmountApp }}</span>
                   </div>
                   <div id="schemeBalanceOver2" class="alert alert-danger py-0 px-1 text-center fs-9 d-none">Insufficient Balance</div>
                 </div>
@@ -328,7 +328,9 @@
                 this.appropriation_log2.data['VAT_₦'] = this.calculatedValues.vatCalculate
                 this.appropriation_log2.data['Withholding_Tax_₦'] = this.calculatedValues.withholdingCalculate
                 this.appropriation_log2.data['Stamp_Duty_₦'] = this.calculatedValues.stampDutyCalculate
+                this.appropriation_log2.data['Gross_Amount'] = this.calculatedValues.gross;
                 this.appropriation_log2.total_amount = this.calculatedValues.gross;
+
                 let res = await postData('/save_appropriation_transaction', {
                     fund_category: this.selected_fund_category,
                     owner_id: this.appropriation.id,
@@ -336,21 +338,8 @@
                     subhead_id: this.selected_subhead.id,
                     subhead_item_id: this.selected_subhead_item.id,
                     transaction: this.appropriation_log2
-                }, true);
-                if (res.status == 200) {
-                    if (this.appropriation_log2.id === '') {
-                        //   this.appropriation_transactions?.data?.unshift(res.data)
-                        showAlert('Transaction Successful');
-                        // location.reload()
-                    } else {
-                        showAlert('Transaction Updated');
-                    }
-
-                    $('#debit-modal').modal('hide');
-                } else {
-                    showAlert('Something went wrong', 'danger');
-                    return false;
-                }
+                }, false);
+                $('#debit-modal').modal('hide');
             }catch(e){
                 Swal.fire(e)
                 console.log(e)

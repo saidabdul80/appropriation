@@ -482,6 +482,54 @@ class SchemeController extends Controller
         }
     }
 
+    public function undoAppropriate($appropriationHistoryId) {
+        try {
+            DB::beginTransaction();
+
+            // Step 1: Fetch the appropriation history record
+            $appropriationHistory = AppropriationHistory::findOrFail($appropriationHistoryId);
+
+            // Step 2: Revert wallet balances
+            $scheme = Scheme::find($appropriationHistory->owner_id);
+
+            // Step 3: Delete appropriation entries created during the appropriation process
+            foreach ($appropriationHistory->appropriation as $appropriation) {
+                $appropriationId = $appropriation['id'];
+                 // Delete related Wallet entries
+                 $wallet = Wallet::where('owner_id', $appropriationId)->where('owner_type', 'App\\Models\\Appropriation')->first();
+                 if( $wallet->balance < $appropriation['amount']){
+                    throw new \Exception('Cannot Rollback this Appropriation');
+                 }
+            }
+
+            foreach ($appropriationHistory->appropriation as $appropriation) {
+                    $wallet->balance -= $appropriation->amount;
+                    $wallet->total_collection -= $appropriation->amount;
+                    $wallet->save();
+
+                    // Delete related MainWallet entries
+                    $mainWallet = MainWallet::where('owner_id', $appropriationId)->where('owner_type', 'appropriation')->first();
+                    $mainWallet->balance -= $appropriation->amount;
+                    $mainWallet->total_collection -= $appropriation->amount;
+                    $mainWallet->save();
+            }
+
+            $schemeWallet = $scheme->wallet;
+            $schemeWallet->balance -= $appropriationHistory->amount;
+            $schemeWallet->safe_balance -= ($schemeWallet->balance - $appropriationHistory->amount); // Adjust safe balance
+            $schemeWallet->save();
+            $appropriationHistory->delete();
+
+            // Commit the transaction
+            DB::commit();
+
+            return response("Appropriation undone successfully", 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response($e->getMessage(), 400);
+        }
+    }
+
     private function monthYearFormatter($date, $scheme){
         $fundCategoryValue = '';
         if($scheme->fund_category == 'month'){

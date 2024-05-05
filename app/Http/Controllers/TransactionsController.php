@@ -303,8 +303,10 @@ class TransactionsController extends Controller
             $fundCategory = $request->get('fund_category');
 
             DB::beginTransaction();
+            $scheme_id =  Appropriation::find($ownerId)?->scheme_id;
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
 
-            $appropriation = Appropriation::withWallet($fundCategory)->where('id', $ownerId)->first();
+            $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();
 
             $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
 
@@ -352,27 +354,30 @@ class TransactionsController extends Controller
             $ownerId = $request->get('owner_id');
 
             DB::beginTransaction();
-
-            $appropriation = Appropriation::withWallet($fundCategory)->where('id', $ownerId)->first();
+            $scheme_id =  Appropriation::find($ownerId)?->scheme_id;
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+            $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();
 
             $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
 
             if ($transactionData['id']??'' != '') {
                 $response = $this->updateTransaction($transactionData, $appropriation, $mainWallet, $request);
+                DB::commit();
+                return response()->json("Transaction Updated", 200);
             } else {
                 $response =  $this->createTransaction($transactionData, $appropriation, $mainWallet, $request);
+                DB::commit();
+                return response()->json("Transaction Completed", 200);
             }
 
-            DB::commit();
 
-            return response($response, 200);
         } catch (ValidationException $e) {
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         } catch (\Exception $e) {
             if (env('APP_DEBUG')) {
-                return response($e->getMessage(), 400);
+                return response()->json($e->getMessage(), 400);
             } else {
-                return response('failed', 400);
+                return response()->json('failed', 400);
             }
         }
     }
@@ -389,11 +394,9 @@ class TransactionsController extends Controller
             }
         }else{
             BudgetService::validateTransaction(
-                $appropriation->id,
                 $transactionData['subhead_item_id'], //subhead_budget_id
                 $oldTransaction->amount,
-                $transactionData['total_amount'],
-                $request->get('fund_category'),
+                $transactionData['total_amount']
             );
         }
 
@@ -418,12 +421,11 @@ class TransactionsController extends Controller
                 throw new \Exception('Insufficient balance');
             }
         }else{
+
             BudgetService::validateTransaction(
-                $appropriation->id,
                 $request->get('subhead_item_id'), //subhead_budget_id
                 0,
-                $transactionData['total_amount'],
-                $request->get('fund_category'),
+                $transactionData['total_amount']
             );
         }
 
@@ -443,6 +445,7 @@ class TransactionsController extends Controller
             'fund_category' => $request->get('fund_category'),
             'performed_by' => 1,
             'subhead_id'=> $request->get('subhead_id'),
+            'subhead_item_id'=>$request->get('subhead_item_id'),
             'data' => $transactionData['data'],
         ]);
 

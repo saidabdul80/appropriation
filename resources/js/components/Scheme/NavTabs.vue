@@ -11,7 +11,7 @@
         Appropriated Income
       </a>
     </li>
-    
+
     <li v-if="appropriations?.length > 0" class="nav-item t-shadow " role="presentation">
       <a @click="handleTabClick(2)" class="rounded-sm-only mx-2 fs-8 t-white nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
         <strong> {{ selected_fund_category == '' ? 'Yearly' : selected_fund_category }}</strong> Appropriated Income
@@ -35,6 +35,7 @@ export default {
   methods: {
     handleTabClick(page) {
       this.$emit('switch-page', page);
+      /*output to Scheme screen */
     },
   },
 };

@@ -67,9 +67,8 @@ class Appropriation extends Model
        return implode(',', Department::whereIn("id", $this->department_id)->get()->pluck('short_name')->toArray());
     }
 
-    public function scopeWithWallet($query,$fundCategory =null,){
-        $scheme =Scheme::find($this->scheme_id);
-        if ($scheme && $scheme->fund_category == 'month') {
+    public function scopeWithWallet($query,$fundCategory =null,$scheme_fund_category){
+        if ($scheme_fund_category == 'month') {
             // For any scheme with fund category = month
             return $query->with(['wallet' => function ($query) {
                 $query->where('owner_type', 'App\\Models\\Appropriation');

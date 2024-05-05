@@ -27,8 +27,20 @@ class SubheadBudgetItem extends Model
         return $this->belongsTo(SubheadBudget::class);
     }
 
-    public static function getAmount($id){
+    public static function getAmount(int $id){
         return self::where(['id'=>$id])->first()?->amount;
+    }
+
+    public static function usedAmount(int $id){
+        return Transaction::where('subhead_item_id',$id)->sum('amount');
+    }
+
+    public static function getItemsAmount(int $subhead_budget_id){
+            return self::where(['id'=>$subhead_budget_id])->sum('amount');
+    }
+
+    public static function getAmountBalance(int $id){
+        return self::where(['id'=>$id])->first()?->amount - Transaction::sumAmountForSubheadItem($id);;
     }
 
     public function getSubheadItemAttribute(){

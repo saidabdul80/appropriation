@@ -137,6 +137,7 @@ div.DTCR_pointer {
 			try{
 				return await axios.post(route, data).then(function(response) {
 					//switchPage(1)
+                    console.log(response)
 					$("#loaderHtml").hide()
 					if (!type) { //if false
 						showAlert(response.data);
@@ -144,7 +145,6 @@ div.DTCR_pointer {
 						return response;
 					}
 				}).catch(function(error) {
-					//switchPage(1)
 					$("#loaderHtml").hide()
 					Swal.fire({
 						text: error.response.data,
