@@ -6,6 +6,6 @@
     <h1 class="text-secondary fw-bold">NiCare Fund Management System (NiFMS)</h1>
 <div>
     <span style="font-size: 10px; text-align:center padding:14px;">
-        All Rights Reserved, Copyright 202,IHSAN Technologies
+        All Rights Reserved, Copyright 2024, IHSAN Technologies
     </span>
 @endsection
