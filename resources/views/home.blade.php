@@ -5,7 +5,7 @@
     <img src="{{asset('images/nicare_logo.jpg')}}" style="width: 135px;" >
     <h1 class="text-secondary fw-bold">NiCare Fund Management System (NiFMS)</h1>
 <div>
-    <span style="font-size: 10px;">
+    <span style="font-size: 10px; text-align:center">
         All Rights Reserved, Copyright 202,IHSAN Technologies
     </span>
 @endsection
