@@ -329,7 +329,7 @@ $routename = str_replace('#','', Route::currentRouteName());
 		<span>
 			<a href="/" class="d-flex nicare-logo-right align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
 				<img src="{{asset('images/nicare_logo.jpg')}}" style="width: 35px;" class="nav-logo">
-				<span class="fs-6 ms-2">FMS</span>
+				<span class="fs-6 ms-2">NiFMS</span>
 			</a>
 		</span>
 
