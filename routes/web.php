@@ -48,6 +48,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::get('/scheme', [SchemeController::class, 'index'])->name('account');
     Route::get('/scheme2', [SchemeController::class, 'schemeScreen'])->name('account2');
     Route::post('/add_appropriation', [SchemeController::class, 'addAppropriation']);
+    Route::post('/appropriation/delete/{id}', [SchemeController::class, 'deleteAppropriation']);
     Route::post('/add_scheme', [SchemeController::class, 'addScheme']);
     Route::post('/fund_programme', [SchemeController::class, 'fundProgramme']);
     Route::post('/undo_fund_programme', [SchemeController::class, 'reverseFundProgramme']);

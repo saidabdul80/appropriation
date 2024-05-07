@@ -64,7 +64,7 @@ class Appropriation extends Model
     */
 
     public function getDepartmentAttribute(){
-       return implode(',', Department::whereIn("id", $this->department_id)->get()->pluck('short_name')->toArray());
+       return implode(',', Department::whereIn("id", $this->department_id??[])->get()->pluck('short_name')->toArray());
     }
 
     public function scopeWithWallet($query,$fundCategory =null,$scheme_fund_category){

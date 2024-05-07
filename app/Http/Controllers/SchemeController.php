@@ -82,6 +82,32 @@ class SchemeController extends Controller
         }
     }
 
+    public function deleteAppropriation($id){
+        try{
+
+            $appropriation = Appropriation::find($id);
+            if(empty($appropriation)){
+                throw new \Exception('Cannot find Appropriaton');
+            }
+            $appropriation->load('wallet');
+
+            if(is_null($appropriation->wallet)){
+                $appropriation->delete();
+            }else{
+                if($appropriation->wallet?->total_collection < 1){
+                    $appropriation->delete();
+                }else{
+                    throw new \Exception("Cannot Delete");
+                }
+
+            }
+            return  response()->json("Deleted", 200);
+            }catch(\Exception $e){
+                return  response()->json($e->getMessage(), 400);
+            }
+    }
+
+
     private function createSchemeWallet($scheme_id){
         $wallet_number = date('ymdhis');
         $scheme = Scheme::where('id', $scheme_id)->first();
