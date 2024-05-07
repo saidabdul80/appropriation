@@ -36,7 +36,7 @@ class SubheadBudgetItem extends Model
     }
 
     public static function getItemsAmount(int $subhead_budget_id){
-            return self::where(['id'=>$subhead_budget_id])->sum('amount');
+            return self::where(['subhead_budget_id'=>$subhead_budget_id])->sum('amount');
     }
 
     public static function getAmountBalance(int $id){

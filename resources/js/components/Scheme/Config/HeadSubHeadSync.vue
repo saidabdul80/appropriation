@@ -111,7 +111,9 @@
                         </tr>
                     </tbody>
                 </table>
-                <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />
+                <Teleport to="#modalFooterConfig">
+                    <Button @click="addBudget()" class="rounded rounded-right pull-left" icon="pi pi-plus" />
+                </Teleport>
             </div>
         </div>
         <!-- <button v-if="selected_appropriation !== null" type="button" @click="addAppropriation()"
@@ -170,7 +172,7 @@ export default {
     },
     methods: {
         async removeItem(cat,index){
-            if(cat?.id, index){
+            if(cat?.id){
                 cat.isEditing = false;
                 await postData('sub_head_budget/delete/'+cat.id)
             }
@@ -185,7 +187,7 @@ export default {
             }
         },
         addBudget() {
-            if (this.selected_appropriation == null) {
+            if (this.selected_appropriation?.id == null || this.selected_appropriation?.id == '') {
                 Swal.fire('Select a Head');
                 return false;
             }

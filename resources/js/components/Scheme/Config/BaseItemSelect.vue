@@ -132,22 +132,18 @@
                         return;
                     }
                    const response = await postData(this.url+'/create',{name})
-                     this.fetchItems('')
-                if (!response?.data) {
-                    return Swal.showValidationMessage(`
-                    ${JSON.stringify(await response)}
-                    `);
-                }
-                return response.json();
-                } catch (error) {
-                Swal.showValidationMessage(`
-                    Request failed: ${error}
-                `);
+                    this.fetchItems('')
+            } catch (error) {
+                    if(error =='undefined'){
+                        return;
+                    }
+                        Swal.showValidationMessage(`
+                            Request failed: ${error}
+                        `);
                 }
             },
             allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
-
             });
 
         /* this.showDialog = false */

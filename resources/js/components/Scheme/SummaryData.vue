@@ -1,13 +1,13 @@
 <template>
     <div class="row position-relative mx-0">
         <div class="col-lg-6 pb-2 text-white">
-            <p v-if="canPerformAction('income')" class="m-0 fs-9">
+            <p v-if="canPerformAction('income')" class="m-0 fs-9" v-show="selected_fund_category != ''">
                 <b>{{ selected_scheme?.name }}</b> {{ selected_fund_category }} Income: <span>&#8358;</span>
                  <span v-show="selected_fund_category == ''">{{ $globals.currency(selected_scheme?.total_collection) }}</span>
                  <span v-show="selected_fund_category != ''"> {{ $globals.currency(fund?.total_collection) }} </span>
             </p>
             <p class="m-0 fs-9">Total Income Across the years.: <span>&#8358;</span>
-                {{ $globals.currency(selected_scheme?.balance) }} </p>
+                {{ $globals.currency(selected_scheme?.total_collection) }} </p>
         </div>
 
         <div class="col-lg-6 pb-2 text-white">

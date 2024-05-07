@@ -27,13 +27,14 @@
               aria-label="Close"></button>
           </div>
         </div>
-        <div class="modal-body mt-0 px-3" style="height: 95%;overflow-y: auto;">
-          <Heads @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>
+        <div class="modal-body mt-0 px-3" style="height: 75vh;overflow-y: auto;">
+          <DepartmentComponent @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>
           <SubHead @oncompleted="oncompleted"     v-if="selectedTab == 'exp'" />
           <HeadSubHeadSync @isLoading="loader($event,'exp-dept')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-dept'"  />
           <SubHeadItemSync @isLoading="loader($event,'exp-item')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-item'"  />
         </div>
-        <div class="modal-footer" v-if="activeTab === 'update'">
+        <div class="modal-footer" id="modalFooterConfig" style="justify-content: space-between;">
+
         </div>
     </div>
   </div>
@@ -73,7 +74,7 @@ export default {
   data() {
     return {
       items: [
-        { name: 'Heads', image: 'amyelsner.png', type: 'dept' },
+        { name: 'Departments', image: 'amyelsner.png', type: 'dept' },
         { name: 'Subhead', image: 'annafali.png', type: 'exp' },
         { name: '-', image: 'annafali.png', type: 'exp-dept' },
         { name: '-', image: 'annafali.png', type: 'exp-item' },

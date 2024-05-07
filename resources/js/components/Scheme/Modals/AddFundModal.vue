@@ -118,7 +118,8 @@
                 let res = await postData('/fund_programme', {fund_month_year: this.fund.date,amount: this.fund.amount,source_id: this.fund.source_id,description: this.fund.description,scheme_id: this.selected_scheme.id}, true);
                 console.log(res,444)
                 if (res.status == 200) {
-                    this.$emit('response', res.data)
+                    this.$emit('onComplete', res.data)
+                    /* out to  scheme screen*/
                     this.$emit('closeModal')
                 }
 

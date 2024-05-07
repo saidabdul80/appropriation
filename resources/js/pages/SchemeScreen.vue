@@ -120,7 +120,7 @@
     <Transition name="fade">
       <add-fund-modal
         v-if="openModalFund"
-        @response="fundAdded"
+        @onComplete="fundAdded"
         :selected_scheme="selected_scheme"
         @closeModal="openModalFund = false"
       />
@@ -335,6 +335,7 @@ export default {
       this.schemes[index] = res.scheme
       this.scheme_changed +=1
       this.selected_scheme = res.scheme
+      this.changeScheme(this.selected_scheme)
       showAlert(res.msg)
     },
     ProjectionModal(){

@@ -1,137 +1,121 @@
 <template>
     <div>
-        <div class="row w-100">
-            <div class="col-lg-6">
-                <Dropdown v-model="department_id" :options="departments" @change="handleSelectDepartment()"
-                    optionLabel="name" optionValue="id" placeholder="Select a Department" class="w-100 mb-3 p-2" />
-            </div>
-            <div class="col-lg-3" v-if="add_unit_enabled">
-                <InputText v-model="unit_name" class="p-2 w-100" placeholder="Enter new unit name" />
-            </div>
-            <div class="col-lg-3">
-                <button v-if="!add_unit_enabled" @click="enableAddUnit()" class="btn btn-primary p-2">Add Unit</button>
-                <button v-else @click="addUnit()" class="btn btn-success p-2">Add Unit <span v-if="adding_unit"
-                        class="pi pi-spin pi-spinner"></span></button>
-            </div>
+      <div class="row w-100">
+        <div class="col-lg-6">
+          <InputText v-model="department.name" class="p-2 w-100" placeholder="Enter department name" />
         </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>S/N</th>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(un, i) in department_units" :key="i">
-                    <td>{{ i + 1 }}</td>
-                    <td>
-                        <span v-if="un?.isEditing">{{ un.name }}</span>                        
-                        <InputText v-else v-model="un.name" class="p-2 w-100"/>                                        
-                    </td>
-                    <td>
-                        <span v-if="un?.isEditing">{{ un?.department_name }}</span>
-                        <Dropdown v-else v-model="un.department_id" :options="departments" optionLabel="name" optionValue="id" placeholder="Select a Department" class="w-100 mb-3 p-2" />
-                    </td>
-                    <td>
-                        <td class="row">
-                        <div class="col-2 col-md-3" v-if="!un?.isEditing">
-                            <button  @click="un.isEditing = true" class="btn btn-white btn-outline-primary py-2 btn-sm py-21 rounded-circle"><span class="pi pi-pencil"></span> </button>                                                
-                        </div>
-                        <div class="col-2 col-md-3" v-else> 
-                            <button   @click="updateUnit(un)" class="btn btn-white btn-outline-success btn-sm py-21 rounded-circle"><span class="pi pi-check"></span> </button>                        
-                        </div>
-                        <div class="col-2 col-md-3" v-if="un?.isEditing">
-                            <button  @click="un.isEditing = false" class="btn btn-white btn-outline-primary py-2 btn-sm py-21 rounded-circle"><span class="pi pi-times "></span> </button>                        
-                        </div>
-                    </td>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="col-lg-6">
+          <InputText v-model="department.short_name" class="p-2 w-100" placeholder="Enter short name" />
+        </div>
+      </div>
+      <div class="button-margin">
+        <button v-if="!editing" @click="addDepartment" class="btn btn-primary p-2">Add Department</button>
+        <button v-else @click="updateDepartment" class="btn btn-success p-2">Update Department</button>
+      </div>
+      <table class="table table-bordered mt-3">
+        <thead>
+          <tr>
+            <th>S/N</th>
+            <th>Name</th>
+            <th>Short Name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(dept, index) in departments" :key="dept.id">
+            <td>{{ index + 1 }}</td>
+            <td>{{ dept.name }}</td>
+            <td>{{ dept.short_name }}</td>
+            <td>
+              <button @click="editDepartment(dept)" class="btn btn-white btn-outline-primary py-2 btn-sm py-21 rounded-circle">
+                <span class="pi pi-pencil"></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-</template>
+  </template>
 
-<script>
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
+  <script>
+  import InputText from 'primevue/inputtext';
 
-export default {
+  export default {
     components: {
-        Dropdown,
-        InputText
+      InputText
     },
-    props: {
-    },
+    props: {},
     data() {
-        return {
-            adding_unit: false,
-            departments: [],
-            department_units: [],
-            department_id: null,
-            add_unit_enabled: false,
-            adding_unit: false,
-            unit_name: ''
-        };
+      return {
+        department: {
+          name: '',
+          short_name: ''
+        },
+        departments: [],
+        editing: false,
+        editingIndex: null
+      };
     },
     methods: {
- 
-        async getDepartmentUnits() {
-            let res = await getData('units/department/' + this.department_id)
-            this.department_units = res.data
-        },
-
-        async getDepartments() {
-            let res = await getData('department')
-            this.departments = res.data
-        },
-
-        handleSelectDepartment() {
-            this.getDepartmentUnits();
-        },
-        enableAddUnit() {
-
-            if (!this.department_id) {
-                Swal.fire('Select Department')
-                return false
-            }
-            this.add_unit_enabled = true
-        },
-        async addUnit() {
-            if (this.unit_name == '') {
-                Swal.fire("Enter Unit Name")
-                return false;
-            }
-            this.adding_unit = true
-            await postData('units/create', {
-                name: this.unit_name,
-                department_id: this.department_id
-            });
-            await this.getDepartmentUnits()
-            this.add_unit_enabled = false
-            this.adding_unit = false
-        },
-        async updateUnit(un) {
-            if (un.name == '') {
-                Swal.fire("Unit Name Cannot be Empty")
-                return false;
-            }
-            un.isLoading = true
-            await postData('units/update/'+un.id, un);
-            await this.getDepartmentUnits()           
-        },
-
+      async addDepartment() {
+        // Check if required fields are filled
+        if (!this.department.name.trim() || !this.department.short_name.trim()) {
+          Swal.fire('Please enter department name and short name');
+          return;
+        }
+        // Send department data to backend
+        await postData('/departments/create', this.department);
+        // Refresh department list
+        this.getDepartments();
+        // Clear input fields
+        this.clearFields();
+      },
+      async updateDepartment() {
+        // Check if required fields are filled
+        if (!this.department.name.trim() || !this.department.short_name.trim()) {
+          Swal.fire('Please enter department name and short name');
+          return;
+        }
+        // Send updated department data to backend
+        await postData(`/department/create_update`, this.department);
+        // Refresh department list
+        this.getDepartments();
+        // Clear input fields
+        this.clearFields();
+        // Exit editing mode
+        this.editing = false;
+        this.editingIndex = null;
+      },
+      editDepartment(department) {
+        // Set editing mode and fill input fields with department data
+        this.editing = true;
+        this.editingIndex = this.departments.findIndex(d => d.id === department.id);
+        this.department = { ...department };
+      },
+      async getDepartments() {
+        // Fetch departments from backend
+        const res = await getData('/department');
+        this.departments = res.data;
+      },
+      clearFields() {
+        // Clear input fields
+        this.department = {
+          name: '',
+          short_name: ''
+        };
+      }
     },
-    async created(){
-        await this.getDepartments()
-        this.$emit('oncompleted',true)
-    }
-};
-</script>
+    async created() {
+      // Load departments when component is created
+      await this.getDepartments();
 
-<style scoped>
-.button-margin {
+      this.$emit('oncompleted', true);
+    }
+  };
+  </script>
+
+  <style scoped>
+  .button-margin {
     margin-top: 10px;
-}
-</style>
+  }
+  </style>

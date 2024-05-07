@@ -4,7 +4,7 @@
             <span style="font-size: 0.8em;" class="ms-1"> <b>Note:</b> Ensure fund already available on the selected
                 Head i.e Appropriation must have been completed </span>
         </InlineMessage> -->
-        <div class="row w-100 mx-auto">
+        <div class="row w-100 mx-auto text-dark">
             <div class="col-md-6 mb-2">
                 <label for="name" class="form-label">Programmes</label>
                 <!--  <Dropdown v-model="selected_scheme" @change="fetchFundYear()" :options="schemes" optionLabel="name"
@@ -28,7 +28,7 @@
                     </template>
                 </Dropdown>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6 mb-2 text-dark">
                 <label for="name" class="form-label">Funding Year</label>
                 {{ monthSelected }}
                 <month-year-selector v-model="monthSelected" :fund_categories="fund_categories"
@@ -57,15 +57,20 @@
                     </template>
                 </Dropdown>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 text-dark">
                 <label for="name" class="form-label mb-0">Subhead Budget Name</label>
-                {{ sub_head_budgets[0]?.subhead }}
                 <Dropdown @change="loadSubheadBudgetItems()" v-model="selected_sub_head_budget"
-                    :options="sub_head_budgets" placeholder="Select a Budget" class="w-100 ">
-                    <template #value="slotProps">
-                        <div v-if="slotProps.value?.subhead" class="flex align-items-center" :class="(slotProps.value?.amount -getTotalAmountSubheadBudget) <0?'text-danger':''">
-                            <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.subhead }} <span>
-                                    (&#8358;{{ $globals.currency(slotProps.value?.amount - getTotalAmountSubheadBudget) }})</span> </div>
+                        :options="sub_head_budgets" placeholder="Select a Budget" class="w-100">
+                    <template #value="{ value }">
+                        <div v-if="value?.subhead" class="flex align-items-center" :class="(value?.amount - getTotalAmountSubheadBudget) < 0 ? 'text-danger' : ''">
+                            <div style="font-size: 12px;font-weight: bolder;">{{ value.subhead }}
+                                <span v-if="value.subhead_id === selected_sub_head_budget?.subhead_id">
+                                    (&#8358;{{ $globals.currency(value?.amount - getTotalAmountSubheadBudget) }})
+                                </span>
+                                <span v-else>
+                                    (&#8358;{{ $globals.currency(value?.amount) }})
+                                </span>
+                            </div>
                             <div style="font-size: 10px;">Subhead Budget Current Balance</div>
                         </div>
                         <span v-else>
@@ -73,12 +78,14 @@
                         </span>
                     </template>
 
-                    <template #option="slotProps">
-                        <div>{{ slotProps?.option?.subhead }} ({{$globals.currency(slotProps.option?.balance)}})
+                    <template #option="{ option }">
+                        <div v-if="option?.subhead" class="d-flex">
+                            <span class="me-2">{{ option?.subhead }}  ({{$globals.currency(option?.amount)}})</span>
                         </div>
                     </template>
                 </Dropdown>
             </div>
+
             <div class="col-md-12 mt-3">
 
                 <table class="table table-bordered w-100 table-condensed">
@@ -127,9 +134,11 @@
                         </tr>
                     </tbody>
                 </table>
-                <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />
             </div>
         </div>
+        <Teleport to="#modalFooterConfig">
+            <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />
+        </Teleport>
         <!-- <button v-if="selected_appropriation !== null" type="button" @click="addAppropriation()"
             class="btn btn-secondary">Update</button>         -->
     </div>

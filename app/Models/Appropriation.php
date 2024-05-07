@@ -84,6 +84,7 @@ class Appropriation extends Model
     {
         return   AppropriationType::find($this->appropriation_type_id)?->name;
     }
+
     protected $appends = ['total_collection','name','department', 'department_id','balance', 'main_wallet'];
 
 }
