@@ -435,7 +435,7 @@ export default {
       const confirmText = appr.data.Subject.value + ' of ' + appr.amount;
       const { value: confirmationText } = await Swal.fire({
         title: 'Continue Delete?',
-        html: 'Please type <strong class="fs-9"><i>' + confirmText + '</i></strong> to confirm:',
+        html: 'Please type <strong class="fs-9 text-primary"><i>' + confirmText + '</i></strong> to confirm:',
         input: 'text',
         inputPlaceholder: 'Type the name to confirm',
         inputAttributes: {
