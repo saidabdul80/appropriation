@@ -43,7 +43,7 @@
                     <template #value="slotProps">
                         <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.main_balance) <0?'text-danger':''">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                    (&#8358;{{ $globals.currency(slotProps.value?.balance) }})</span> </div>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.main_balance) }})</span> </div>
                             <div style="font-size: 10px;">Head with Current Balance</div>
                         </div>
                         <span v-else>
@@ -108,7 +108,7 @@
                                     optionValue="id" />
                             </td>
                             <td>
-                                <span v-if="!cat?.isEditing">{{  cat.amount }}</span>
+                                <span v-if="!cat?.isEditing">{{$globals.currency(cat.amount) }}</span>
                                 <InputText v-else v-model="cat.amount" class="p-1 w-100" />
                             </td>
                             <td>

@@ -412,7 +412,7 @@ export default {
     async fetchWalletBalance() {
       let page_type = localStorage.getItem('page_type')
       let owner_ids = []
-      if (page_type == 'sigle') {
+      if (page_type == 'single') {
         owner_ids = [this.selected_appropriation.id]
       } else {
         let appropriations = JSON.parse(localStorage.getItem('appropriations'));

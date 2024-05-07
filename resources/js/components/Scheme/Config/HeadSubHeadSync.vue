@@ -85,7 +85,7 @@
                                     optionValue="id" />
                             </td>
                             <td>
-                                <span v-if="!cat?.isEditing">{{  cat.amount }}</span>
+                                <span v-if="!cat?.isEditing">{{$globals.currency(cat.amount) }}</span>
                                 <InputText v-else v-model="cat.amount" class="p-1 w-100" />
                             </td>
                             <td>
