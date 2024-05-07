@@ -14,7 +14,7 @@
                     <template #value="slotProps">
                         <div v-if="slotProps.value?.name" class="flex align-items-center">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                    (&#8358;{{ $globals.currency(slotProps.value?.wallet?.main_balance) }})</span> </div>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.wallet?.balance) }})</span> </div>
                             <div style="font-size: 10px;">Programme (Current Programme fund )</div>
                         </div>
                         <span v-else>
@@ -41,7 +41,7 @@
                 <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
                     :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
                     <template #value="slotProps">
-                        <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance) <0?'text-danger':''">
+                        <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.main_balance) <0?'text-danger':''">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
                                     (&#8358;{{ $globals.currency(slotProps.value?.balance) }})</span> </div>
                             <div style="font-size: 10px;">Head with Current Balance</div>
@@ -52,7 +52,7 @@
                     </template>
 
                     <template #option="slotProps">
-                        <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.balance)}})
+                        <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.main_balance)}})
                         </div>
                     </template>
                 </Dropdown>

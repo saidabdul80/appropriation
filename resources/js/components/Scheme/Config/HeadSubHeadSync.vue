@@ -47,7 +47,7 @@
                         <template #value="slotProps">
                             <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
                                 <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                        (&#8358;{{ $globals.currency(slotProps.value?.balance -getTotalAmountSubheadBudget) }})</span> </div>
+                                        (&#8358;{{ $globals.currency(slotProps.value?.main_balance -getTotalAmountSubheadBudget) }})</span> </div>
                                 <div style="font-size: 10px;">Head with Current Balance</div>
                             </div>
                             <span v-else>
@@ -56,7 +56,7 @@
                         </template>
 
                         <template #option="slotProps">
-                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.balance)}})
+                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.main_balance)}})
                             </div>
                         </template>
                     </Dropdown>
