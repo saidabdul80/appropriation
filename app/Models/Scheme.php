@@ -14,16 +14,16 @@ class Scheme extends Model
     use HasFactory, LogsActivity, Account;
     protected $with = ['appropriations','sources'];
     protected $fillable = ['name',"wallet_number"];
-    public function appropriations(){        
+    public function appropriations(){
         return $this->hasMany(Appropriation::class);
     }
 
-    public function getAppropriationWalletsAttribute(){        
-     /*    $ids = Appropriation::where('scheme_id',$this->id)->pluck('id')->toArray();        
+    public function getAppropriationWalletsAttribute(){
+     /*    $ids = Appropriation::where('scheme_id',$this->id)->pluck('id')->toArray();
         $wallets = Wallet::with('appropriation')->whereIn('owner_id',$ids)->where('owner_type','App\\Models\\Appropriation')->get()->groupBy('fund_category')->map(function($item, $key){
             return $item->map(function($t){
                 return collect($t)->merge($t->appropriation);
-            });        
+            });
         });
         dd(json_encode($wallets)); */
     }
@@ -36,7 +36,7 @@ class Scheme extends Model
     public function transactions()
     {
         return  $this->hasMany(Transaction::class);
-    }    
+    }
 
     public function sources(){
        return $this->hasMany(Source::class);
@@ -57,12 +57,12 @@ class Scheme extends Model
         $wallet_details = Wallet::selectRaw('SUM(balance) as balance, SUM(total_collection) as total_collection, fund_category')->whereIn('owner_id',$ids)->where(['owner_type'=>'App\\Models\\Appropriation'])->groupBy('fund_category')->get();
 
         return $wallet_details->count() >0? $wallet_details->groupBy('fund_category'):new stdClass();
-    } 
+    }
 
     public function getTotalCollectionAttribute(){
         return $this->wallet?->total_collection;
     }
-    
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -72,10 +72,10 @@ class Scheme extends Model
 
 /*     public function getFundCategoriesAttribute(){
         return FundCategory::where([
-                    'scheme_id'=>$this->id            
+                    'scheme_id'=>$this->id
                 ])->get();
     }
   */
     protected $appends = ['balance','total_collection','appropriation_wallets','funds','fund_categories'];
-    
+
 }

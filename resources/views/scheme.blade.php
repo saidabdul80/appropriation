@@ -4,6 +4,18 @@ use App\Models\AppropriationType;
 use App\Models\Department;
 use App\Models\Scheme;
 $schemes = Scheme::all();
+$schemes->each(function ($scheme) {
+    $scheme->appropriations->each(function ($appropriation) use ($scheme) {
+        $appropriation->main_balance = $appropriation->load('appropriation_histories')->appropriation_histories->sum(function ($history) use ($appropriation) {
+            foreach ($history->appropriation as $item) {
+                if ($item['id'] == $appropriation->id) {
+                    return $item['amount'];
+                }
+            }
+            return 0;
+        });
+    });
+});
 $departments = Department::all();
 $appropriationTypes = AppropriationType::all();
 $dyear = 2020;

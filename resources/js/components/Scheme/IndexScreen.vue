@@ -320,10 +320,27 @@
         this.newAppropriation = false
         this.selected_appropriation = appropriation
       },
-      async removeItem(app, apps, index){
-          await postData('/appropriation/delete/'+app?.id,{}, true)
-          app.splice(index,1)
-      },
+      async removeItem(app, apps, index) {
+            const confirmation = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this item!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (confirmation.isConfirmed) {
+                try {
+                    await postData('/appropriation/delete/' + app?.id, {}, true);
+                    apps.splice(index, 1);
+                    Swal.fire('Deleted', 'Your item has been deleted.', 'success');
+                } catch (error) {
+                    console.error('Error deleting item:', error);
+                    Swal.fire('Failed to delete item', '', 'error');
+                }
+            }
+        },
       totalPercentage(){
         if(this.selected_appropriations_to_appropriate.length >0){
             let total = 0;

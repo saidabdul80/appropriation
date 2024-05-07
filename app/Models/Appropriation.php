@@ -7,6 +7,10 @@ use App\Traits\Account;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Database\Eloquent\Builder;
+
 class Appropriation extends Model
 {
     use HasFactory;
@@ -54,6 +58,24 @@ class Appropriation extends Model
         return Wallet::where('owner_id', $this->id)->where('owner_type','App\\Models\\Appropriation')->sum('balance');
     }
 
+     //total balance accross all funds
+    /*  protected static function booted()
+     {
+
+        // Apply the historyBalance scope automatically
+        static::addGlobalScope('historyBalance', function (Builder $builder) {
+            $subQuery = DB::table('appropriations_history')
+                ->select('owner_id', DB::raw('SUM(JSON_EXTRACT(appropriation, "$[*].amount")) AS main_balance'))
+                ->groupBy('appropriation_id');
+
+            $builder->leftJoinSub($subQuery, 'sub', function ($join) {
+                $join->on('appropriations.id', '=', DB::raw('sub.appropriation_id'));
+            })->select('appropriations.*', 'sub.main_balance');
+        });
+
+     } */
+
+
     public function getTotalCollectionAttribute(){
         return Wallet::where('owner_id', $this->id)->where('owner_type','App\\Models\\Appropriation')->sum('total_collection');
     }
@@ -83,6 +105,11 @@ class Appropriation extends Model
     public function getNameAttribute()
     {
         return   AppropriationType::find($this->appropriation_type_id)?->name;
+    }
+
+    public function appropriation_histories()
+    {
+        return $this->hasMany(AppropriationHistory::class,'owner_id', 'scheme_id');
     }
 
     protected $appends = ['total_collection','name','department', 'department_id','balance', 'main_wallet'];
