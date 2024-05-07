@@ -27,6 +27,9 @@
                     <button @click="appropriationModalUpdate(appropriation, i)" class="me-2 btn btn-sm btn-info text-white">
                       <i class="bi bi-pencil-square" style="color:inherit"></i>
                     </button>
+                    <button @dblclick="removeItem(appropriation,index)"
+                    class=" btn btn-sm btn-danger text-white"><span
+                        class="pi pi-times "></span> </button>
                   </td>
                 </tr>
               </tbody>
@@ -317,6 +320,9 @@
         this.showModal = true
         this.newAppropriation = false
         this.selected_appropriation = appropriation
+      },
+      removeItem(app){
+        Swal.fire('deleting')
       },
       totalPercentage(){
         if(this.selected_appropriations_to_appropriate.length >0){

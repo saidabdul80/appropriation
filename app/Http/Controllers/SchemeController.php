@@ -51,22 +51,24 @@ class SchemeController extends Controller
             ]);
 
             $data = $request->only(['scheme_id', 'appropriation_type_id', 'department_id', 'percentage_dividend']);
-            $appropriation = Appropriation::updateOrCreate(
-                [
-                    'scheme_id' => $data['scheme_id'],
-                    'appropriation_type_id' => $data['appropriation_type_id']
-                ],
-                [
-                    'department_id' => $data['department_id'],
-                    'percentage_dividend' => $data['percentage_dividend']
-                ]
-            );
-
-            if ($appropriation->wasRecentlyCreated) {
-                return response()->json(['appropriation' => $appropriation, 'msg' => 'Created Successfully'], 200);
-            } else {
-                return response()->json(['appropriation' => $appropriation, 'msg' => 'Updated Successfully'], 200);
+            if($request->has('id')){
+                $appropriation = Appropriation::where('id', $request->id)->update([
+                        'scheme_id' => $data['scheme_id'],
+                        'appropriation_type_id' => $data['appropriation_type_id'],
+                        'department_id' => $data['department_id'],
+                        'percentage_dividend' => $data['percentage_dividend']
+                    ]);
+                    return response()->json(['appropriation' => $appropriation, 'msg' => 'Updated Successfully'], 200);
             }
+
+            $appropriation = Appropriation::create([
+                'scheme_id' => $data['scheme_id'],
+                'appropriation_type_id' => $data['appropriation_type_id'],
+                'department_id' => $data['department_id'],
+                'percentage_dividend' => $data['percentage_dividend']
+            ]);
+
+            return response()->json(['appropriation' => $appropriation, 'msg' => 'Created Successfully'], 200);
 
         } catch(ValidationException $e){
             return response($e->getMessage(),400);
