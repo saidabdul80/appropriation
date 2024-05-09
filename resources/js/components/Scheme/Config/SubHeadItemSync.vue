@@ -85,15 +85,74 @@
                     </template>
                 </Dropdown>
             </div>
+            <!--SUBHEAD BUDGET ITEMS  -->
+            <div class="col-md-12 mt-3" >
+                <DataTable v-model:expandedRows="expandedRows" v-model:editingRows="editingRows"  editMode="row"  @row-edit-save="saveSubheadBudgetItem" :value="sub_head_budget_items" dataKey="id" ref="dt">
+                        <template #header>
+                            <div style="text-align: left">
+                                <Button class="btn btn-success" @click="exportCSV('dt')">Export</Button>
+                            </div>
+                        </template>
+                        <Column expander style="width: 5rem" />
+                        <Column header="#">
+                            <template #body="slotProps">
+                                {{ slotProps.index +1 }}
+                            </template>
+                        </Column>
+                        <Column field="subhead_item" header="Activity Name">
+                            <template #body="{ data, field }">{{ data[field] }}</template>
+                            <template #editor="{ data, field }">
+                                <BaseItemSelect v-model="data['item_name_id']" url="subhead_item_name" optionLabel="name"
+                                    optionValue="id" />
+                            </template>
+                        </Column>
+                        <Column field="amount" header="Budget" >
+                            <template #body="{ data, field }">{{ $globals.currency(data[field]) }}</template>
+                            <template #editor="{data, field}">
+                                <InputText v-model="data[field]" class="p-1 w-100" />
+                            </template>
+                        </Column>
+                        <Column field="balance" header="Balance" :body="$globals.currency">
+                            <template #body="{ data, field }">{{ $globals.currency(data[field]) }}</template>
+                        </Column>
+                        <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+                        <Column>
+                            <template #body="slotProps">
+                                <Button icon="pi pi-reply" title="Make Virement" class="p-1 p-button- rounded p-button-success" @click="promptVirement(slotProps.data)"></Button>
+                            </template>
+                        </Column>
+                        <Column>
+                            <template #body="slotProps">
+                                <button @click="removeItem(slotProps.data,slotProps.index)"
+                                            class="btn btn-white btn-outline-primary py-2 btn-sm py-21 rounded-circle"><span
+                                                class="pi pi-trash "></span> </button>
+                            </template>
+                        </Column>
+                        <template #expansion="slotProps">
+                            <div class="border rounded-3 mb-4 w-75 mx-auto">
+                                <h6 class="text-left p-3 font-bold">Virments</h6>
+                                <DataTable :value="slotProps.data.virments" v-if="slotProps.data.virments.length > 0">
+                                    <Column field="" header="#" :body="(_, { index }) => index + 1" />
+                                    <Column field="destination" header="Destination"></Column>
+                                    <Column field="amount" header="Amount" >
+                                        <template #body="{ data, field }">{{ $globals.currency(data[field]) }}</template>
+                                        <template #editor="{data}">
+                                            <InputText v-model="data[amount]" class="p-1 w-100" />
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                                <p v-else class="p-3">No Virments</p>
+                            </div>
+                        </template>
+                    </DataTable>
 
-            <div class="col-md-12 mt-3">
-
-                <table class="table table-bordered w-100 table-condensed">
+             <!--    <table class="table table-bordered w-100 table-condensed">
                     <thead>
                         <tr>
                             <th>S/N</th>
                             <th>Subhead</th>
                             <th>Amount</th>
+                            <th>Balance</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -102,8 +161,6 @@
                             <td>{{ index + 1 }}</td>
                             <td>
                                 <span v-if="!cat?.isEditing">{{ cat.subhead_item }}</span>
-                                <!--<Dropdown v-else v-model="cat.subhead_id" :options="subheads" optionLabel="name"
-                                    optionValue="id" placeholder="Select a subhead" class="w-100" /> -->
                                     <BaseItemSelect v-else v-model="cat.item_name_id" url="subhead_item_name" optionLabel="name"
                                     optionValue="id" />
                             </td>
@@ -112,9 +169,12 @@
                                 <InputText v-else v-model="cat.amount" class="p-1 w-100" />
                             </td>
                             <td>
+                                <span>{{$globals.currency(cat.balance) }}</span>
+                            </td>
+                            <td>
                                 <div class="row">
                                     <div class="col-2 col-md-5 px-2" v-if="!cat?.isEditing">
-                                        <button @click="cat.isEditing = true"
+                                        <button @click="promptVirement(cat)"
                                             class="btn btn-white btn-outline-primary py-2 btn-sm py-21 rounded-circle"><span
                                                 class="pi pi-pencil"></span> </button>
                                     </div>
@@ -133,7 +193,7 @@
                             </td>
                         </tr>
                     </tbody>
-                </table>
+                </table> -->
             </div>
         </div>
         <Teleport to="#modalFooterConfig">
@@ -153,6 +213,10 @@ import InlineMessage from 'primevue/InlineMessage';
 import Button from 'primevue/button';
 import MonthYearSelector from '../MonthYearSelector.vue';
 import BaseItemSelect from './BaseItemSelect.vue'
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';
+import Row from 'primevue/row';
 export default {
     components: {
         Dropdown,
@@ -162,7 +226,11 @@ export default {
         InputGroup,
         InputGroupAddon,
         Button,
-        BaseItemSelect
+        BaseItemSelect,
+        ColumnGroup,
+        Column,
+        Row,
+        DataTable,
 
     },
 
@@ -177,6 +245,8 @@ export default {
             fund_categories: [],
             monthSelected: null,
             selected_sub_head_budget:null,
+            expandedRows:null,
+            editingRows:null
         }
     },
     async created() {
@@ -244,6 +314,84 @@ export default {
                 Swal.fire("Failed to load budgets");
             }
         },
+        async promptVirement(subHeadBudgetItem) {
+            const { value: isVirement } = await Swal.fire({
+                title: 'Virement Confirmation',
+                text: 'Is this a virement?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No'
+            });
+            console.log(isVirement)
+            if (isVirement) {
+                this.handleVirement(subHeadBudgetItem);
+            } else {
+               /*  // Continue with regular edit
+                DomHandler.find(document.body, '.p-row-editor-init')[2].click();
+ */
+                subHeadBudgetItem.isEditing = true;
+            }
+        },
+
+        async handleVirement(subHeadBudgetItem) {
+            try {
+                // Fetch all subhead budget items except the selected one
+
+
+                // Filter out the current item
+                const filteredItems = this.sub_head_budget_items.filter(item => item.id !== subHeadBudgetItem.id);
+
+                // Prompt user to select destination subhead budget item
+                const { value: { selectedDestination, transferAmount } } = await Swal.fire({
+                title: 'Virement Confirmation',
+                html:
+                    `<div>
+                        <label for="destination" class='text-left'>Select Destination:</label>
+                        <select id="destination" class="form-control border mb-3">
+                            ${filteredItems.map(item => `<option value="${item.id}">${item.subhead_item} - (${item.amount})</option>`).join('')}
+                        </select>
+                        <label for="amount" class='text-left'>Amount to Transfer:</label>
+                        <input id="amount" type="number" class="form-control">
+                    </div>`,
+                focusConfirm: false,
+                preConfirm: async () => {
+                    const selectedDestination = document.getElementById('destination').value;
+                    const transferAmount = document.getElementById('amount').value;
+                    const res = await postData('sub_head_budget_item/virement', {
+                        source_id: subHeadBudgetItem.id,
+                        destination_id: selectedDestination,
+                        amount: parseFloat(transferAmount)
+                    });
+                    if(res !== 'success'){
+                        Swal.showValidationMessage(`Request failed`);
+                    }else{
+
+                        this.loadSubheadBudgetItems()
+                        return { selectedDestination, transferAmount };
+                    }
+                },
+                showCancelButton: true,
+                didOpen: () => {
+                    // Set default amount to transfer as the current amount
+                    document.getElementById('amount').value = 0;
+                },
+                inputValidator: (value) => {
+                    if (!value.selectedDestination) {
+                        return 'You need to select a destination';
+                    }
+                    if (!value.transferAmount || value.transferAmount <= 0) {
+                        return 'Please enter a valid amount to transfer';
+                    }
+                }
+            });
+
+        } catch (error) {
+            //console.error("Failed to handle virement", error);
+            Swal.fire("Failed to handle virement");
+        }
+        },
+
         async loadSubheadBudgetItems() {
             try {
                 this.$emit('isLoading', true)
@@ -256,7 +404,9 @@ export default {
                 Swal.fire("Failed to load budgets");
             }
         },
-        async saveSubheadBudgetItem(subHeadBudgetItem) {
+        async saveSubheadBudgetItem(data) {
+            const subHeadBudgetItem = data.newData
+
             if (!subHeadBudgetItem.amount || subHeadBudgetItem.amount === '') {
                 Swal.fire("Amount is required");
                 return false;
@@ -266,7 +416,7 @@ export default {
                 Swal.fire("Subhead Budget is required");
                 return false;
             }
-
+            subHeadBudgetItem.amount = parseFloat(subHeadBudgetItem.amount);
             subHeadBudgetItem.isLoading = true;
             try {
                 await postData('sub_head_budget_item/save', subHeadBudgetItem);

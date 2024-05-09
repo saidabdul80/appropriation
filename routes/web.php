@@ -13,6 +13,7 @@ use App\Http\Controllers\SubHeadBudgetController;
 use App\Http\Controllers\SubheadBudgetItemController;
 use App\Http\Controllers\SubheadBudgetItemNameController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VirementController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +90,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::get('/sub_head_budget_item/subhead_budget/{id}', [SubheadBudgetItemController::class, 'bySubheadBudgetId']);
     Route::post('/sub_head_budget_item/save', [SubheadBudgetItemController::class, 'updateCreate']);
     Route::post('/sub_head_budget_item/delete/{id}', [SubheadBudgetItemController::class, 'destroy']);
+    Route::post('/sub_head_budget_item/virement', [VirementController::class, 'subheadBudgetItem']);
 
 
     Route::post('/subhead_item_name/create', [SubheadBudgetItemNameController::class, 'store']);

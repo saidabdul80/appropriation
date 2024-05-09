@@ -1,33 +1,6 @@
 <template>
   <div class="p-3 rounded-lg-only shadow-lg-only bg-white" style="height: inherit;overflow: hidden;">
- <!--    <v-popup group="templating">
-      <template #container="{ message, acceptCallback, rejectCallback }">
-        <div class="scrollable-container" style="height: 260px; overflow-y: auto;cursor: grab;user-select: none;"
-          @mousedown="startDragging" @mouseup="stopDragging" @mouseleave="stopDragging" @mousemove="scrollOnDrag">
-          <div class="scrollable-content" ref="scrollContent" style="width: 100%;">
-            <table class="table w-100 h-100" style="position: relative;">
-              <thead style="position: sticky; top: 0; z-index: 1;" class="bg-white">
-                <tr>
-                  <th>Subhead</th>
-                  <th>Amount (₦)</th>
-                  <th>Balance (₦)</th>
-                </tr>
-              </thead>
-              <tbody style="margin-top: 20px;">
-                <tr v-for="(cat, index) in sub_head_budgets" :class="cat.amount > cat.balance ? 'text-success' : ''"
-                  :key="index" style="font-size: 0.9em;">
-                  <td>{{ cat.subhead }}</td>
-                  <td>{{ $globals.currency(cat.amount) }}</td>
-                  <td>{{ $globals.currency(cat.balance) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </template>
-    </v-popup> -->
 
-    <div>
       <div class="row w-100">
         <div class="col-md-4 col-lg-3">
           <button @click="$emit('switch-page', 1)" class="btn fs-9 btn-primary text-white rounded" style=""><span
@@ -36,6 +9,9 @@
               class="pi pi-refresh"></span></button>
           <button @click="exportToExcel()" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
               class="pi pi-file-export"></span></button>
+          <button @click="toggleSheet" class="btn fs-9 ms-3 btn-primary text-white rounded" style=""><span
+              class="pi pi-window-maximize"></span></button>
+
         </div>
         <div class="col-md-5 col-lg-6 mb-3">
 
@@ -76,144 +52,160 @@
       <!-- <div class="btn-group" role="group" aria-label="Basic example2">
         </div> -->
       <Divider />
-      <div class="row">
-        <div class="col-md-3">
-          <p class="inline-block mb-2 me-4"><b>Income:</b><span>&#8358;</span>
-            {{ $globals.currency(selected_appropriation_income, converCurrency) }}</p>
-          <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span>
-            {{ $globals.currency(selected_appropriation_balance, converCurrency) }}</p>
-        </div>
-        <div class="col-md-3">
-          <p class="inline-block mb-0"><b>Total Expenditure: <span>&#8358;</span></b>
-            {{ $globals.currency(total_expenditure_appropriation, converCurrency) }}</p>
-        </div>
-        <div class="col-md-3">
-            <PopUp label="More details" :items="transformData(sub_head_budgets)" />
+      <div class="table-containerx" >
+            <div class="row">
+                <div class="col-md-3">
+                <p class="inline-block mb-2 me-4"><b>Income:</b><span>&#8358;</span>
+                    {{ $globals.currency(selected_appropriation_income, converCurrency) }}</p>
+                <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span>
+                    {{ $globals.currency(selected_appropriation_balance, converCurrency) }}</p>
+                </div>
+                <div class="col-md-3">
+                <p class="inline-block mb-0"><b>Total Expenditure: <span>&#8358;</span></b>
+                    {{ $globals.currency(total_expenditure_appropriation, converCurrency) }}</p>
+                </div>
+                <div class="col-md-3">
+                    <PopUp label="More details" :items="transformData(sub_head_budgets)" />
+                </div>
+            </div>
+            <!-- <Divider /> -->
+            <div style="overflow: scroll;height: 68%" :key="tableKey">
+            <table v-if="filters.group !='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
+                style="min-width:1000px;">
+                <thead>
+                <!--   <tr :class="!converCurrency?'':'d-none'">
+                        <th colspan="6"></th>
+                        <th colspan="6"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department}}</b>Transactions</th>
+                    </tr> -->
+                <tr>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
+                    <th v-for="header in Object.keys(dynamicData)" :data-name="header"
+                    class="fs-8 fw-bold" style="white-space: nowrap;">
+                    <div class="d-flex" style="justify-content: space-between; align-items: center;">
+
+                        <button class="btn btn-white text-danger btn-sm p-1" @click="removeColumn(header)">
+                            <span class="pi pi-times "></span>
+                        </button>
+                        {{ header.replaceAll('_', ' ') }}
+                    </div>
+                    </th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
+                    <th>#</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- {{ resetTotalExpenditureForAppropriation() }} -->
+                <tr v-for="(appr, i) in transactions?.data">
+                    <td>{{ parseInt(i + 1) }} </td>
+                    <td>{{ appr.head }}</td>
+                    <td>{{ appr.subhead }}</td>
+                    <td>{{ appr.subhead_item }}</td>
+                    <td v-for="key in Object.keys(dynamicData)" class="" style="white-space: nowrap;">
+                    <span v-if="key.includes('₦')">
+                        {{ $globals.currency(appr.data && appr.data[key] ? appr.data[key] : 0, converCurrency)
+                        }}
+                    </span>
+                    <span v-else>
+                        <span v-if="appr.data[key] && (appr.data[key].type || 'text') === 'number'">
+                        <span v-if="key.includes('Account')">{{ appr.data[key].value }}</span>
+                        <span v-else>
+                            {{ $globals.currency(appr.data[key].value || 0, converCurrency) }}
+                        </span>
+                        </span>
+                        <span v-else>
+                        {{ appr.data[key] ? appr.data[key].value : '' }}
+                        </span>
+                    </span>
+                    </td>
+
+                    <td>{{ $globals.currency(appr.amount, converCurrency) }} </td>
+                    <td class="p-0">
+                    <button @click="editAppropriationTransaction(appr, i)"
+                        class="btn btn-info d-inline-block text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
+                    <button @click="deleteAppropriationTransaction(appr, i)" class="btn btn-danger btn-sm d-inline-block"><i
+                        class="fs-9 bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot class="d-none">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td v-for="(key, index) in Object.keys(dynamicData)">
+                    <span v-if="index == Object.keys(dynamicData)?.length - 2">Total</span>
+                    <span v-if="index == Object.keys(dynamicData)?.length - 1">{{
+                        $globals.currency(total_expenditure_appropriation, converCurrency) }}</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6"></td>
+                    <td colspan="2" class="inline-block mb-2 me-4"><b>Income:</b></td>
+                    <td colspan="2"><span>&#8358;</span> {{ $globals.currency(selected_appropriation_income,
+                    converCurrency)
+                    }}</td>
+
+                </tr>
+                <tr>
+                    <td colspan="6"></td>
+                    <td colspan="2" class="inline-block mb-0"><b>Total Expenditure: </b></td>
+                    <td colspan="2"><span>&#8358;</span> {{
+                    $globals.currency(total_expenditure_appropriation, converCurrency) }}</td>
+                </tr>
+                </tfoot>
+            </table>
+            <table v-if="filters.group =='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable">
+                <thead>
+                <tr>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Date</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Particulars</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Payment</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Total</th>
+                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Balance</th>
+                    <th>#</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(tra,i) in transactions?.data">
+                    <td>{{ i+1 }}</td>
+                    <td>{{ tra.payment_date }}</td>
+                    <td>{{ tra.name }}</td>
+                    <td>{{ $globals.currency( tra.amount,converCurrency ) }}</td>
+                    <td>{{ $globals.currency( tra.total, converCurrency) }}</td>
+                    <td>{{ $globals.currency( tra.balance, converCurrency) }}</td>
+                </tr>
+                </tbody>
+                <tfoot class="d-none">
+                <tr></tr>
+                <tr>
+                    <td></td><td></td>
+                    <td><span>APPROPRIATION:</span></td>
+                    <td></td>
+                    <td><span >{{$globals.currency(selected_appropriation_income, converCurrency) }}</span></td>
+                    <td><span >{{$globals.currency(selected_appropriation_income -total_expenditure_appropriation, converCurrency) }}</span></td>
+                </tr>
+                </tfoot>
+            </table>
+            </div>
+    </div>
+    <teleport to="body">
+        <div v-if="showSheet">
+        <div class="table-sheet-overlay" @click="toggleSheet"></div>
+      <div  class="table-sheet pullUp">
+        <button @click="toggleSheet" class="pi pi-times btn btn-light text-danger pull-right"></button>
+        <div class="sheet-content">
+          <!-- Placeholder for the table -->
+          <div id="tableContainerx" style="width:100%;height:100%; overflow: auto;"></div>
         </div>
       </div>
-      <!-- <Divider /> -->
-    </div>
-    <div style="overflow: scroll;height: 68%" :key="tableKey">
-      <table v-if="filters.group !='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
-        style="min-width:1000px;">
-        <thead>
-          <!--   <tr :class="!converCurrency?'':'d-none'">
-                <th colspan="6"></th>
-                <th colspan="6"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department}}</b>Transactions</th>
-            </tr> -->
-          <tr>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
-            <th v-for="header in Object.keys(dynamicData)" :data-name="header"
-              class="fs-8 fw-bold position-relative" style="white-space: nowrap;">
-              <div class="thoverlay" @click="removeColumn(header)">
-                <span class="pi pi-times "></span>
-              </div>
-              {{ header.replaceAll('_', ' ') }}
-            </th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- {{ resetTotalExpenditureForAppropriation() }} -->
-          <tr v-for="(appr, i) in transactions?.data">
-            <td>{{ parseInt(i + 1) }} </td>
-            <td>{{ appr.head }}</td>
-            <td>{{ appr.subhead }}</td>
-            <td>{{ appr.subhead_item }}</td>
-            <td v-for="key in Object.keys(dynamicData)" class="" style="white-space: nowrap;">
-              <span v-if="key.includes('₦')">
-                {{ $globals.currency(appr.data && appr.data[key] ? appr.data[key] : 0, converCurrency)
-                }}
-              </span>
-              <span v-else>
-                <span v-if="appr.data[key] && (appr.data[key].type || 'text') === 'number'">
-                  <span v-if="key.includes('Account')">{{ appr.data[key].value }}</span>
-                  <span v-else>
-                    {{ $globals.currency(appr.data[key].value || 0, converCurrency) }}
-                  </span>
-                </span>
-                <span v-else>
-                  {{ appr.data[key] ? appr.data[key].value : '' }}
-                </span>
-              </span>
-            </td>
-
-            <td>{{ $globals.currency(appr.amount, converCurrency) }} </td>
-            <td class="p-0">
-              <button @click="editAppropriationTransaction(appr, i)"
-                class="btn btn-info d-inline-block text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
-              <button @click="deleteAppropriationTransaction(appr, i)" class="btn btn-danger btn-sm d-inline-block"><i
-                  class="fs-9 bi bi-trash"></i></button>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot class="d-none">
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td v-for="(key, index) in Object.keys(dynamicData)">
-              <span v-if="index == Object.keys(dynamicData)?.length - 2">Total</span>
-              <span v-if="index == Object.keys(dynamicData)?.length - 1">{{
-                $globals.currency(total_expenditure_appropriation, converCurrency) }}</span>
-            </td>
-          </tr>
-
-          <tr>
-            <td colspan="6"></td>
-            <td colspan="2" class="inline-block mb-2 me-4"><b>Income:</b></td>
-            <td colspan="2"><span>&#8358;</span> {{ $globals.currency(selected_appropriation_income,
-              converCurrency)
-              }}</td>
-
-          </tr>
-          <tr>
-            <td colspan="6"></td>
-            <td colspan="2" class="inline-block mb-0"><b>Total Expenditure: </b></td>
-            <td colspan="2"><span>&#8358;</span> {{
-              $globals.currency(total_expenditure_appropriation, converCurrency) }}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <table v-if="filters.group =='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable">
-        <thead>
-          <tr>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Date</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Particulars</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Payment</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Total</th>
-            <th class="fs-8 fw-bold" style="white-space: nowrap;">Balance</th>
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(tra,i) in transactions?.data">
-            <td>{{ i+1 }}</td>
-            <td>{{ tra.payment_date }}</td>
-            <td>{{ tra.name }}</td>
-            <td>{{ $globals.currency( tra.amount,converCurrency ) }}</td>
-            <td>{{ $globals.currency( tra.total, converCurrency) }}</td>
-            <td>{{ $globals.currency( tra.balance, converCurrency) }}</td>
-          </tr>
-        </tbody>
-        <tfoot class="d-none">
-          <tr></tr>
-          <tr>
-            <td></td><td></td>
-            <td><span>APPROPRIATION:</span></td>
-            <td></td>
-            <td><span >{{$globals.currency(selected_appropriation_income, converCurrency) }}</span></td>
-            <td><span >{{$globals.currency(selected_appropriation_income -total_expenditure_appropriation, converCurrency) }}</span></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
@@ -295,6 +287,7 @@ export default {
       converCurrency: true,
       deletedColumns: [],
       deletedCellsMap: new Map(),
+      showSheet:false,
     }
   },
   computed: {
@@ -314,7 +307,18 @@ export default {
 
   },
   methods: {
-
+    toggleSheet() {
+      this.showSheet = !this.showSheet;
+      if (this.showSheet) {
+        // Move the table to the sheet when showing the sheet
+        setTimeout(()=>{
+            document.getElementById('tableContainerx').appendChild(document.querySelector('.table-containerx'));
+        },300)
+      } else {
+        // Move the table back to its original container when hiding the sheet
+        document.querySelector('.table-containerx').appendChild(document.querySelector('.table-containerx'));
+      }
+    },
     exportToExcel() {
       this.converCurrency = false;
       const table = document.getElementById('myTable');
@@ -656,5 +660,42 @@ td {
 .dragging {
   opacity: 0.5;
   box-shadow: 1px 2px 3px #000;
+}
+
+/* Styles for the table sheet and overlay */
+.table-containerx {
+  position: relative; /* Ensure it can contain the absolute positioned sheet */
+  height: 100%; /* Adjust as needed */
+}
+
+.table-sheet {
+  position: fixed; /* Position fixed to overlay on top of everything */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+}
+
+.table-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 98;
+}
+
+.sheet-content {
+    position: absolute; /* Position absolute to overlay on top of overlay */
+    bottom:0px;
+    width:100%;
+    padding:20px 20px;
+    height:80vh ;
+    border-radius:25px 25px 0px 0px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
 }
 </style>

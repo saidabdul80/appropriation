@@ -158,7 +158,7 @@
     </Transition> -->
 
 </div>
-<div id="modal-10" class="effect-modal md-effect-10" style="min-width: 80% !important;">
+<div id="modal-10" class="effect-modal md-effect-10" style="width: 80%;">
     <config-modal  class="effect-content"  />
 </div>
 <div class="md-overlay"></div>

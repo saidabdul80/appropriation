@@ -27,7 +27,7 @@
               aria-label="Close"></button>
           </div>
         </div>
-        <div class="modal-body mt-0 px-3" style="height: 75vh;overflow-y: auto;">
+        <div class="modal-body mt-0 px-3" style="height: 75vh;overflow: auto;">
           <DepartmentComponent @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>
           <SubHead @oncompleted="oncompleted"     v-if="selectedTab == 'exp'" />
           <HeadSubHeadSync @isLoading="loader($event,'exp-dept')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-dept'"  />

@@ -17,6 +17,8 @@ class SubheadBudgetItem extends Model
         'updated_at',
     ];
 
+    protected $with = ['virments'];
+
     public function itemName()
     {
         return $this->belongsTo(SubheadBudgetItemName::class, 'item_name_id');
@@ -51,6 +53,9 @@ class SubheadBudgetItem extends Model
         return $this->amount - Transaction::sumAmountForSubheadItem($this->id);
     }
 
+    public function virments(){
+        return $this->hasMany(Virement::class,'source_id');
+    }
 
     protected $appends = ['subhead_item','balance'];
 }
