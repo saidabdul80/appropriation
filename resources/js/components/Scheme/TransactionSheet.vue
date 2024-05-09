@@ -52,148 +52,13 @@
       <!-- <div class="btn-group" role="group" aria-label="Basic example2">
         </div> -->
       <Divider />
-      <div class="table-containerx" >
-            <div class="row">
-                <div class="col-md-3">
-                <p class="inline-block mb-2 me-4"><b>Income:</b><span>&#8358;</span>
-                    {{ $globals.currency(selected_appropriation_income, converCurrency) }}</p>
-                <p class="inline-block mb-2 me-4"><b>Balance:</b><span>&#8358;</span>
-                    {{ $globals.currency(selected_appropriation_balance, converCurrency) }}</p>
-                </div>
-                <div class="col-md-3">
-                <p class="inline-block mb-0"><b>Total Expenditure: <span>&#8358;</span></b>
-                    {{ $globals.currency(total_expenditure_appropriation, converCurrency) }}</p>
-                </div>
-                <div class="col-md-3">
-                    <PopUp label="More details" :items="transformData(sub_head_budgets)" />
-                </div>
-            </div>
-            <!-- <Divider /> -->
-            <div style="overflow: scroll;height: 68%" :key="tableKey">
-            <table v-if="filters.group !='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
-                style="min-width:1000px;">
-                <thead>
-                <!--   <tr :class="!converCurrency?'':'d-none'">
-                        <th colspan="6"></th>
-                        <th colspan="6"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department}}</b>Transactions</th>
-                    </tr> -->
-                <tr>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
-                    <th v-for="header in Object.keys(dynamicData)" :data-name="header"
-                    class="fs-8 fw-bold" style="white-space: nowrap;">
-                    <div class="d-flex" style="justify-content: space-between; align-items: center;">
-
-                        <button class="btn btn-white text-danger btn-sm p-1" @click="removeColumn(header)">
-                            <span class="pi pi-times "></span>
-                        </button>
-                        {{ header.replaceAll('_', ' ') }}
-                    </div>
-                    </th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
-                    <th>#</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- {{ resetTotalExpenditureForAppropriation() }} -->
-                <tr v-for="(appr, i) in transactions?.data">
-                    <td>{{ parseInt(i + 1) }} </td>
-                    <td>{{ appr.head }}</td>
-                    <td>{{ appr.subhead }}</td>
-                    <td>{{ appr.subhead_item }}</td>
-                    <td v-for="key in Object.keys(dynamicData)" class="" style="white-space: nowrap;">
-                    <span v-if="key.includes('₦')">
-                        {{ $globals.currency(appr.data && appr.data[key] ? appr.data[key] : 0, converCurrency)
-                        }}
-                    </span>
-                    <span v-else>
-                        <span v-if="appr.data[key] && (appr.data[key].type || 'text') === 'number'">
-                        <span v-if="key.includes('Account')">{{ appr.data[key].value }}</span>
-                        <span v-else>
-                            {{ $globals.currency(appr.data[key].value || 0, converCurrency) }}
-                        </span>
-                        </span>
-                        <span v-else>
-                        {{ appr.data[key] ? appr.data[key].value : '' }}
-                        </span>
-                    </span>
-                    </td>
-
-                    <td>{{ $globals.currency(appr.amount, converCurrency) }} </td>
-                    <td class="p-0">
-                    <button @click="editAppropriationTransaction(appr, i)"
-                        class="btn btn-info d-inline-block text-white btn-sm me-1"><i class="fs-9 bi bi-pencil"></i></button>
-                    <button @click="deleteAppropriationTransaction(appr, i)" class="btn btn-danger btn-sm d-inline-block"><i
-                        class="fs-9 bi bi-trash"></i></button>
-                    </td>
-                </tr>
-                </tbody>
-                <tfoot class="d-none">
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td v-for="(key, index) in Object.keys(dynamicData)">
-                    <span v-if="index == Object.keys(dynamicData)?.length - 2">Total</span>
-                    <span v-if="index == Object.keys(dynamicData)?.length - 1">{{
-                        $globals.currency(total_expenditure_appropriation, converCurrency) }}</span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="6"></td>
-                    <td colspan="2" class="inline-block mb-2 me-4"><b>Income:</b></td>
-                    <td colspan="2"><span>&#8358;</span> {{ $globals.currency(selected_appropriation_income,
-                    converCurrency)
-                    }}</td>
-
-                </tr>
-                <tr>
-                    <td colspan="6"></td>
-                    <td colspan="2" class="inline-block mb-0"><b>Total Expenditure: </b></td>
-                    <td colspan="2"><span>&#8358;</span> {{
-                    $globals.currency(total_expenditure_appropriation, converCurrency) }}</td>
-                </tr>
-                </tfoot>
-            </table>
-            <table v-if="filters.group =='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable">
-                <thead>
-                <tr>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Date</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Particulars</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Payment</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Total</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Balance</th>
-                    <th>#</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(tra,i) in transactions?.data">
-                    <td>{{ i+1 }}</td>
-                    <td>{{ tra.payment_date }}</td>
-                    <td>{{ tra.name }}</td>
-                    <td>{{ $globals.currency( tra.amount,converCurrency ) }}</td>
-                    <td>{{ $globals.currency( tra.total, converCurrency) }}</td>
-                    <td>{{ $globals.currency( tra.balance, converCurrency) }}</td>
-                </tr>
-                </tbody>
-                <tfoot class="d-none">
-                <tr></tr>
-                <tr>
-                    <td></td><td></td>
-                    <td><span>APPROPRIATION:</span></td>
-                    <td></td>
-                    <td><span >{{$globals.currency(selected_appropriation_income, converCurrency) }}</span></td>
-                    <td><span >{{$globals.currency(selected_appropriation_income -total_expenditure_appropriation, converCurrency) }}</span></td>
-                </tr>
-                </tfoot>
-            </table>
-            </div>
-    </div>
+      <TableSheet
+        ref="trxSheet"
+        :converCurrency="converCurrency"
+        :filters_date="filters_date"
+        :filters_grouping="filters_grouping"
+        :filters="filters"
+        />
     <teleport to="body">
         <div v-if="showSheet">
         <div class="table-sheet-overlay" @click="toggleSheet"></div>
@@ -201,7 +66,15 @@
         <button @click="toggleSheet" class="pi pi-times btn btn-light text-danger pull-right"></button>
         <div class="sheet-content">
           <!-- Placeholder for the table -->
-          <div id="tableContainerx" style="width:100%;height:100%; overflow: auto;"></div>
+          <div id="tableContainerx" style="width:100%;height:100%; overflow: auto;">
+            <TableSheet
+                ref="trxSheet"
+                :converCurrency="converCurrency"
+                :filters_date="filters_date"
+                :filters_grouping="filters_grouping"
+                :filters="filters"
+                />
+            </div>
         </div>
       </div>
       </div>
@@ -216,7 +89,7 @@ import Calendar from 'primevue/calendar';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import { utils, writeFileXLSX } from "xlsx";
-
+import TableSheet from './Transaction/TableSheet.vue';
 import InlineMessage from 'primevue/InlineMessage';
 import TreeSelect from 'primevue/treeselect';
 
@@ -234,7 +107,8 @@ export default {
     InputGroupAddon,
     TreeSelect,
     PopUp,
-    InlineMessage
+    InlineMessage,
+    TableSheet
   },
   props: {
     agency_name: {
@@ -278,312 +152,50 @@ export default {
         }
       ],
       filters: { date: null, group:null },
-      selected_appropriation_balance: 0,
-      selected_appropriation_income: 0,
       transactions: { data: [] },
-      tableKey:0,
+
       dynamicData: {...this.$globals.dynamic_data},
-      sub_head_budgets: [],
       converCurrency: true,
       deletedColumns: [],
-      deletedCellsMap: new Map(),
       showSheet:false,
     }
   },
-  computed: {
-    total_expenditure_appropriation() {
-      return this.transactions?.data?.reduce((accumulator, currentTransaction) => accumulator + currentTransaction.amount, 0)
-    },
-    maxColumns() {
-      const max = this.transactions?.data?.reduce((acc, appr) => {
-        return Math.max(acc, Object.keys(appr.data).length);
-      }, 0);
-      return max + 3; // Adjust for static columns (index, amount, action buttons)
-    }
-  },
   async created() {
-    await this.fetchWalletBalance()
-    await this.fetchTransactions()
+
 
   },
   methods: {
     toggleSheet() {
       this.showSheet = !this.showSheet;
-      if (this.showSheet) {
-        // Move the table to the sheet when showing the sheet
-        setTimeout(()=>{
-            document.getElementById('tableContainerx').appendChild(document.querySelector('.table-containerx'));
-        },300)
-      } else {
-        // Move the table back to its original container when hiding the sheet
-        document.querySelector('.table-containerx').appendChild(document.querySelector('.table-containerx'));
-      }
     },
-    exportToExcel() {
-      this.converCurrency = false;
-      const table = document.getElementById('myTable');
-      const wb = utils.table_to_book(table);
-      const sheetName = Object.keys(wb.Sheets)[0]; // Assuming only one sheet
-      const ws = wb.Sheets[sheetName];
-      /*  const lastRowIndex = ws['!ref'].split(':')[1].replace(/\D/g, '');
-       ws[`C${parseInt(lastRowIndex) + 1}`] = { t: 's', v: "Balance" };
-       ws[`D${parseInt(lastRowIndex) + 1}`] = { t: 'n', v: this.selected_appropriation_balance };
-       console.log()
-       ws[`C${parseInt(lastRowIndex) + 2}`] = { t: 's', v: "Total Expenditure" };
-       ws[`D${parseInt(lastRowIndex) + 2}`] = { t: 'n', v: this.total_expenditure_appropriation };
-        */
-      writeFileXLSX(wb, "transaction_reports.xlsx");
-      setTimeout(() => {
-        this.converCurrency = true;
-      }, 1000)
-    },
+
     async filterTransaction() {
-        await this.fetchWalletBalance()
-      await this.fetchTransactions()
+       await this.$refs.trxSheet.fetchWalletBalance()
+      await this.$refs.trxSheet.fetchTransactions()
     },
     async reloadTransaction() {
-        //console.log(this.dynamicData,232323)
-        this.filters= { date: null, group:null }
-        await this.fetchWalletBalance()
-        await this.fetchTransactions()
-        this.tableKey++
-    },
-    editAppropriationTransaction(appr, i) {
-      this.$emit('openDebitModal', {
-        transaction: { ...appr },
-        index: i
-      })
-      //this.markSelectedDynamicField()
-    },
-    async fetchTransactions() {
-      try {
+      this.filters = { date: null, group: null }
+      await this.$refs.trxSheet.fetchTransactions();
 
-        let page_type = localStorage.getItem('page_type')
-        let owner_ids = []
-        if (page_type == 'single') {
-            owner_ids = [this.selected_appropriation.id]
-        } else {
-          let appropriations = JSON.parse(localStorage.getItem('appropriations'));
-          owner_ids = appropriations.map(item => item.id);
-        }
-        let res = await postData('/get_transactions', {
-          owner_id: owner_ids,
-          owner_type: 'appropriation',
-          fund_category: this.fund_category,
-          filters: this.filters
-        }, true);
-
-        if (res.status == 200) {
-          this.transactions = res.data
-          setTimeout(() => {
-            //this.iniTableTransaction()
-          }, 100)
-        } else {
-          showAlert('Something went wrong');
-        }
-
-        if (page_type === 'single') {
-          let res2 = await getData(`sub_head_budget/appropriation/${this.selected_appropriation.id}/${this.fund_category}`);
-          let res3 = await getData(`sub_head_budget/appropriation/${this.selected_appropriation.id}/${this.fund_category}`);
-          this.sub_head_budgets = res2?.data || [];
-          //this.sub_head_budgets = res2?.data || [];
-        } else {
-          this.sub_head_budgets = []
-        }
-      } catch (e) {
-        console.log('tranx error: ' + e)
-      }
     },
-    transformData(data) {
-         const transformedData =[]
-        data.forEach((subheadBudget,index) => {
-            const subheadBudgetItemChildren = subheadBudget.subhead_budget_items.map((subheadBudgetItem,inddex) => ({
-                  name: subheadBudgetItem.subhead_item,
-                  amount:subheadBudgetItem.amount,
-                  balance:subheadBudgetItem.balance
-            }));
 
-            transformedData.push({
-                name: subheadBudget.subhead,
-                amount:subheadBudget.amount,
-                balance:subheadBudget.balance,
-                children: subheadBudgetItemChildren
-            });
-        });
-
-        return transformedData;
-    },
-    async fetchWalletBalance() {
-      let page_type = localStorage.getItem('page_type')
-      let owner_ids = []
-      if (page_type == 'single') {
-        owner_ids = [this.selected_appropriation.id]
-      } else {
-        let appropriations = JSON.parse(localStorage.getItem('appropriations'));
-        owner_ids = appropriations.map(item => item.id);
-      }
-      let res = await postData('/get_wallet_detail', {
-        fund_category: this.fund_category,
-        owner_id: owner_ids,
-        owner_type: 'appropriation'
-      }, true)
-      if (res.status == 200) {
-        this.selected_appropriation_balance = res.data?.balance
-        this.selected_appropriation_income = res.data?.income
-      }
-    },
     resetTotalExpenditureForAppropriation() {
       // Implement your logic for resetting total expenditure
     },
-    async deleteAppropriationTransaction(appr, i) {
-      const confirmText = appr.data.Subject.value + ' of ' + appr.amount;
-      const { value: confirmationText } = await Swal.fire({
-        title: 'Continue Delete?',
-        html: 'Please type <strong class="fs-9 text-primary"><i>' + confirmText + '</i></strong> to confirm:',
-        input: 'text',
-        inputPlaceholder: 'Type the name to confirm',
-        inputAttributes: {
-          autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Continue',
-        cancelButtonText: 'Cancel',
-        preConfirm: (text) => {
-          if (text !== confirmText) {
-            Swal.showValidationMessage('Confirmation text does not match.');
-          }
-        }
-      });
 
-      if (!confirmationText) {
-        return false;
-      }
-
-      await postData('/delete_appropriation_transaction', {
-        transaction_id: appr.id,
-        owner_id: appr.owner_id,
-        fund_category: appr.fund_category
-      });
-    },
     getTotalExpenditureForAppropriation(amount) {
       // Implement your logic for getting total expenditure for appropriation
     },
-    iniTableTransaction(destroy = true) {
-      let $this = this
 
-      var table = $('.transactions-tables').DataTable({
-        dom: 'Bfrtip',
-        colReorder: true,
-        initComplete: function () {
-          table?.colReorder?.move(1, 2);
-
-        },
-        destroy: true,
-        buttons: [{
-          extend: 'print',
-          exportOptions: {
-            stripHtml: false
-          },
-          title: this.agency_name,
-          customize: (win) => {
-            $(win.document.body)
-              .css({
-                'font-size': '10pt'
-              })
-              .prepend(
-                '<style>table{width:135%}</style><svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>'
-              );
-
-            $(win.document.body).find('.table').before(`<h1 style="text-align:center;margin:10px 0px;">${this.selected_scheme?.name} - ${this.selected_appropriation?.name}/${this.selected_appropriation?.department}</h1>`)
-            $(win.document.body).find('.table').before(`<p><b>Balance:</b> ${this.$globals.currency($this.selected_appropriation_balance)}</p>`)
-          }
-        }],
-        exportOptions: {
-          stripHtml: false
-        },
-        pageLength: 10,
-      });
-    },
     switchPageFunc(page) {
       // Implement your logic for switching pages
       this.$emit('switch-page', page);
     },
-    removeColumn(refname) {
-      const table = document.getElementById('myTable');
-      const colIndex = Array.from(table.rows[0].children).findIndex(th => th.getAttribute('data-name') === refname);
 
-      if (colIndex !== -1) {
-        for (let i = 0; i < table.rows.length; i++) {
-          const cell = table.rows[i].cells[colIndex];
-          table.rows[i].deleteCell(colIndex);
-        }
-      }
-    }
 
 
   },
-  mounted() {
-    //document.addEventListener('keydown', this.handleUndo);
-    this.$nextTick(() => {
-      const table = document.getElementById('myTable');
-      let draggingCol = null;
 
-      table.querySelectorAll('th').forEach(th => {
-        th.draggable = true;
-
-        th.addEventListener('dragstart', function (e) {
-          draggingCol = this;
-          setTimeout(() => this.classList.add('dragging'), 0);
-        });
-
-        th.addEventListener('dragover', function (e) {
-          e.preventDefault();
-        });
-
-        th.addEventListener('dragenter', function (e) {
-          e.preventDefault();
-          if (this !== draggingCol) {
-            this.style.borderLeft = '3px solid blue';
-          }
-        });
-
-        th.addEventListener('dragleave', function (e) {
-          this.style.borderLeft = '';
-        });
-
-        th.addEventListener('drop', function (e) {
-          if (this !== draggingCol) {
-            swapColumns(table, draggingCol.cellIndex, this.cellIndex);
-            this.style.borderLeft = '';
-          }
-        });
-
-        th.addEventListener('dragend', function () {
-          this.classList.remove('dragging');
-        });
-
-        /*   th.addEventListener('dblclick', function () {
-            const colIndex = this.cellIndex;
-            table.querySelectorAll('tr').forEach(row => {
-              row.deleteCell(colIndex);
-            });
-          }); */
-      });
-
-      function swapColumns(table, fromIndex, toIndex) {
-        const rows = Array.from(table.querySelectorAll('tr'));
-        rows.forEach(row => {
-          const cells = Array.from(row.querySelectorAll('th, td'));
-          row.insertBefore(cells[fromIndex], cells[toIndex > fromIndex ? toIndex + 1 : toIndex]);
-        });
-      }
-
-    })
-
-
-
-
-  }
 };
 </script>
 

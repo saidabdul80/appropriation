@@ -51,6 +51,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/add_appropriation', [SchemeController::class, 'addAppropriation']);
     Route::post('/appropriation/delete/{id}', [SchemeController::class, 'deleteAppropriation']);
     Route::post('/add_scheme', [SchemeController::class, 'addScheme']);
+    Route::get('/schemes', [SchemeController::class, 'getSchemes']);
     Route::post('/fund_programme', [SchemeController::class, 'fundProgramme']);
     Route::post('/undo_fund_programme', [SchemeController::class, 'reverseFundProgramme']);
     Route::post('/fetch_fund', [FundController::class, 'fetchFund']);

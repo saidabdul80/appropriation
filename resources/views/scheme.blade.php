@@ -3,7 +3,7 @@
 use App\Models\AppropriationType;
 use App\Models\Department;
 use App\Models\Scheme;
-$schemes = Scheme::all();
+/* $schemes = Scheme::all();
 $schemes->each(function ($scheme) {
     $scheme->appropriations->each(function ($appropriation) use ($scheme) {
         $appropriation->main_balance = $appropriation->load('appropriation_histories')->appropriation_histories->sum(function ($history) use ($appropriation) {
@@ -15,7 +15,7 @@ $schemes->each(function ($scheme) {
             return 0;
         });
     });
-});
+}); */
 $departments = Department::all();
 $appropriationTypes = AppropriationType::all();
 $dyear = 2020;
@@ -29,7 +29,6 @@ $permissions = $logedInUser->permissions->pluck('name')->toArray();
 @section('content')
     <scheme-screen
         :permissions="{{ json_encode($permissions) }}"
-        :schemes="{{ json_encode($schemes) }}"
         :appropriationtypes="{{ json_encode($appropriationTypes) }}"
         :departments="{{ json_encode($departments) }}"
         :dyear="{{ $dyear }}"

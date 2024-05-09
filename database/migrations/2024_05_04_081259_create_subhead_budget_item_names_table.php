@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('subhead_budget_item_names', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('output',500);
+            $table->string('outcome',500);
             $table->timestamps();
         });
     }

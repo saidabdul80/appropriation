@@ -3,7 +3,7 @@
       <div v-if="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
           <div style="height: inherit; ">
-            <table class="table mtable table-lg driveInRight " style="min-width:1000px;">
+            <table class="table mtable table-lg  " style="min-width:1000px;">
               <thead>
                 <tr class="fw-bold">
                   <th class="small-col" >
@@ -44,7 +44,7 @@
         </div>
       </div>
       <div  v-if="switchPageOne == 1" >
-      <table class="table mtable table-lg driveInRight" style="min-width:1000px;">
+      <table class="table mtable table-lg " style="min-width:1000px;">
         <thead class="bg-light">
           <tr>
             <th>SN.</th>
@@ -69,7 +69,7 @@
       </div>
 
         <div  v-if="switchPageOne == 2" >
-          <table class="table mtable table-lg driveInRight " :key="selected_fund_category" style="min-width:1000px;">
+          <table class="table mtable table-lg  " :key="selected_fund_category" style="min-width:1000px;">
             <thead class="">
               <tr>
                 <th>SN.</th>
@@ -237,43 +237,27 @@
                 if (scheme.appropriations.findIndex(app =>app.appropriation_type_id == this.selected_appropriation.appropriation_type_id ) !=-1 && this.newAppropriation) {
                         throw new Error("Appropriation Already exist");
                     }
-                scheme.appropriations.push(this.selected_appropriation);
-
+               /*  scheme.appropriations.push(this.selected_appropriation);
+ */
                 $("#totalDividend").removeClass("bg-danger text-white");
                 $(".errorMsg").remove();
 
-                if (this.selected_appropriation.id !== "") {
+              /*   if (this.selected_appropriation.id !== "") {
                 scheme.appropriations.pop();
-                }
+                } */
 
                 this.selected_appropriation.scheme_id = this.selected_scheme.id;
 
                 const res = await postData("/add_appropriation", this.selected_appropriation, true);
-
                 if (res.status === 200) {
-                    const responseData = res.data;
-                    const app = res.data.appropriation
-                    if (!scheme.appropriations.find(app => app.scheme_id !== this.selected_appropriation.scheme_id || app.appropriation_type_id !== this.selected_appropriation.appropriation_type_id)) {
-                        scheme.appropriations.push(responseData.appropriation); // Reactive way
-                    } else {
-                        const index = scheme.appropriations.findIndex(app => app.id === this.selected_appropriation.id);
-                        scheme.appropriations[index] = { ...scheme.appropriations[index], ...this.selected_appropriation }; // Replace with a new object
-                    }
-
-                    showAlert(responseData.msg);
-                    this.selected_scheme.appropriations = scheme.appropriations.slice();
-                    this.$emit('updateSchemes',[schemeIndex,scheme.appropriations]);
-                    //this.initTable(500);
-                    /* out to scheme screen */
-                  /*   setTimeout(()=>{
-                      // location.reload();
-                    },2000) */
+                    this.$emit('updateParentSchemes', {})
                     this.showModal = false;
+                    this.$emit('closeAppModal')
                 }
             } catch (error) {
                 Swal.fire(error.message);
             }
-            this.$emit('closeAppModal')
+
         },
         selectAllAppropriation(appropriations, e){
             if(e.target.checked){
@@ -332,11 +316,12 @@
 
             if (confirmation.isConfirmed) {
                 try {
-                    await postData('/appropriation/delete/' + app?.id, {}, true);
-                    apps.splice(index, 1);
-                    Swal.fire('Deleted', 'Your item has been deleted.', 'success');
+                    const res = await postData('/appropriation/delete/' + app?.id,app);
+
+                    this.$emit('updateParentSchemes',{})
+                    //Swal.fire('Deleted', 'Your item has been deleted.', 'success');
                 } catch (error) {
-                    console.error('Error deleting item:', error);
+                    console.warn('Error deleting item:', error);
                     Swal.fire('Failed to delete item', '', 'error');
                 }
             }
@@ -447,7 +432,7 @@
       },
     },
     created() {
-
+        console.log(this.$parent,233333)
       try {
         if(this.selected_fund_category){
             this.appropriationHistoriesResolver();

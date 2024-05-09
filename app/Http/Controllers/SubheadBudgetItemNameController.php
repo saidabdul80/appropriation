@@ -23,10 +23,16 @@ class SubheadBudgetItemNameController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string|max:255|unique:expenditure_categories,name'
+                'name' => 'required|string|max:255|unique:expenditure_categories,name',
+                'outcome' => 'required|string',
+                'output' => 'required|string'
             ]);
 
-            SubheadBudgetItemName::updateOrCreate(['name' => $request->name]);
+            SubheadBudgetItemName::updateOrCreate([
+                'name' => $request->name,
+                'output' => $request->output,
+                'outcome' => $request->outcome
+            ]);
             return response()->json('Category created successfully.', 200);
         }catch(ValidationException $e){
             return response(collect($e->getMessage())->first() ?? $e->getMessage() ,400);

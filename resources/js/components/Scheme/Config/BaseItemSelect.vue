@@ -122,16 +122,38 @@
             inputAttributes: {
                 autocapitalize: "off"
             },
+            html:`<div>
+                    <label for="nameCTX" class='text-left'>Name</label>
+                    <input id="nameCTX" type="text" class="form-control mb-3">
+                    <label for="outputCTX" class='text-left'>Output</label>
+                    <input id="outputCTX" type="text" class="form-control mb-3">
+                    <label for="outcomeCTX" class='text-left'>Outcome</label>
+                    <input id="outcomeCTX" type="text" class="form-control mb-3">
+                </div>`,
             showCancelButton: true,
             confirmButtonText: "Add",
             showLoaderOnConfirm: true,
-            preConfirm: async (name) => {
+            preConfirm: async () => {
                 try {
+                    const name = document.getElementById('nameCTX').ariaValueMax;
+                    const output = document.getElementById('outputCTX').ariaValueMax;
+                    const outcome = document.getElementById('outcomeCTX').ariaValueMax;
                     if(name == ''){
                         Swal.showValidationMessage(`Name Field is Required `);
-                        return;
+                        return false;
                     }
-                   const response = await postData(this.url+'/create',{name})
+
+                    if(output == ''){
+                        Swal.showValidationMessage(`Output is Required `);
+                        return false;
+                    }
+
+                    if(outcome == ''){
+                        Swal.showValidationMessage(`Outcome Field is Required `);
+                        return false;
+                    }
+
+                    const response = await postData(this.url+'/create',{name, output, outcome})
                     this.fetchItems('')
             } catch (error) {
                     if(error =='undefined'){

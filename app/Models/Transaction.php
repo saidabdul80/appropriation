@@ -115,6 +115,13 @@ class Transaction extends Model
         return SubheadBudgetItem::find($this->subhead_item_id)?->subhead_item;
     }
 
+    public function getOutcomeAttribute(){
+        return SubheadBudgetItem::find($this->subhead_item_id)?->outcome;
+    }
+    public function getOutputAttribute(){
+        return SubheadBudgetItem::find($this->subhead_item_id)?->output;
+    }
+
     public function getHeadAttribute(){
         return SubHeadBudget::find($this->subhead_id)?->head;
     }
@@ -124,6 +131,8 @@ class Transaction extends Model
         'date_updated',
         'head',
         'subhead',
-        'subhead_item'
+        'subhead_item',
+        'outcome',
+        'output'
     ];
 }

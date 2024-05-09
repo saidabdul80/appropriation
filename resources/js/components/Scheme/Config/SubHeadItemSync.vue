@@ -128,6 +128,8 @@
                                                 class="pi pi-trash "></span> </button>
                             </template>
                         </Column>
+                        <Column field="output" header="Out Put" />
+                        <Column field="outcome" header="Out Come" />
                         <template #expansion="slotProps">
                             <div class="border rounded-3 mb-4 w-75 mx-auto">
                                 <h6 class="text-left p-3 font-bold">Virments</h6>

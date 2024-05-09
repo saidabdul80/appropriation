@@ -52,13 +52,16 @@ class SchemeController extends Controller
 
             $data = $request->only(['scheme_id', 'appropriation_type_id', 'department_id', 'percentage_dividend']);
             if($request->has('id')){
-                $appropriation = Appropriation::where('id', $request->id)->update([
+                if(!empty($request->id)){
+
+                    $appropriation = Appropriation::where('id', $request->id)->update([
                         'scheme_id' => $data['scheme_id'],
                         'appropriation_type_id' => $data['appropriation_type_id'],
                         'department_id' => $data['department_id'],
                         'percentage_dividend' => $data['percentage_dividend']
                     ]);
                     return response()->json(['appropriation' => $appropriation, 'msg' => 'Updated Successfully'], 200);
+                }
             }
 
             $appropriation = Appropriation::create([
@@ -138,7 +141,23 @@ class SchemeController extends Controller
         }
         return false;
     }
+    public function getSchemes() {
+        $schemes = Scheme::all();
+        $schemes->each(function ($scheme) {
+            $scheme->appropriations->each(function ($appropriation) use ($scheme) {
+                $appropriation->main_balance = $appropriation->load('appropriation_histories')->appropriation_histories->sum(function ($history) use ($appropriation) {
+                    foreach ($history->appropriation as $item) {
+                        if ($item['id'] == $appropriation->id) {
+                            return $item['amount'];
+                        }
+                    }
+                    return 0;
+                });
+            });
+        });
 
+        return response()->json($schemes,200);
+    }
     public function addScheme(Request $request)
     {
         try{

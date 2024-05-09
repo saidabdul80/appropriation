@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->integer('item_name_id')->comment('subhead_budget_item_names table id ');
             $table->integer('subhead_budget_id');
+            $table->string('output',500);
+            $table->string('outcome',500);
             $table->float('amount',15)->default(0.00);
             $table->timestamps();
         });

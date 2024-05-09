@@ -137,11 +137,11 @@ div.DTCR_pointer {
 			try{
 				return await axios.post(route, data).then(function(response) {
 					//switchPage(1)
-                    console.log(response)
 					$("#loaderHtml").hide()
 					if (!type) { //if false
 						showAlert(response.data);
 					} else {
+                        console.log(response,111122)
 						return response;
 					}
 				}).catch(function(error) {
