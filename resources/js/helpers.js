@@ -28,10 +28,12 @@ export const helpers = {
       }
       return '0.00';
     },
+    canPerformAction(permission,permissions) {
+        return permissions.includes(permission);
+    },
     dynamic_data:{
         Subject: { required:1, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Approval_Date: { required:1, show: 1, activate: 1, value: '', type: 'date', for: '' },
-
         Participants: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Number_of_Days: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },
         Frequency: { required:0, show: 1, activate: 1, value: '', type: 'text', for: '' },

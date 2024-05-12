@@ -31,7 +31,7 @@
           <DepartmentComponent @oncompleted="oncompleted" v-if="selectedTab == 'dept'"/>
           <SubHead @oncompleted="oncompleted"     v-if="selectedTab == 'exp'" />
           <HeadSubHeadSync @isLoading="loader($event,'exp-dept')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-dept'"  />
-          <SubHeadItemSync @isLoading="loader($event,'exp-item')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-item'"  />
+          <SubHeadItemSync :permissions="permissions" @isLoading="loader($event,'exp-item')" @oncompleted="oncompleted"     v-if="selectedTab == 'exp-item'"  />
         </div>
         <div class="modal-footer" id="modalFooterConfig" style="justify-content: space-between;">
 
@@ -56,6 +56,9 @@ import SubHeadItemSync from './../Config/SubHeadItemSync.vue'
 SubHead
 export default {
   props: {
+    permissions:{
+        default:[]
+    },
     selected_config: {
       type: Object,
       default: () => ({ id: '', name: '' }),

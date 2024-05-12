@@ -1,6 +1,7 @@
 <template>
 
 <div class="table-containerx" >
+
             <div class="row">
                 <div class="col-md-3">
                 <p class="inline-block mb-2 me-4"><b>Income:</b><span>&#8358;</span>
@@ -189,6 +190,9 @@ export default {
     filters_date:{
         default:[{ id: 'Payment_Date', name: "Payment Date" }, { id: 'Approval_Date', name: 'Approval Date' }, { id: 'created_at', name: 'Created Date' }],
     },
+    selected_appropriation:{
+        default:{}
+    },
     filters_grouping:{
     default:[
         {
@@ -276,6 +280,7 @@ export default {
         let page_type = localStorage.getItem('page_type')
         let owner_ids = []
         if (page_type == 'single') {
+
           owner_ids = [this.selected_appropriation.id]
         } else {
           let appropriations = JSON.parse(localStorage.getItem('appropriations'));

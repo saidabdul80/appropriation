@@ -22,18 +22,36 @@ class SubheadBudgetItemNameController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
+                // Validate the request data
+            $rules = [
                 'name' => 'required|string|max:255|unique:expenditure_categories,name',
                 'outcome' => 'required|string',
                 'output' => 'required|string'
-            ]);
+            ];
 
-            SubheadBudgetItemName::updateOrCreate([
-                'name' => $request->name,
-                'output' => $request->output,
-                'outcome' => $request->outcome
-            ]);
-            return response()->json('Category created successfully.', 200);
+            // If updating an existing record, exclude the current ID from unique check
+            if (!empty($request->id)) {
+                $rules['name'] .= ',' . $request->id;
+            }
+
+            $request->validate($rules);
+
+
+            if (!empty($request->id)) {
+                SubheadBudgetItemName::where('id', $request->id)->update([
+                    'name' => $request->name,
+                    'output' => $request->output,
+                    'outcome' => $request->outcome
+                ]);
+                return response()->json('Updated successfully.', 200);
+            } else {
+                SubheadBudgetItemName::create([
+                    'name' => $request->name,
+                    'output' => $request->output,
+                    'outcome' => $request->outcome
+                ]);
+                return response()->json('Created successfully.', 200);
+            }
         }catch(ValidationException $e){
             return response(collect($e->getMessage())->first() ?? $e->getMessage() ,400);
         }catch (\Exception $e) {

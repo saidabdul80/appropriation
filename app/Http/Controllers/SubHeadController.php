@@ -28,11 +28,23 @@ class SubHeadController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
+            $rules = [
                 'name' => 'required|string|max:255|unique:expenditure_categories,name'
-            ]);
+            ];
 
-            SubHead::updateOrCreate(['name' => $request->name]);
+            // If updating an existing record, exclude the current ID from unique check
+            if (!empty($request->id)) {
+                $rules['name'] .= ',' . $request->id;
+            }
+
+            $request->validate($rules);
+
+            if(!empty($request->id)){
+                SubHead::where('id', $request->id)->update(['name' => $request->name]);
+            }else{
+                SubHead::updateOrCreate(['name' => $request->name]);
+            }
+
             return response()->json('Category created successfully.', 200);
         }catch(ValidationException $e){
             return response(collect($e->getMessage())->first() ?? $e->getMessage() ,400);

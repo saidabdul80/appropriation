@@ -118,7 +118,7 @@
                         <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                         <Column>
                             <template #body="slotProps">
-                                <Button icon="pi pi-reply" title="Make Virement" class="p-1 p-button- rounded p-button-success" @click="promptVirement(slotProps.data)"></Button>
+                                <Button icon="pi pi-reply" v-if="$globals.canPerformAction('virement',permissions)" title="Make Virement" class="p-1 p-button- rounded p-button-success" @click="promptVirement(slotProps.data)"></Button>
                             </template>
                         </Column>
                         <Column>
@@ -228,6 +228,11 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
 export default {
+    props:{
+        permissions:{
+            default:[]
+        }
+    },
     components: {
         Dropdown,
         InputText,

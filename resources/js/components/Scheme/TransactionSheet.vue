@@ -58,9 +58,10 @@
         :filters_date="filters_date"
         :filters_grouping="filters_grouping"
         :filters="filters"
+        :selected_appropriation="selected_appropriation"
         />
     <teleport to="body">
-        <div v-if="showSheet">
+        <div v-show="showSheet">
         <div class="table-sheet-overlay" @click="toggleSheet"></div>
       <div  class="table-sheet pullUp">
         <button @click="toggleSheet" class="pi pi-times btn btn-light text-danger pull-right"></button>
@@ -73,6 +74,8 @@
                 :filters_date="filters_date"
                 :filters_grouping="filters_grouping"
                 :filters="filters"
+                :permissions="permissions"
+                :selected_appropriation="selected_appropriation"
                 />
             </div>
         </div>
@@ -129,6 +132,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    permissions:{
+        default:[]
+    }
   },
   data() {
     return {

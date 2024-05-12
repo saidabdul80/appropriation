@@ -86,6 +86,7 @@
                     :selected_appropriation="selected_transcation_appropriation"
                     :fund_category="selected_fund_category"
                     agency_name=""
+                    :permissions="permissions"
                     @switch-page="switchPageFunc"
                     @openDebitModal="openDebitModalForTransaction"
                   />
@@ -143,7 +144,7 @@
         />
       </transition>
       <div id="modal-10" class="effect-modal md-effect-10" style="width: 80%;">
-        <config-modal  class="effect-content"  />
+        <config-modal :permissions="permissions"  class="effect-content"  />
         </div>
         <div class="md-overlay"></div>
     </div>
