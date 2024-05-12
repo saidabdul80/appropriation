@@ -33,18 +33,15 @@ class SubheadBudgetItemController extends Controller
                 ->first();
 
             if (!empty($subheadItem)) {
-                //$totalAllocated = SubheadBudgetItem::getItemsAmount($validated['subhead_budget_id']) - $subheadItem->amount;
-                //  dd($subheadBudgetAmount);
+                //there is logic error hear because when updating amount and  there is still enough balance on  $subheadBudgetBalance it should work
                 $usedAmount = SubheadBudgetItem::usedAmount($subheadItem->id);
                 $balance  = $subheadItem->amount - $usedAmount;
 
-                if($validated['amount'] > $balance){
+                if ($validated['amount'] > $balance && $validated['amount'] > $subheadBudgetBalance) {
                     throw new \Exception('Insufficient Fund on Subhead Budget Item');
                 }
 
-
             } else {
-
                 // Check if the new amount exceeds the total subhead budget amount
                 if ($validated['amount'] > $subheadBudgetBalance) {
                     throw new \Exception('Insufficient Fund on Subhead Budget');
@@ -53,7 +50,7 @@ class SubheadBudgetItemController extends Controller
 
             SubheadBudgetItem::updateOrCreate(
                 ['item_name_id' => $validated['item_name_id'], 'subhead_budget_id' => $validated['subhead_budget_id']],
-                ['amount' => $validated['amount']]
+                ['amount' => $validated['amount'], 'actual_amount' => $validated['amount'],'outcome' => $request->outcome,'output' => $request->output]
             );
 
             return response()->json('SubheadBudgetItem saved or updated successfully');

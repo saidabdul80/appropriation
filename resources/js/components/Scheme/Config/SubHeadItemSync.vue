@@ -90,7 +90,8 @@
                 <DataTable v-model:expandedRows="expandedRows" v-model:editingRows="editingRows"  editMode="row"  @row-edit-save="saveSubheadBudgetItem" :value="sub_head_budget_items" dataKey="id" ref="dt">
                         <template #header>
                             <div style="text-align: left">
-                                <Button class="btn btn-success" @click="exportCSV('dt')">Export</Button>
+                                <Button class="btn btn-success" @click="exportCSV('dt')">Print Table</Button>
+                                <Button class="btn btn-success ms-2" @click="showManageItems = true">Manage Activities</Button>
                             </div>
                         </template>
                         <Column expander style="width: 5rem" />
@@ -102,8 +103,7 @@
                         <Column field="subhead_item" header="Activity Name">
                             <template #body="{ data, field }">{{ data[field] }}</template>
                             <template #editor="{ data, field }">
-                                <BaseItemSelect v-model="data['item_name_id']" url="subhead_item_name" optionLabel="name"
-                                    optionValue="id" />
+                                <BaseItemSelect @change="onChangeItem($event,data)" url="subhead_item_name" optionLabel="name" />
                             </template>
                         </Column>
                         <Column field="amount" header="Budget" >
@@ -132,18 +132,24 @@
                         <Column field="outcome" header="Out Come" />
                         <template #expansion="slotProps">
                             <div class="border rounded-3 mb-4 w-75 mx-auto">
-                                <h6 class="text-left p-3 font-bold">Virments</h6>
-                                <DataTable :value="slotProps.data.virments" v-if="slotProps.data.virments.length > 0">
+                                <h6 class="text-left p-3 font-bold">Virements</h6>
+                                <DataTable :value="slotProps.data.virements" v-if="slotProps.data.virements.length > 0">
                                     <Column field="" header="#" :body="(_, { index }) => index + 1" />
-                                    <Column field="destination" header="Destination"></Column>
+                                    <Column field="destination" header="Budget">
+                                        <template #body="{data,field}">
+                                            <span :class="data.type=='source'?'text-success':'text-danger'">    {{ data[field].slice(0,40) }}...</span>
+                                        </template>
+                                    </Column>
                                     <Column field="amount" header="Amount" >
-                                        <template #body="{ data, field }">{{ $globals.currency(data[field]) }}</template>
+                                        <template #body="{ data, field }">
+                                        <span :class="data.type=='source'?'text-success':'text-danger'">    {{ $globals.currency(data[field]) }}</span>
+                                        </template>
                                         <template #editor="{data}">
                                             <InputText v-model="data[amount]" class="p-1 w-100" />
                                         </template>
                                     </Column>
                                 </DataTable>
-                                <p v-else class="p-3">No Virments</p>
+                                <p v-else class="p-3">No Virements</p>
                             </div>
                         </template>
                     </DataTable>
@@ -198,6 +204,8 @@
                 </table> -->
             </div>
         </div>
+
+        <BaseItemSelect v-if="showManageItems" @onclose="showManageItems=false" :show="true" url="subhead_item_name" optionLabel="name" />
         <Teleport to="#modalFooterConfig">
             <Button @click="addBudget()" class="rounded rounded-right" icon="pi pi-plus" />
         </Teleport>
@@ -248,7 +256,8 @@ export default {
             monthSelected: null,
             selected_sub_head_budget:null,
             expandedRows:null,
-            editingRows:null
+            editingRows:null,
+            showManageItems:false,
         }
     },
     async created() {
@@ -268,6 +277,11 @@ export default {
         }
     },
     methods: {
+        onChangeItem(e,data ){
+            data['item_name_id'] = e.id
+            data['output'] = e.output;
+            data['outcome'] = e.outcome;
+        },
         async removeItem(cat,index){
             if(cat?.id, index){
                 cat.isEditing = false;

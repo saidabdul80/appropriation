@@ -12,6 +12,8 @@ class SubheadBudgetItemName extends Model
     protected $fillable = [
         'name',
         'created_at',
+        'output',
+        'outcome',
         'updated_at',
     ];
 

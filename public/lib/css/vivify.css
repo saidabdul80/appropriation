@@ -2823,3 +2823,10 @@ swoopOutRight
 swoopOutTop
 unfold
  */
+
+ .swal2-container {
+    display: grid;
+    position: fixed;
+    z-index: 3060 !important;
+    top: 0;
+}

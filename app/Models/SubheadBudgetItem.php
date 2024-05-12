@@ -8,16 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class SubheadBudgetItem extends Model
 {
     use HasFactory;
+    protected $with =['source','destination'];
 
     protected $fillable = [
         'item_name_id',
         'subhead_budget_id',
         'amount',
+        'actual_amount',
         'created_at',
+        'output',
+        'outcome',
         'updated_at',
     ];
 
-    protected $with = ['virments'];
+
 
     public function itemName()
     {
@@ -53,9 +57,31 @@ class SubheadBudgetItem extends Model
         return $this->amount - Transaction::sumAmountForSubheadItem($this->id);
     }
 
-    public function virments(){
+    public function source(){
         return $this->hasMany(Virement::class,'source_id');
     }
 
-    protected $appends = ['subhead_item','balance'];
+    public function destination(){
+        return $this->hasMany(Virement::class,'destination_id');
+    }
+
+    public function getVirementsAttribute(){
+        $sourceVirements = $this->source->map(function ($virement) {
+            $virement->type = 'source';
+            return $virement;
+        });
+
+        $destinationVirements = $this->destination->map(function ($virement) {
+            $virement->type = 'destination';
+            return $virement;
+        });
+
+        // Merge source and destination virements
+        $mergedVirements = $sourceVirements->merge($destinationVirements);
+
+        return $mergedVirements;
+    }
+
+
+    protected $appends = ['subhead_item','balance','virements'];
 }
