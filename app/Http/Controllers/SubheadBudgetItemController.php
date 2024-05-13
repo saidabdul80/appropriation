@@ -37,7 +37,7 @@ class SubheadBudgetItemController extends Controller
                 $usedAmount = SubheadBudgetItem::usedAmount($subheadItem->id);
                 $balance  = $subheadItem->amount - $usedAmount;
 
-                if ($validated['amount'] > $balance && $validated['amount'] > $subheadBudgetBalance) {
+                if ($validated['amount'] > $balance && $validated['amount'] > ($subheadBudgetBalance + $subheadItem->amount)) {
                     throw new \Exception('Insufficient Fund on Subhead Budget Item');
                 }
 
