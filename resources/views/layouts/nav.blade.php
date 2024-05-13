@@ -303,6 +303,9 @@ $routename = str_replace('#','', Route::currentRouteName());
 		}
 
 	}
+
+    .dropdown-menu {
+            top: -150px !important;}
 </style>
 <!-- <main class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
 
@@ -332,11 +335,10 @@ $routename = str_replace('#','', Route::currentRouteName());
 				<span class="fs-6 ms-2">NiFMS</span>
 			</a>
 		</span>
-
 		<label for="drawer-toggle" class="btn-close" id="drawer-toggle-label2"></label>
 	</div>
 	<hr class="m-0">
-	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative">
+	<div class=" offcanvas-body d-flex flex-column flex-shrink-0 p-3 bg-white w-100 position-relative" style="height: 500px;">
 		<ul class="nav nav-pills flex-column mb-auto">
 			<li data-bs-toggle="tooltip" title="Home" class="nav-item">
 				<a href="/home" class="nav-link {{$routename =='home'? 'activeLink text-white':'text-dark' }}" aria-current="page">
@@ -350,30 +352,21 @@ $routename = str_replace('#','', Route::currentRouteName());
 					<span class="nav-name">Dashboard</span>
 				</a>
 			</li>
+            @can('manage_user')
+                <li data-bs-toggle="tooltip" title="User">
+                    <a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
 
-			<li data-bs-toggle="tooltip" title="User">
-				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">
-					<!-- <svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#grid" />
-					</svg> -->
-					<i class=" nav-name2 fa fa-user menu-icon  d-flex justify-content-center"></i>
-					<span class="nav-name">User</span>
-				</a>
-			</li>
+                        <i class=" nav-name2 fa fa-user menu-icon  d-flex justify-content-center"></i>
+                        <span class="nav-name">User</span>
+                    </a>
+                </li>
+            @endcan
 			<li  data-bs-toggle="tooltip" title="Account" class="nav-item dropdown ">
 				<a href="{{route('account')}}" class="nav-link {{$routename =='account'? 'activeLink text-white':'text-dark' }}   link-dark" href="#" id="navbarDropdownMenuLink">
-					<!-- <svg class="bi me-2" width="16" height="16">
-						<use xlink:href="#table" />
-					</svg> -->
+
 					<i class=" nav-name2 fa fa-table menu-icon  d-flex justify-content-center"></i>
 					<span class="nav-name">Account</span>
 				</a>
-				<!--
-					<ul class="nav nav-pills flex-column mb-auto">
-						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> New</a></li>
-						<li class="nav-item"><a class="nav-link {{$routename =='dashboard'? 'activeLink text-white':'text-dark' }}  link-dark" href="#"><i class="bi bi-chevron-right"></i> View</a></li>
-					</ul>
-				-->
 			</li>
 			<!-- <li>
 				<a href="{{route('user')}}" class="nav-link {{$routename =='user'? 'activeLink text-white':'text-dark' }}  link-dark">

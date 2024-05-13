@@ -40,7 +40,7 @@ Route::group(["middleware"=>['web','auth']],function(){
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
-    Route::get('/user', [UserController::class, 'userIndex'])->name('user');
+    Route::get('/user', [UserController::class, 'userIndex'])->middleware('permission:manage_user')->name('user');
     Route::post('/get_users', [UserController::class, 'getUsers']);
     Route::post('/new_update_user', [UserController::class, 'newUpdateUser']);
     Route::post('/change_password', [UserController::class, 'changePassword']);
