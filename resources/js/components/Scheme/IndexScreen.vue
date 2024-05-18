@@ -173,7 +173,10 @@
     },
     computed: {
       totalAppropriationPercentageValue() {
-        return this.selected_scheme.appropriations.reduce((total, appropriation) => total + appropriation.percentage_dividend, 0);
+        if(Array.isArray(this.selected_scheme.appropriations) && this.selected_scheme.appropriations){
+            return this.selected_scheme.appropriations.reduce((total, appropriation) => total + appropriation.percentage_dividend, 0);
+        }
+        return 0;
       },
     },
     watch: {
@@ -317,7 +320,6 @@
             if (confirmation.isConfirmed) {
                 try {
                     const res = await postData('/appropriation/delete/' + app?.id,app);
-
                     this.$emit('updateParentSchemes',{})
                     //Swal.fire('Deleted', 'Your item has been deleted.', 'success');
                 } catch (error) {

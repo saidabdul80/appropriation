@@ -42,6 +42,7 @@
                     <!--    <Dropdown v-model="selected_appropriation" :options="selected_scheme.appropriations"
                         optionLabel="name" optionValue="id" @change="loadSubheadBudgets()" placeholder="Select a Head"
                         class="w-100 " /> -->
+
                     <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
                         :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
                         <template #value="slotProps">

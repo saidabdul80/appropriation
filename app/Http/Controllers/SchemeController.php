@@ -141,21 +141,37 @@ class SchemeController extends Controller
         }
         return false;
     }
-    public function getSchemes() {
+    public function getSchemes(Request $request) {
         $schemes = Scheme::all();
-        $schemes->each(function ($scheme) {
-            $scheme->appropriations->each(function ($appropriation) use ($scheme) {
-                $appropriation->main_balance = $appropriation->load('appropriation_histories')->appropriation_histories->sum(function ($history) use ($appropriation) {
-                    foreach ($history->appropriation as $item) {
-                        if ($item['id'] == $appropriation->id) {
-                            return $item['amount'];
-                        }
-                    }
-                    return 0;
-                });
-            });
-        });
+        $user = $request->user();
+        $permissions = $user->permissions->pluck('name')->toArray();
 
+
+        foreach($schemes as &$scheme) {
+            foreach ( $scheme->appropriations as $key => $appropriation) {
+
+                if (!array_intersect(explode(',', $appropriation->department), $permissions)) {
+                    unset($scheme->appropriations[$key]);
+                }else{
+                    $appropriation->main_balance = $appropriation->load('appropriation_histories')->appropriation_histories->sum(function ($history) use ($appropriation) {
+                        foreach ($history->appropriation as $item) {
+                            if ($item['id'] == $appropriation->id) {
+                                return $item['amount'];
+                            }
+                        }
+                        return 0;
+                    });
+
+                }
+
+            }
+            // Re-index array to avoid issues with array keys being unset
+        }
+
+        $schemes = $schemes->toArray();
+        foreach($schemes as &$scheme) {
+            $scheme['appropriations'] = array_values($scheme['appropriations']);
+        }
         return response()->json($schemes,200);
     }
     public function addScheme(Request $request)

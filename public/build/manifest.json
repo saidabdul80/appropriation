@@ -1,11 +1,11 @@
 {
-  "node_modules/primeicons/fonts/primeicons.eot": {
-    "file": "assets/primeicons-987f23ea.eot",
-    "src": "node_modules/primeicons/fonts/primeicons.eot"
-  },
   "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-italic.var.woff2": {
     "file": "assets/Inter-italic.var-d1401419.woff2",
     "src": "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-italic.var.woff2"
+  },
+  "node_modules/primeicons/fonts/primeicons.eot": {
+    "file": "assets/primeicons-987f23ea.eot",
+    "src": "node_modules/primeicons/fonts/primeicons.eot"
   },
   "node_modules/primevue/resources/themes/aura-light-blue/fonts/Inter-roman.var.woff2": {
     "file": "assets/Inter-roman.var-17fe38ab.woff2",
@@ -33,7 +33,7 @@
     "isEntry": true
   },
   "resources/js/app.css": {
-    "file": "assets/app-0b631c93.css",
+    "file": "assets/app-8b64badd.css",
     "src": "resources/js/app.css"
   },
   "resources/css/app.css": {
@@ -42,11 +42,11 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-dba32267.js",
+    "file": "assets/app-0029d48f.js",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-0b631c93.css"
+      "assets/app-8b64badd.css"
     ],
     "assets": [
       "assets/Inter-roman.var-17fe38ab.woff2",
