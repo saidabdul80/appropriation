@@ -21,8 +21,11 @@ class Connect
     public function handle(Request $request, Closure $next)
     {
         // Check if the request has a '_token' header
+        $token = $request->header('_token');
+        return response()->json([
+            'message' =>  $token
+        ], Response::HTTP_UNAUTHORIZED);
         if ($request->hasHeader('_token')) {
-            $token = $request->header('_token');
             $tokenObj = ApiToken::where('_token',$token)->first();
             // Validate the token
             if (!empty($tokenObj)) {
