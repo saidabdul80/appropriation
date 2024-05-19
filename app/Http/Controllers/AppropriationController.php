@@ -120,8 +120,6 @@ class AppropriationController extends Controller
                     $result1[$appr['name']] = ($result1[$appr['name']] ?? 0) + $appr['amount'];
                 }
             }
-            // Now $result is an associative array with 'name' as key and 'total_amount' as value
-
 
 
             $appropriations = Appropriation::withWallet($fund_category, $scheme_fund_category)->where('scheme_id', $scheme_id)->get();

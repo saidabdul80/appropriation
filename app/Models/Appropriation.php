@@ -28,6 +28,12 @@ class Appropriation extends Model
         "department_id"=>ToArray::class
     ];
 
+    public function scheme()
+    {
+        return $this->belongsTo(Scheme::class);
+    }
+
+
     public function wallet()
     {
         return $this->hasOne(Wallet::class,'owner_id','id');

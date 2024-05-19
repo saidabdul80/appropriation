@@ -9,8 +9,8 @@
             <button @click="$emit('closeModal')" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <table class="table table-bordered">
-              <thead class="bg-light">
+            <table class="border-collapse w-full ">
+              <thead class="sm:visible invisible absolute sm:relative bg-gray-100">
                 <tr>
                   <th>S/N</th>
                   <th>Appropriation</th>
@@ -19,9 +19,9 @@
               </thead>
               <tbody>
                 <tr v-for="(appr, i) in expenditure_details" :key="i">
-                  <td>{{ i + 1 }}</td>
-                  <td>{{ appr.name }}</td>
-                  <td>{{ $globals.currency(appr.expenditure_total_amount) }}</td>
+                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ i + 1 }}</td>
+                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ appr.name }}</td>
+                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ $globals.currency(appr.expenditure_total_amount) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -38,7 +38,7 @@
       </div>
     </div>
   </template>
-  
+
   <script>
   export default {
     props: {
@@ -95,11 +95,10 @@
     },
   };
   </script>
-  
+
   <style scoped>
   .modal {
     display: block !important;
     background: #000a;
   }
   </style>
-  

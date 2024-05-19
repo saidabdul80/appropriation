@@ -29,6 +29,7 @@ class Transaction extends Model
         'subhead_item_id',
         'fund_date'
     ];
+
     protected $casts = [
         'data'=>TransactionData::class,
         'created_at'=>'datetime:Y-m-d',
