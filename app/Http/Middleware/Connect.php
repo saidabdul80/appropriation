@@ -21,8 +21,8 @@ class Connect
     public function handle(Request $request, Closure $next)
     {
         // Check if the request has a '_token' header
-        if ($request->hasHeader('session_token')) {
-            $token = $request->header('session_token');
+        if ($request->hasHeader('session_token') || $request->has('session_token')) {
+            $token = $request->header('session_token') ?? $request->session_token;
             $tokenObj = ApiToken::where('_token',$token)->first();
             // Validate the token
             if (!empty($tokenObj)) {
