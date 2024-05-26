@@ -24,11 +24,14 @@
                   <td>{{ appropriation.department }}</td>
                   <td>{{appropriation.percentage_dividend }}</td>
                   <td>
-                    <button @click="appropriationModalUpdate(appropriation, i)" class="me-2 btn btn-sm btn-info text-white">
-                      <i class="bi bi-pencil-square" style="color:inherit"></i>
-                    </button>
-                    <button @dblclick="removeItem(appropriation,i)" class=" btn btn-sm btn-danger text-white"><span
-                        class="pi pi-times "></span> </button>
+                    <div v-if="canPerformAction('new_appropriationm')">
+
+                        <button @click="appropriationModalUpdate(appropriation, i)" class="me-2 btn btn-sm btn-info text-white">
+                            <i class="bi bi-pencil-square" style="color:inherit"></i>
+                        </button>
+                        <button @dblclick="removeItem(appropriation,i)" class=" btn btn-sm btn-danger text-white"><span
+                            class="pi pi-times "></span> </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -92,7 +95,7 @@
                 <td>{{ $globals.currency(appropriation_data_summary?.income?.[appropriation.name] ?? 0) }}</td>
                 <td>{{ $globals.currency(appropriation_data_summary?.balance?.[appropriation.name]??0) }} </td>
                 <td>
-                  <button v-if="canPerformAction('report')" @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
+                  <button v-if="canPerformAction('report') || permissions.some(perm=>appropriation.department.split(',').includes(perm)) " @click="appropriationLogPage(appropriation, i)" class="btn me btn-sm btn-success text-white">
                     <i class="bi bi-columns-gap" style="color:inherit"></i>
                   </button>
                 </td>

@@ -14,7 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 class AppropriationController extends Controller
 {
     /**
@@ -31,20 +31,59 @@ class AppropriationController extends Controller
                 "scheme_id"=>"required",
 //                "fund_category"=>""
             ]);
+
+            $user = $request->user();
+            $permissions = $user->permissions->pluck('name')->toArray();
+
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
             //return $fund_category;
             $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
-            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme','fund_category'=>$fund_category])->orderBy('id','desc')->paginate(100);
+            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme','fund_category'=>$fund_category])->orderBy('id','desc')->get();
             $appropriations = Appropriation::withWallet($fund_category, $scheme_fund_category)->where('scheme_id', $scheme_id)->get();
-            /* if(!empty($fund_category)){
+
+                    // Initialize response arrays
+            $filtered_appropriations = [];
+            $filtered_appropriation_histories = [];
+
+            // Process each appropriation
+            foreach ($appropriations as $appropriation) {
+                $departmentList = explode(',', $appropriation->department);
+
+                // Check if user has permission for this appropriation's department
+                if (array_intersect($departmentList, $permissions)) {
+                    $filtered_appropriations[] = $appropriation;
+                }
             }
-            $appropriation_histories = AppropriationHistory::where(['owner_id'=>$scheme_id,"owner_type"=>'scheme'])->orderBy('id','desc')->paginate(100);
-            $appropriations = Appropriation::with(['wallet'=>function($query){
-                $query->where(['owner_type'=>'App\\Models\\Appropriation']);
-            }])->where('scheme_id', $scheme_id)->get();
- */
-            return response(['appropriations'=>$appropriations, 'appropriations_histories'=>$appropriation_histories],200);
+
+            // Process each appropriation history
+            foreach ($appropriation_histories as $history) {
+
+                $appropriations = $history->appropriation; // Assuming AppropriationHistory has a relation 'appropriation'
+                if ($appropriations) {
+                    foreach ($history->appropriation as $key =>$appropriation) {
+                        $departmentList = explode(',', $appropriation['department']);
+                        if (array_intersect($departmentList, $permissions)) {
+                          //  $filtered_appropriation_histories[] = $history;
+                        }else{
+                            unset($history->appropriation[$key]);
+                        }
+                    }
+                    $departmentList = explode(',', $appropriation['department']);
+                }
+            }
+
+            $perPage = 100;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $paginatedHistories = new LengthAwarePaginator(
+                array_slice($filtered_appropriation_histories, ($currentPage - 1) * $perPage, $perPage),
+                count($filtered_appropriation_histories),
+                $perPage,
+                $currentPage,
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
+            );
+
+            return response(['appropriations'=>$filtered_appropriations, 'appropriations_histories'=>$paginatedHistories],200);
         }catch(ValidationException $e){
             return response($e->getMessage(),400);
         }catch(\Exception $e){

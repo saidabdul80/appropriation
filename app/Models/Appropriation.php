@@ -33,6 +33,10 @@ class Appropriation extends Model
         return $this->belongsTo(Scheme::class);
     }
 
+    public function appropriationType()
+    {
+        return $this->belongsTo(AppropriationType::class);
+    }
 
     public function wallet()
     {

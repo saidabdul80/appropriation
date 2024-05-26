@@ -172,6 +172,7 @@ class SchemeController extends Controller
         foreach($schemes as &$scheme) {
             $scheme['appropriations'] = array_values($scheme['appropriations']);
         }
+
         return response()->json($schemes,200);
     }
     public function addScheme(Request $request)

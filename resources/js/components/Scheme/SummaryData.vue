@@ -31,6 +31,9 @@
 <script>
 export default {
     props: {
+        withpermission:{
+            default:true,
+        },
         permissions: {
             type: Array,
             default: () => [],
@@ -51,6 +54,9 @@ export default {
     },
     methods: {
         canPerformAction(permission) {
+            if(!this.withpermission){
+                return true;
+            }
             return this.permissions.includes(permission);
         },
         openExpenditureDetails() {

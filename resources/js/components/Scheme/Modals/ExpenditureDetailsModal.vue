@@ -10,18 +10,18 @@
           </div>
           <div class="modal-body">
             <table class="border-collapse w-full ">
-              <thead class="sm:visible invisible absolute sm:relative bg-gray-100">
+              <thead class="absolute sm:relative text-gray-600 bg-gray-100">
                 <tr>
-                  <th>S/N</th>
-                  <th>Appropriation</th>
-                  <th>Amount (<span>&#8358;</span>)</th>
+                  <th class="text-gray-600">S/N</th>
+                  <th class="text-gray-600">Appropriation</th>
+                  <th class="text-gray-600">Amount (<span>&#8358;</span>)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(appr, i) in expenditure_details" :key="i">
-                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ i + 1 }}</td>
-                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ appr.name }}</td>
-                  <td class="border-t-2 border-white text-white sm:flexxx sm:inline-block">{{ $globals.currency(appr.expenditure_total_amount) }}</td>
+                  <td class="border-t-2 border-white text-gray-600 sm:flexxx sm:inline-block">{{ i + 1 }}</td>
+                  <td class="border-t-2 border-white text-gray-600 sm:flexxx sm:inline-block">{{ appr.name }}</td>
+                  <td class="border-t-2 border-white text-gray-600 sm:flexxx sm:inline-block">{{ $globals.currency(appr.expenditure_total_amount) }}</td>
                 </tr>
               </tbody>
             </table>

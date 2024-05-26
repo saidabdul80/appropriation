@@ -228,6 +228,7 @@ export default {
     }
   },
   async created() {
+    this.fund_category = this.$parent.$parent?.selected_fund_category
     await this.fetchWalletBalance()
     await this.fetchTransactions()
     this.iniTableTransaction()
@@ -335,6 +336,7 @@ export default {
         let appropriations = JSON.parse(localStorage.getItem('appropriations'));
         owner_ids = appropriations.map(item => item.id);
       }
+
       let res = await postData('/get_wallet_detail', {
         fund_category: this.fund_category,
         owner_id: owner_ids,

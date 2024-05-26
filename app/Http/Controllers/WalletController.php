@@ -32,8 +32,10 @@ class WalletController extends Controller
                 return response()->json("Select an Appropriation",400);
             }
 
-            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+            //$scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+            $scheme_fund_category = $request->fund_category;
             $response = Appropriation::withWallet( $request->get('fund_category'),$scheme_fund_category)->whereIn('id', $id)->get();
+
             $balance = $response?->sum('wallet.balance')??0;  // Use first() to get a single model instance
             $income = $response?->sum('wallet.total_collection')??0;  // Use first() to get a single model instance
             return response()->json([
