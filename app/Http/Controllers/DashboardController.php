@@ -55,6 +55,7 @@ class DashboardController extends Controller
                         $used = [
                          $approp->balance,
                          $approp->total_collection,
+                         $approp->total_collection- $approp->balance,
                          $approp->fund_category,
                         ];
 

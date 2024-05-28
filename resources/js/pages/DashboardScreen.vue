@@ -151,6 +151,7 @@ export default {
             arr.forEach(item => {
                 result.push(item[col])
             });
+
             return result
         },
         openExpenditureModal(data) {
@@ -177,7 +178,7 @@ export default {
             records = JSON.parse(JSON.stringify(records))
             //console.log(records.filter((value,i)=>),records)
             return {
-                labels: this.getProgrameYearReportData(2, records),
+                labels: this.getProgrameYearReportData(3, records),
                 datasets: [
                     {
                         label: 'Balance',
@@ -189,6 +190,12 @@ export default {
                         label: 'Income',
                         data: this.getProgrameYearReportData(1, records),
                         backgroundColor: '#17a2b888',
+                        borderColor: '#fff'
+                    },
+                    {
+                        label: 'Expenditure',
+                        data: this.getProgrameYearReportData(2, records),
+                        backgroundColor: '#a217b888',
                         borderColor: '#fff'
                     }
                 ]

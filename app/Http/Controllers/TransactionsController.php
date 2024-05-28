@@ -29,21 +29,34 @@ class TransactionsController extends Controller
             $request->validate([
                 "scheme_id"=>"required",
             ]);
+
+            $user = $request->user();
+            $permissions = $user->permissions->pluck('name')->toArray();
+
+
             $scheme_id = $request->get('scheme_id');
             $fund_category = $request->get('fund_category');
             $appropriations = Appropriation::where('scheme_id',$scheme_id)->get();
             if($fund_category){
                 foreach($appropriations as $key => &$appropriation){
-                    $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation', 'fund_category'=>$fund_category])->sum('amount');
-                    $appropriation->expenditure_total_amount = $totalAmount;
+                    if (!array_intersect(explode(',', $appropriation->department), $permissions)) {
+                        unset($appropriations[$key]);
+                    }else{
+                        $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation', 'fund_category'=>$fund_category])->sum('amount');
+                        $appropriation->expenditure_total_amount = $totalAmount;
+                    }
                 }
             }else{
                 foreach($appropriations as $key => &$appropriation){
-                    $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation'])->sum('amount');
-                    $appropriation->expenditure_total_amount = $totalAmount;
+                    if (!array_intersect(explode(',', $appropriation->department), $permissions)) {
+                        unset($appropriations[$key]);
+                    }else{
+                        $totalAmount = Transaction::where(['owner_id'=>$appropriation->id, 'owner_type'=> 'appropriation'])->sum('amount');
+                        $appropriation->expenditure_total_amount = $totalAmount;
+                    }
                 }
             }
-            return response($appropriations,200);
+            return response($appropriations->values(),200);
         }catch(ValidationException $e){
             return response($e->getMessage(),400);
         }catch(\Exception $e){

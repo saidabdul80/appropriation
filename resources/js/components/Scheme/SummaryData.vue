@@ -16,9 +16,11 @@
                 <span v-show="selected_fund_category != ''">{{ $globals.currency(fund?.balance) }} </span></p>
             <p v-if="canPerformAction('expenditure')" href="#" class="m-0 fs-9 ">
                 <span class="display-inline-block me-2">
-                    Expenditure: <span>&#8358;</span>
-                    <span v-if="getCategoryIncomeBalance == 0">0.00</span>
-                    <span v-else>{{ $globals.currency(fund?.total_collection - fund?.balance) }} </span>
+                    <span v-if="withpermission">
+                        Expenditure: <span>&#8358;</span>
+                        <span v-if="getCategoryIncomeBalance == 0">0.00</span>
+                        <span v-else>{{ $globals.currency(fund?.total_collection - fund?.balance) }} </span>
+                    </span>
                 </span>
                 <a @click="$emit('openExpenditure',{category_income:fund?.total_collection||0,category_income_balance:fund?.balance||0})" class="d-inline-block fs-8 underline text-white" href="#">View Details
                     <i class="fa fa-caret-right mt-1"></i>
