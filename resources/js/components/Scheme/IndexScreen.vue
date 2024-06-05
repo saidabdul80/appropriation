@@ -1,4 +1,5 @@
 <template>
+
     <div class="bg-white rounded-lg-only shadow-lg-only" style="overflow-x: auto">
       <div v-if="switchPageOne == 0" style="height: inherit">
         <div style="height: inherit; display: flex; flex-direction: column">
@@ -120,6 +121,7 @@
 
   <script>
   import SharehoderModal from './Modals/SharehoderModal.vue'
+  import { useGlobalStore } from '../../store';
   export default {
     props: {
         appropriation_types:{
@@ -166,6 +168,7 @@
     },
     data() {
       return {
+        globals:useGlobalStore(),
         selected_appropriation: [],
         appropriationHistories: [],
         appropriations: [],

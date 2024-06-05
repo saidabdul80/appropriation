@@ -38,6 +38,7 @@
   
   <script>
   import Dropdown from 'primevue/dropdown';
+  import { useGlobalStore } from '../../../store';
   export default {
     components:{
         Dropdown,
@@ -46,6 +47,7 @@
     },
     data(){
       return {
+        globals:useGlobalStore(),
         departments:[],
         selected_appropriation:{department_id:[],appropriation_type_id:''},
         appropriation_types:[],
@@ -54,8 +56,8 @@
       }
     },
     async created(){   
-        this.selected_scheme = this.$parent.$parent.$parent.selected_scheme
-        this.schemes =  this.$parent.$parent.$parent.schemes;
+        this.selected_scheme = this.globals.selected_scheme
+        this.schemes =  this.globals.schemes;
       await this.getDepartments()
       await this.getAppType()
       this.$emit('oncompleted',true)
@@ -85,8 +87,8 @@
                 throw new Error("Department field is required");
                 }
 
-                const schemeIndex = this.$globals.getIndexOf(this.$parent.$parent.$parent.schemes, this.selected_scheme);
-                const scheme = this.$parent.$parent.$parent.schemes[schemeIndex];
+                const schemeIndex = this.$globals.getIndexOf(this.globals.schemes, this.selected_scheme);
+                const scheme = this.globals.schemes[schemeIndex];
 
                 scheme.appropriations.push(this.selected_appropriation);
 

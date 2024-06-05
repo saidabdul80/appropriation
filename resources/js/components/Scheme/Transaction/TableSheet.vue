@@ -27,23 +27,23 @@
                         <th colspan="6"><b>{{ selected_appropriation.name }} / {{ selected_appropriation.department}}</b>Transactions</th>
                     </tr> -->
                 <tr>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;" data-name="outcome">
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;">S/N</th>
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;">Head</th>
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;">Subhead</th>
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;">Activity</th>
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;" data-name="outcome">
                         <button class="btn btn-white text-danger btn-sm p-1" @click="removeColumn('outcome')">
                             <span class="pi pi-times "></span>
                         </button>
                         Outcome
                     </th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;" data-name="output">
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;" data-name="output">
                         <button class="btn btn-white text-danger btn-sm p-1" @click="removeColumn('output')">
                             <span class="pi pi-times "></span>
                         </button>
                         Output
                     </th>
-                    <th v-for="header in Object.keys(dynamicData)" :data-name="header"
+                    <th draggable="true" v-for="header in Object.keys(dynamicData)" :data-name="header"
                     class="fs-8 fw-bold" style="white-space: nowrap;">
                     <div class="d-flex" style="justify-content: space-between; align-items: center;">
                         <button class="btn btn-white text-danger btn-sm p-1" @click="removeColumn(header)">
@@ -52,8 +52,8 @@
                         {{ header.replaceAll('_', ' ') }}
                     </div>
                     </th>
-                    <th class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
-                    <th>#</th>
+                    <th draggable="true" class="fs-8 fw-bold" style="white-space: nowrap;">Total Amount</th>
+                    <th draggable="true">#</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -169,7 +169,7 @@ import InlineMessage from 'primevue/InlineMessage';
 import TreeSelect from 'primevue/treeselect';
 import PopUp from '../../PopUp/PopUp.vue'
 import Dropdown from 'primevue/dropdown';
-
+import { useGlobalStore } from '../../../store';
 export default {
   components: {
     ConfirmPopup,
@@ -216,6 +216,7 @@ export default {
   },
   data() {
     return {
+      globals:useGlobalStore(),
       showSheet: false,
       transactions: { data: [] },
       tableKey: 0,
@@ -231,7 +232,6 @@ export default {
     this.fund_category = this.$parent.$parent?.selected_fund_category
     await this.fetchWalletBalance()
     await this.fetchTransactions()
-    this.iniTableTransaction()
   },
   computed: {
     total_expenditure_appropriation() {
@@ -271,10 +271,17 @@ export default {
     },
 
     editAppropriationTransaction(appr, i) {
-      this.$emit('openDebitModal', {
+      this.globals.open_debit_modal = false;
+      setTimeout(()=>{
+
+        this.globals.open_debit_modal = true;
+        this.globals.transaction = { ...appr };
+        this.globals.transaction_index =i
+      },200)
+     /*  this.$emit('openDebitModal', {
         transaction: { ...appr },
         index: i
-      })
+      }) */
     },
     async fetchTransactions() {
       try {
@@ -403,17 +410,63 @@ export default {
             }
         }
     },
+    enableColumnDragAndDrop() {
+      const table = document.getElementById('myTable');
+      const headers = table.querySelectorAll('th[draggable]');
+
+        headers.forEach(header => {
+          header.addEventListener('dragstart', this.handleDragStart);
+          header.addEventListener('dragover', this.handleDragOver);
+          header.addEventListener('drop', this.handleDrop);
+          header.addEventListener('dragend', this.handleDragEnd);
+        });
+      },
+      handleDragStart(e) {        
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', e.target.cellIndex);
+      },
+      handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      },
+      handleDrop(e) {
+        alert()
+        e.stopPropagation();
+        e.preventDefault();
+
+        const dragSrcIndex = e.dataTransfer.getData('text/plain');
+        const dropTargetIndex = e.target.cellIndex;
+        alert(dragSrcIndex)
+        alert(dropTargetIndex)
+        if (dragSrcIndex !== dropTargetIndex) {
+          this.moveColumn(dragSrcIndex, dropTargetIndex);
+        }
+      },
+      handleDragEnd(e) {
+        // Optional: Add any cleanup code here if needed
+      },
+      moveColumn(fromIndex, toIndex) {
+        const table = document.getElementById('myTable');
+        const rows = table.rows;
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].cells;
+          if (cells[fromIndex] && cells[toIndex]) {
+            rows[i].insertBefore(cells[fromIndex], cells[toIndex + (fromIndex < toIndex ? 1 : 0)]);
+          }
+        }
+
+        // Update the table key to force re-render
+        this.tableKey++;
+      },
     iniTableTransaction(destroy = true) {
       let $this = this
-
+      this.enableColumnDragAndDrop();
+/* 
       var table = $('.transactions-tables').DataTable({
         dom: 'Bfrtip',
         colReorder: true,
-        initComplete: function () {
-          table?.colReorder?.move(1, 2);
-
-        },
-        destroy: true,
+              destroy: true,
         buttons: [{
           extend: 'print',
           exportOptions: {
@@ -436,10 +489,16 @@ export default {
         exportOptions: {
           stripHtml: false
         },
+        colReorder: true,
         pageLength: 10,
-      });
+      }); */
     },
 
-  }
+  },
+  mounted() {
+        this.$nextTick(() => {
+            this.iniTableTransaction();
+        });
+    },
 };
 </script>

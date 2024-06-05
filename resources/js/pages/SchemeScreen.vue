@@ -164,6 +164,7 @@
   import SummaryData from '../components/Scheme/SummaryData.vue';
   import AppropriationHistory from '../components/Scheme/AppropriationHistory.vue';
   import ConfigModal from './../components/Scheme/Modals/ConfigModal.vue';
+  import { useGlobalStore } from '../store';
   export default {
     components: {
       'scheme-modal': SchemeModal,
@@ -182,6 +183,7 @@
     },
     data() {
       return {
+        globals:useGlobalStore(),
         pageIsLoading: true,
         scheme_changed: 0,
         switchPageOne: '0',
@@ -233,6 +235,17 @@
       cyear: {
         default: '',
       },
+    },
+    watch:{
+      'globals.open_debit_modal':function(n){
+        if(this.globals.open_debit_modal){
+          this.transaction = {};
+          this.transaction = this.globals.transaction;
+          this.transaction.total_amount =  this.globals.transaction.amount;
+          this.transaction.index =  this.globals.transaction_index;
+          this.openModalApprRemit = true;
+        }
+      }
     },
     methods: {
       openTransactionModal() {
@@ -321,6 +334,7 @@
         const res = await getData('/schemes');
         if (res?.data) {
           this.schemes = res.data;
+          this.globals.schemes = this.schemes
           if (this.selected_scheme?.name != '') {
             this.selected_scheme = this.schemes.find(scheme => scheme.id === this.selected_scheme.id);
           }
@@ -390,6 +404,7 @@
       },
     },
     async created() {
+     
         this.selected_scheme = { name: '', balance: 0, wallet: { fund_category: '', balance: 0 }, appropriations: [] };
         await this.reloadSchemes();
       // If alert() is not necessary, remove or replace with desired logic.

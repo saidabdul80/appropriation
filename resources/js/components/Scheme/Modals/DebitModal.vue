@@ -7,11 +7,11 @@
             <button @click="$emit('closeModal')" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <InlineMessage severity="error" v-if="!$parent?.$parent?.selected_scheme?.id" class="p-1 mb-3">
+            <InlineMessage severity="error" v-if="!globals.selected_scheme?.id" class="p-1 mb-3">
                 <span style="font-size: 0.8em;" class="ms-1"> <b>Note:</b> Please Select a Programme to add a transaction </span>
             </InlineMessage>
 
-            <div class="mb-3 input-group"  v-if="$parent?.$parent?.selected_scheme?.fund_category == 'year'">
+            <div class="mb-3 input-group"  v-if="globals.selected_scheme?.fund_category == 'year'">
               <span class="input-group-text">Funding Year</span>
               <select v-model="selected_fund_category" @input="monthYearTriggered($event)" class="form-control">
                 <option value=""></option>
@@ -132,7 +132,7 @@
   import MultiSelect from 'primevue/multiselect';
   import Dropdown from 'primevue/dropdown';
   import InlineMessage from 'primevue/InlineMessage';
-
+import { useGlobalStore } from '../../../store';
   export default {
     components:{
       MultiSelect,
@@ -157,6 +157,7 @@
     },
     data() {
       return {
+        globals:useGlobalStore(),
         appropriation:null,
         appropriations:{
           name: '',
@@ -200,7 +201,7 @@
         this.data_columns = Object.keys(this.dynamic_data).filter(key => this.dynamic_data[key].required === 0);
         this.data_columns = this.data_columns.filter(key => this.dynamic_data[key].show === 1);
         this.markSelectedDynamicField();
-        if($parent?.$parent?.selected_scheme?.fund_category == 'month'){
+        if(this.globals.selected_scheme?.fund_category == 'month'){
             this.requestPreparedData()
         }
     },
@@ -218,8 +219,8 @@
             const gross = stampDutyCalculate +
                 vatCalculate +
                 withholdingCalculate +
-                this.appropriation_log2.data['Amount'].value +
-                this.appropriation_log2.data['Trx_Charges'].value;
+                this.appropriation_log2.data['Amount']?.value +
+                this.appropriation_log2.data['Trx_Charges']?.value;
 
             const totalTaxes = vatCalculate + withholdingCalculate + stampDutyCalculate;
 

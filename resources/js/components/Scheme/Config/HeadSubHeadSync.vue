@@ -131,6 +131,7 @@ import InlineMessage from 'primevue/InlineMessage';
 import Button from 'primevue/button';
 import MonthYearSelector from '../MonthYearSelector.vue';
 import BaseItemSelect from './BaseItemSelect.vue'
+import { useGlobalStore } from '../../../store';
 export default {
     components: {
         Dropdown,
@@ -146,6 +147,7 @@ export default {
 
     data() {
         return {
+            globals:useGlobalStore(),
             selected_appropriation: null,
             sub_head_budgets: [],
             subheads: [],
@@ -156,8 +158,8 @@ export default {
         }
     },
     async created() {
-        this.selected_scheme = { ...this.$parent.$parent.selected_scheme }
-        this.schemes = [...this.$parent.$parent.schemes];
+        this.selected_scheme = { ...this.globals.selected_scheme }
+        this.schemes = [...this.globals.schemes];
         await this.getAllSubhead();
         this.$emit('oncompleted', true);
     },

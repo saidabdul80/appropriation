@@ -1,7 +1,7 @@
 //import { createApp } from 'vue';
 import { createApp } from 'vue/dist/vue.esm-bundler';
 import './bootstrap';
-
+import { createPinia } from 'pinia'
 import PrimeVue from "primevue/config";
 import ReportScreen from './pages/ReportScreen.vue';
 import SchemeScreen from './pages/SchemeScreen.vue';
@@ -56,5 +56,7 @@ app.component('scheme-modal', SchemeModal);
 app.component('shareholder-modal', ShareholderModal); // Corrected component name
 */
 app.component('swift-button', SwiftButton); // Corrected component name
+const pinia = createPinia()
 app.use(PrimeVue);
+app.use(pinia)
 app.mount('#page-content');

@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="/lib/js/datatable/vfs_fonts.js"></script>
 	<!-- <script type="text/javascript" src="/lib/js/datatable/buttons.html5.min.js"></script>	 -->
 	<script type="text/javascript" src="/lib/js/datatable/colvis.min.js"></script>
-
+	<script type="text/javascript" src="/lib/js/datatable/col_reorder.js"></script>
 
 <!-- 	<script type="text/javascript" src="/lib/js/select2.js"></script> -->
 	<!-- <script src="/lib/js/jqueryvalidate.js"></script> -->

@@ -54,7 +54,7 @@ import MonthYearSelector from './MonthYearSelector.vue';
 
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
-
+import { useGlobalStore } from '../../store';
 export default {
   components: {
     MonthYearSelector,
@@ -75,6 +75,7 @@ export default {
   },
   data() {
     return {
+      globals:useGlobalStore(),
       defaultScheme: { index: '', id: '', name: '', appropriations: [] },
       selectedScheme: { index: '', id: '', name: '', appropriations: [] }
     };
@@ -92,11 +93,13 @@ export default {
   },
   methods: {
     monthSelected(data) {
+      this.globals.selected_fund_category = data.selected_month
       this.$emit('month-selected', data)
     },
     onSchemeChange() {
       setTimeout(() => {
         //console.log(this.selectedScheme);
+        this.globals.selected_scheme = this.selectedScheme;
         this.$emit('scheme-selected', this.selectedScheme);
       }, 500)
     },

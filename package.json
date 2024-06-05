@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "ckeditor4-vue": "^2.2.1",
+        "pinia": "^2.1.7",
         "primeicons": "^7.0.0",
         "primevue": "^3.51.0",
         "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"

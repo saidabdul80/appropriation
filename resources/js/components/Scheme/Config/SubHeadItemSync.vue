@@ -227,6 +227,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
+import { useGlobalStore } from '../../../store';
 export default {
     props:{
         permissions:{
@@ -251,6 +252,7 @@ export default {
 
     data() {
         return {
+            globals:useGlobalStore(),
             selected_appropriation: null,
             sub_head_budgets: [],
             sub_head_budget_items:[],
@@ -266,8 +268,8 @@ export default {
         }
     },
     async created() {
-        this.selected_scheme = { ...this.$parent.$parent.selected_scheme }
-        this.schemes = [...this.$parent.$parent.schemes];
+        this.selected_scheme = { ...this.globals.selected_scheme }
+        this.schemes = [...this.globals.schemes];
         await this.getAllSubhead();
         this.$emit('oncompleted', true);
     },
