@@ -33,7 +33,7 @@
     "isEntry": true
   },
   "resources/js/app.css": {
-    "file": "assets/app-26976e87.css",
+    "file": "assets/app-abaa858b.css",
     "src": "resources/js/app.css"
   },
   "resources/css/app.css": {
@@ -42,11 +42,11 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-e8c2f879.js",
+    "file": "assets/app-5bbe6306.js",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-26976e87.css"
+      "assets/app-abaa858b.css"
     ],
     "assets": [
       "assets/Inter-roman.var-17fe38ab.woff2",

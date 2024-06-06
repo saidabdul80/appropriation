@@ -32,7 +32,7 @@
                 <label for="name" class="form-label">Funding Year</label>
                 {{ monthSelected }}
                 <month-year-selector v-model="monthSelected" :fund_categories="fund_categories"
-                    @change="loadSubheadBudgets" />
+                    @change="loadAppropriations"  />
                 <!-- <Dropdown v-model="selected_scheme" :options="schemes" optionLabel="name" placeholder="Select a Department"
                 class="w-100 mb-3" /> -->
             </div>
@@ -44,11 +44,11 @@
                         class="w-100 " /> -->
 
                     <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
-                        :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
+                        :options="appropriations" placeholder="Select a Scheme" class="w-100 ">
                         <template #value="slotProps">
-                            <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
+                            <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.wallet.balance -getTotalAmountSubheadBudget) <0?'text-danger':''">
                                 <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                        (&#8358;{{ $globals.currency(slotProps.value?.main_balance -getTotalAmountSubheadBudget) }})</span> </div>
+                                        &#8358;{{ $globals.currency(slotProps.value?.wallet?.balance - getTotalAmountSubheadBudget) }})</span> </div>
                                 <div style="font-size: 10px;">Head with Current Balance</div>
                             </div>
                             <span v-else>
@@ -56,8 +56,8 @@
                             </span>
                         </template>
 
-                        <template #option="slotProps">
-                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.main_balance)}})
+                        <template #option="slotProps">                            
+                            <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.wallet.balance)}})
                             </div>
                         </template>
                     </Dropdown>
@@ -132,6 +132,7 @@ import Button from 'primevue/button';
 import MonthYearSelector from '../MonthYearSelector.vue';
 import BaseItemSelect from './BaseItemSelect.vue'
 import { useGlobalStore } from '../../../store';
+import { useMonthYearTrigger } from '../../../composable';
 export default {
     components: {
         Dropdown,
@@ -150,6 +151,7 @@ export default {
             globals:useGlobalStore(),
             selected_appropriation: null,
             sub_head_budgets: [],
+            appropriations:[],
             subheads: [],
             schemes: [],
             selected_scheme: null,
@@ -211,6 +213,10 @@ export default {
                 console.error("Failed to fetch subheads", error);
                 Swal.fire("Failed to fetch subheads");
             }
+        },
+       async loadAppropriations(selected_fund_category){
+            const res = await useMonthYearTrigger(selected_fund_category, this.selected_scheme.id);
+            this.appropriations = res?.appropriations
         },
         async loadSubheadBudgets() {
             try {

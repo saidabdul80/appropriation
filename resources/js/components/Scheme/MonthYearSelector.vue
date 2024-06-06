@@ -12,6 +12,7 @@
 </template>
 <script>  
 import Dropdown from 'primevue/dropdown';
+import { useMonthYearTrigger } from '../../composable';
     export default {
         components:{
             Dropdown
@@ -48,25 +49,8 @@ import Dropdown from 'primevue/dropdown';
              //1 means from the right source
             /* this.selected_fund_category  = e.target.value; */
             if(this.selected_scheme_id){
-                let res = await postData('/get_prepared_data', {
-                    scheme_id: this.selected_scheme_id,
-                    fund_category: this.selected_fund_category
-                }, true);
-                if (res?.status == 200) {                        
-                    this.appropriations_history = {
-                        data: []
-                    }
-                    this.$nextTick(() => {                        
-                        this.$emit('month-selected',{
-                            appropriations_history:res.data.appropriations_histories,
-                            appropriations:res.data.appropriations,
-                            selected_month: this.selected_fund_category
-                        })                 
-                    })
-                } else {
-                    showAlert('Something went wrong');
-                    return false;
-                }
+                const res = await useMonthYearTrigger(this.selected_fund_category, this.selected_scheme_id);
+                this.$emit('month-selected', res);          
             }else{
                 this.$emit('update:modelValue',this.selected_fund_category)
                 this.$emit('change',this.selected_fund_category)

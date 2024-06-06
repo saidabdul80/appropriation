@@ -32,18 +32,18 @@
                 <label for="name" class="form-label">Funding Year</label>
                 {{ monthSelected }}
                 <month-year-selector v-model="monthSelected" :fund_categories="fund_categories"
-                    @change="loadSubheadBudgets" />
+                @change="loadAppropriations" />
                 <!-- <Dropdown v-model="selected_scheme" :options="schemes" optionLabel="name" placeholder="Select a Department"
                 class="w-100 mb-3" /> -->
             </div>
             <div class="col-md-6">
                 <label for="name" class="form-label mb-0">Head Name</label>
                 <Dropdown @change="loadSubheadBudgets()" v-model="selected_appropriation"
-                    :options="selected_scheme.appropriations" placeholder="Select a Scheme" class="w-100 ">
+                    :options="appropriations" placeholder="Select a Scheme" class="w-100 ">
                     <template #value="slotProps">
                         <div v-if="slotProps.value?.name" class="flex align-items-center" :class="(slotProps.value?.main_balance) <0?'text-danger':''">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
-                                    (&#8358;{{ $globals.currency(slotProps.value?.main_balance) }})</span> </div>
+                                    (&#8358;{{ $globals.currency(slotProps.value?.wallet.balance) }})</span> </div>
                             <div style="font-size: 10px;">Head with Current Balance</div>
                         </div>
                         <span v-else>
@@ -52,7 +52,7 @@
                     </template>
 
                     <template #option="slotProps">
-                        <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.main_balance)}})
+                        <div>{{ slotProps?.option?.name }} ({{$globals.currency(slotProps.option?.wallet.balance)}})
                         </div>
                     </template>
                 </Dropdown>
@@ -228,6 +228,7 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
 import { useGlobalStore } from '../../../store';
+import { useMonthYearTrigger } from '../../../composable';
 export default {
     props:{
         permissions:{
@@ -254,6 +255,7 @@ export default {
         return {
             globals:useGlobalStore(),
             selected_appropriation: null,
+            appropriations:[],
             sub_head_budgets: [],
             sub_head_budget_items:[],
             subheads: [],
@@ -284,6 +286,10 @@ export default {
         }
     },
     methods: {
+        async loadAppropriations(selected_fund_category){
+            const res = await useMonthYearTrigger(selected_fund_category, this.selected_scheme.id);
+            this.appropriations = res?.appropriations
+        },
         onChangeItem(e,data ){
             data['item_name_id'] = e.id
             data['output'] = e.output;

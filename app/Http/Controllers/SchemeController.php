@@ -164,8 +164,7 @@ class SchemeController extends Controller
 
                 }
 
-            }
-            // Re-index array to avoid issues with array keys being unset
+            }           
         }
 
         $schemes = $schemes->toArray();
@@ -175,6 +174,8 @@ class SchemeController extends Controller
 
         return response()->json($schemes,200);
     }
+
+    
     public function addScheme(Request $request)
     {
         try{
