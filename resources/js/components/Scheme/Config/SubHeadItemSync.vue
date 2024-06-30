@@ -15,7 +15,7 @@
                         <div v-if="slotProps.value?.name" class="flex align-items-center">
                             <div style="font-size: 12px;font-weight: bolder;">{{ slotProps.value.name }} <span>
                                     (&#8358;{{ $globals.currency(slotProps.value?.wallet?.balance) }})</span> </div>
-                            <div style="font-size: 10px;">Programme (Current Programme fund )</div>
+                            <div style="font-size: 10px;">Programme (Unappropriated fund )</div>
                         </div>
                         <span v-else>
                             Select Programme

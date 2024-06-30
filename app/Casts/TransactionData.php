@@ -45,6 +45,10 @@ class TransactionData implements CastsAttributes
      */
     public function set($model, string $key, $value, array $attributes)
     {
-        return [$key => json_encode($value)];
+        $jsonValue = json_encode($value);
+
+        $jsonValue = str_replace("\ufeff", '', $jsonValue);
+        
+        return [$key => $jsonValue];
     }
 }

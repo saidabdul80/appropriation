@@ -132,10 +132,11 @@ div.DTCR_pointer {
 		}
 		var loaderHtml = ''
 
-		async function postData(route, data, type = false) {
+		async function postData(route, data, type = false, isFormData= false) {
 			$("#loaderHtml").show()
 			try{
-				return await axios.post(route, data).then(function(response) {
+				const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+				return await axios.post(route, data, config).then(function(response) {
 					//switchPage(1)
 					$("#loaderHtml").hide()
 					if (!type) { //if false

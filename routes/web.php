@@ -72,6 +72,7 @@ Route::group(["middleware"=>['web','auth']],function(){
     Route::post('/get_appropriations_projection', [AppropriationController::class, 'getAppropriationsProjection']);
     Route::post('/get_transactions', [TransactionsController::class, 'transactions']);
     Route::post('/save_appropriation_transaction', [TransactionsController::class, 'saveAppropriationTransaction']);
+    Route::post('/upload_appropriation_transaction', [TransactionsController::class, 'uploadAppropriationTransaction']);
     Route::post('/delete_appropriation_transaction', [TransactionsController::class, 'deleteAppropriationTransaction']);
     Route::post('/get_wallet_detail', [WalletController::class, 'getWalletsBalance']);
     Route::post('/fetch_expenditures', [TransactionsController::class, 'expenditureDetails']);

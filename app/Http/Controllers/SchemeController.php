@@ -554,6 +554,9 @@ class SchemeController extends Controller
             // Step 1: Fetch the appropriation history record
             $appropriationHistory = AppropriationHistory::findOrFail($appropriationHistoryId);
 
+            if($appropriationHistory->status == 'undo'){
+                throw new \Exception('Cannot Rollback this Appropriation');
+            }
             // Step 2: Revert wallet balances
             $scheme = Scheme::find($appropriationHistory->owner_id);
 
@@ -583,7 +586,8 @@ class SchemeController extends Controller
             $schemeWallet->balance -= $appropriationHistory->amount;
             $schemeWallet->safe_balance -= ($schemeWallet->balance - $appropriationHistory->amount); // Adjust safe balance
             $schemeWallet->save();
-            $appropriationHistory->delete();
+            $appropriationHistory->status = 'undo';
+            $appropriationHistory->save();
 
             // Commit the transaction
             DB::commit();

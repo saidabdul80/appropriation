@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Budget;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class TransactionsController extends Controller
@@ -394,6 +396,108 @@ class TransactionsController extends Controller
             }
         }
     }
+
+    public function uploadAppropriationTransaction(Request $request)
+    {
+        try {                    
+            $request->validate([
+                "owner_id" => "required",
+                "fund_category" => "required",
+                "subhead_item_id"=>"required",
+                'file' => 'required|mimes:csv,txt', 
+            ]);
+
+            // Check if the file is uploaded
+            if ($request->hasFile('file')) {
+                // Store the file temporarily                
+                Log::info("start");
+                $path = Storage::put('file.jpg', $request->file);
+                Log::info("start 1");
+                $fileContent = Storage::get($path);
+                Log::info("start");
+                // Convert the file content to an array of records
+                $data = $this->parseCsv($fileContent);             
+
+                $transactionData = $request->get("transaction");
+                $fundCategory = $request->get('fund_category');
+                $ownerId = $request->get('owner_id');
+    
+                DB::beginTransaction();
+                $scheme_id =  Appropriation::find($ownerId)?->scheme_id;
+                $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
+                $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();
+    
+                $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
+    
+                foreach($data["data"] as $record ){
+                    $transactionData =[
+                        "total_amount"=> $record["Amount"],
+                        "data"=>$record
+                    ];
+                    $response =  $this->createTransaction($transactionData, $appropriation, $mainWallet, $request);
+
+                }
+                DB::commit();
+                return response()->json('success');
+            }
+
+            throw new \Exception ('File upload failed');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json($e->getMessage(), 400);
+        }
+    }
+
+    private function parseCsv($content)
+    {
+
+        if (substr($content, 0, 3) === "\ufeff") {
+            $content = substr($content, 3);
+        }
+
+        $lines = explode(PHP_EOL, $content);
+        $header = null;
+        $data = [];
+        $sumAmount = 0;
+
+        foreach ($lines as $line) {
+            $row = str_getcsv($line);
+
+            // Skip empty rows
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            if (!$header) {
+                $header = $row;
+                if (substr($header[0], 0, 3) === "\ufeff") {
+                    $header[0] = substr($header[0], 3);
+                }
+            } else {
+                if (count($header) == count($row)) {
+                    // Combine the header and row into an associative array
+                    $combined = array_combine($header, $row);
+
+                    // Filter out entries with empty keys or values
+                    $combined = array_filter($combined, function($value, $key) {
+                        return $key !== "" && $value !== "";
+                    }, ARRAY_FILTER_USE_BOTH);
+
+                    // Ensure 'Amount' is properly handled
+                    if (isset($combined['Amount'])) {
+                        $combined['Amount'] = floatval($combined['Amount']);
+                        $sumAmount += $combined['Amount'];
+                    }
+
+                    $data[] = $combined;
+                }
+            }
+        }
+
+        return ["data" => $data, "total" => $sumAmount];
+    }
+
+
 
     private function updateTransaction($transactionData, $appropriation, $mainWallet, $request)
     {

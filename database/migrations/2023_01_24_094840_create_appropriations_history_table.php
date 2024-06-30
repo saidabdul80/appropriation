@@ -23,13 +23,14 @@ return new class extends Migration
             $table->string("description")->nullable();   
             $table->string('fund_category');    
             $table->string("fund_month_year")->nullable(); 
+            $table->string('status')->default(null)->nullable();
             $table->timestamps();
         });
-    }
+    }    
 
     /**
      * Reverse the migrations.
-     *
+     *        
      * @return void
      */
     public function down()
