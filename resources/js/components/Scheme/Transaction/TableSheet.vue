@@ -18,7 +18,8 @@
                 </div>
             </div>
             <!-- <Divider /> -->
-            <div style="overflow: scroll;height: 68%" :key="tableKey">
+             
+            <div style="overflow: scroll;" :style="{height:height}" :key="tableKey">
             <table v-if="filters.group !='vote_book'" class="fs-8 table-bordered transactions-tables table table-sm table-hover" id="myTable"
                 style="min-width:1000px;">
                 <thead>
@@ -213,6 +214,9 @@ export default {
         }
       ]},
     filters:{default: { date: null, group: null }},
+    height:{
+      default:"58%"
+    }
   },
   data() {
     return {

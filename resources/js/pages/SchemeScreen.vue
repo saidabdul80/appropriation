@@ -51,7 +51,7 @@
         <div class="position-relative">
           <div class="py-2">
             <div style="height: inherit;">
-              <div id="pagerContainer" style="height: 65vh">
+              <div id="pagerContainer" style="height: 72vh">
                 <div v-if="switchPage === 1" style="height: inherit;" class="driveInRight">
                   <index-screen
                     :permissions="permissions"

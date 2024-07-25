@@ -70,6 +70,7 @@
           <div id="tableContainerx" style="width:100%;height:100%; overflow: auto;">
             <TableSheet
                 ref="trxSheet"
+                height="100%"
                 :converCurrency="converCurrency"
                 :filters_date="filters_date"
                 :filters_grouping="filters_grouping"

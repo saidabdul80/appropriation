@@ -40,8 +40,8 @@
                 optionLabel="subhead_item" />
             </div>
           </div>
-          <div>
-            <div class="d-flex align-items-center">Do you want to upload Transactions? <input type="checkbox"
+          <div>            
+            <div class="d-flex align-items-center" style="font-size: 17px;font-weight: bold;">Do you want to upload Bulk Transaction? <input type="checkbox"
                 v-model="uploading" class="mx-2" /> </div>
             <div v-if="uploading">
               <button class="form-control mb-3 btn-sm btn btn-primary" @click="downloadCSV">Download CSV
