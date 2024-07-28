@@ -25,6 +25,175 @@ class TransactionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $format = [
+        "Subject"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Approval_Date"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "date",
+            "for"=> null
+        ],
+        "Bank_Name"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Participants"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Number_of_Days"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Frequency"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Unit_Cost"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> null
+        ],
+        "Section_of_Work_Plan"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "1.5.1",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "File_Name"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "File_Number"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Page_Number"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Beneficiary"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Account_Number"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "text",
+            "for"=> null
+        ],
+        "Amount"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],
+        "Payment_Date"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> "",
+            "type"=> "date",
+            "for"=> null
+        ],
+        "Trx_Charges"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 0,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],
+        "VAT_%"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 0,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],
+        "Withholding_Tax_%"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 0,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],    
+        "Stamp_Duty_%"=> [
+            "required"=> 0,
+            "show"=> 1,
+            "activate"=> 0,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],
+        "Total_Taxes"=> [
+            "required"=> 1,
+            "show"=> 1,
+            "activate"=> 1,
+            "value"=> 0,
+            "type"=> "number",
+            "for"=> "tax",
+            "amount"=> 0
+        ],
+        "Gross_Amount"=>0
+        ];
     public function expenditureDetails(Request $request)
     {
         try{
@@ -248,6 +417,7 @@ class TransactionsController extends Controller
         } catch (ValidationException $e) {
             return response($e->getMessage(), 400);
         } catch (\Exception $e) {
+            return $e;
             if (env('APP_DEBUG')) {
                 return response($e->getMessage(), 400);
             } else {
@@ -373,7 +543,7 @@ class TransactionsController extends Controller
             $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();
 
             $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
-
+            
             if ($transactionData['id']??'' != '') {
                 $response = $this->updateTransaction($transactionData, $appropriation, $mainWallet, $request);
                 DB::commit();
@@ -428,14 +598,37 @@ class TransactionsController extends Controller
     
                 $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
     
-                foreach($data["data"] as $record ){
-                    $transactionData =[
-                        "total_amount"=> $record["Amount"],
-                        "data"=>$record
-                    ];
-                    $response =  $this->createTransaction($transactionData, $appropriation, $mainWallet, $request);
-
+                foreach ($data["data"] as $record) {
+                    $recordD = [];
+                    foreach ($record as $key => $value) {
+                        // Check if the key exists in the format array
+                        if (isset($this->format[$key])) {
+                            // Copy the format array to avoid modifying the original
+                            $obj = $this->format[$key];
+                            if(isset($obj['value'])){
+                                $obj['value'] = $value;
+                            }else{
+                                $obj = $value;
+                            }
+                            $recordD[$key] = $obj;
+                        } else {
+                            // Handle cases where the key is not found in the format array
+                            $recordD[$key] = ['value' => $value];
+                        }
+                    }                
+                    // Ensure "Gross_Amount" exists in the record
+                    if (isset($recordD["Gross_Amount"])) {
+                        $transactionData = [
+                            "total_amount" => $recordD["Gross_Amount"],
+                            "data" => $recordD
+                        ];
+                        $response = $this->createTransaction($transactionData, $appropriation, $mainWallet, $request);
+                    } else {
+                        // Handle the case where "Gross_Amount" is missing
+                        throw new \Exception("Gross_Amount is missing from the record");
+                    }
                 }
+                
                 DB::commit();
                 return response()->json('success');
             }
@@ -504,16 +697,18 @@ class TransactionsController extends Controller
         $currentWalletBalance = $appropriation->wallet->balance + $oldTransaction->amount - $transactionData['total_amount'];
         $currentMainWalletBalance = $mainWallet->balance + $oldTransaction->amount - $transactionData['total_amount'];
 
-        if($appropriation->budget_location == 'head'){
-            if (($mainWallet->balance + $oldTransaction->amount) < $transactionData['total_amount']) {
-                throw new \Exception('Insufficient balance');
+        if($oldTransaction['total_amount'] != $transactionData['total_amount'] ){
+            if($appropriation->budget_location == 'head'){
+                if (($mainWallet->balance + $oldTransaction->amount) < $transactionData['total_amount']) {
+                    throw new \Exception('Insufficient balance');
+                }
+            }else{
+                BudgetService::validateTransaction(
+                    $transactionData['subhead_item_id'], //subhead_budget_id
+                    $oldTransaction->amount,
+                    $transactionData['total_amount']
+                );
             }
-        }else{
-            BudgetService::validateTransaction(
-                $transactionData['subhead_item_id'], //subhead_budget_id
-                $oldTransaction->amount,
-                $transactionData['total_amount']
-            );
         }
 
         $oldTransaction->amount = $transactionData['total_amount'];

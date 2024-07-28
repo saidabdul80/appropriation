@@ -140,9 +140,9 @@ div.DTCR_pointer {
 					//switchPage(1)
 					$("#loaderHtml").hide()
 					if (!type) { //if false
-						showAlert(response.data);						
+						showAlert(response.data);
 					} else {
-                        //console.log(response,111122)
+                        console.log(response,111122)
 						return response;
 					}
 				}).catch(function(error) {

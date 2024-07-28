@@ -77,6 +77,7 @@
             <hr class="mt-0">
             <div v-for="key in Object.keys(appropriation_log2.data || {})" :key="key"
               v-show="appropriation_log.data[key].activate === 1">
+              <div v-if="!key.includes('₦')">
               <div
                 v-if="key !== 'Amount' && key !== 'VAT_%' && key !== 'Withholding_Tax_%' && key !== 'Stamp_Duty_%' && key !== 'Gross_Amount' && key !== 'Total_Taxes'">
                 <div class="mb-3 position-relative">
@@ -90,6 +91,7 @@
                     class="form-control">
                 </div>
               </div>
+            </div>
               <div v-if="key === 'Amount'">
                 <div class="mb-3 ">
                   <label for="ApplogAmount" class="form-label">Actual Amount (<span class="fs-9 text-dark mb-1">{{

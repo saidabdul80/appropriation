@@ -303,7 +303,7 @@ export default {
           owner_type: 'appropriation',
           fund_category: this.fund_category,
           filters: this.filters
-        }, true);
+        }, true);        
         if (res.status == 200) {
           this.transactions = res.data
         } else {
