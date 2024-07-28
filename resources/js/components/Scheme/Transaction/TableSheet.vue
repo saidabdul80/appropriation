@@ -358,8 +358,8 @@ export default {
         this.selected_appropriation_income = res.data?.income
       }
     },
-    async deleteAppropriationTransaction(appr, i) {
-      const confirmText = appr.data?.Subject?.value + ' of ' + appr.amount;
+    async deleteAppropriationTransaction(appr, i) {      
+      const confirmText = 'Delete of ' + appr.amount;
       const { value: confirmationText } = await Swal.fire({
         title: 'Continue Delete?',
         html: 'Please type <strong class="fs-9 text-primary"><i>' + confirmText + '</i></strong> to confirm:',
@@ -382,16 +382,14 @@ export default {
 
       if (confirmationText === confirmText) {
         try {
-          let res = await postData('/delete_transaction', {
-            transaction_id: appr.id
-          });
+          let res = await postData('/delete_appropriation_transaction', {
+            transaction_id: appr.id,
+            owner_id: appr.owner_id,
+            fund_category:appr.fund_category
+          },true);
+          console.log(res.status == 200,32232323)
           if (res.status == 200) {
-            this.$toast.add({
-              severity: 'success',
-              summary: 'Success!',
-              detail: 'Transaction deleted successfully',
-              life: 5000
-            });
+            showAlert('Transaction deleted successfully')
             this.transactions.data.splice(i, 1);
             this.tableKey++;
             this.fetchWalletBalance()

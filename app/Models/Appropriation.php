@@ -99,19 +99,27 @@ class Appropriation extends Model
        return implode(',', Department::whereIn("id", $this->department_id??[])->get()->pluck('short_name')->toArray());
     }
 
-    public function scopeWithWallet($query,$fundCategory =null,$scheme_fund_category){
-        if ($scheme_fund_category == 'month') {
+    public function scopeWithWallet($query, $fundCategory = null, $schemeFundCategory = null)
+    {
+        if ($schemeFundCategory === 'month') {
             // For any scheme with fund category = month
             return $query->with(['wallet' => function ($query) {
                 $query->where('owner_type', 'App\\Models\\Appropriation');
             }]);
         }
-
-        return $query->with(['wallet' => function ($query) use ($fundCategory) {
-                $query->where(['fund_category' => $fundCategory, 'owner_type' => 'App\\Models\\Appropriation']);
+    
+        // Ensure $fundCategory is not null before applying the condition
+        if ($fundCategory !== null) {
+            return $query->with(['wallet' => function ($query) use ($fundCategory) {
+                $query->where('fund_category', $fundCategory)
+                      ->where('owner_type', self::class);
             }]);
+        }
+    
+        // If $fundCategory is null, just return the query without additional conditions
+        return $query->with(['wallet']);
     }
-
+    
     public function getNameAttribute()
     {
         return   AppropriationType::find($this->appropriation_type_id)?->name;

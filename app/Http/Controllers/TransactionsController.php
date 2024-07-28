@@ -319,10 +319,8 @@ class TransactionsController extends Controller
 
             DB::beginTransaction();
             $scheme_id =  Appropriation::find($ownerId)?->scheme_id;
-            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;
-
-            $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();
-
+            $scheme_fund_category = Scheme::find($scheme_id)?->fund_category;            
+            $appropriation = Appropriation::withWallet($fundCategory,$scheme_fund_category)->where('id', $ownerId)->first();            
             $mainWallet = MainWallet::where(['owner_id' => $appropriation->id, 'owner_type' => 'appropriation'])->first();
 
             $deletedTransaction = Transaction::find($transactionId);
@@ -335,8 +333,9 @@ class TransactionsController extends Controller
 
             return response("Transaction deleted successfully", 200);
         } catch (\Exception $e) {
+            
             DB::rollBack();
-
+            return  $e;
             if (env('APP_DEBUG')) {
                 return response($e->getMessage(), 400);
             } else {
