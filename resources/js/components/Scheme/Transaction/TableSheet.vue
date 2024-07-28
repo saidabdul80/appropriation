@@ -359,7 +359,7 @@ export default {
       }
     },
     async deleteAppropriationTransaction(appr, i) {
-      const confirmText = appr.data.Subject.value + ' of ' + appr.amount;
+      const confirmText = appr.data?.Subject?.value + ' of ' + appr.amount;
       const { value: confirmationText } = await Swal.fire({
         title: 'Continue Delete?',
         html: 'Please type <strong class="fs-9 text-primary"><i>' + confirmText + '</i></strong> to confirm:',
